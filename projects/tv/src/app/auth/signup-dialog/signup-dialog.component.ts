@@ -16,11 +16,121 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 
 @Component({
-  selector: 'async-signup',
-  providers: [AuthApiService],
-  imports: [RouterModule, MatIconModule, MatSlideToggleModule, MatButtonModule, CommonModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatProgressBarModule],
-  templateUrl: './signup-dialog.component.html',
-  styleUrls: ['./signup-dialog.component.scss']
+selector: 'async-signup',
+providers: [AuthApiService],
+imports: [RouterModule, MatIconModule, MatSlideToggleModule, MatButtonModule, CommonModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatProgressBarModule],
+template: `
+
+
+<form [formGroup]="form" (ngSubmit)="onSignUp(form.value)" class="signup">
+
+    <h1>Create account</h1>
+    <span>Use your email to sign up</span>
+
+    <mat-form-field appearance="outline">
+        <mat-label>Last name</mat-label>
+        <input matInput placeholder="Surname" formControlName="lastname">
+        <mat-error *ngIf="form.get('lastname')?.hasError('required')">
+            Your surname is required
+        </mat-error>
+        <mat-error *ngIf=" form.get('lastname')?.hasError('pattern')">
+            Enter a valid surname
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+        <mat-label>First name</mat-label>
+        <input matInput formControlName="firstname">
+        <mat-error *ngIf="form.get('firstname')?.hasError('required')">
+            Your first name is required
+        </mat-error>
+        <mat-error *ngIf="form.get('firstname')?.hasError('pattern')">
+            Enter a valid first name
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+        <mat-label>Email address</mat-label>
+        <input matInput type="email" formControlName="email">
+        <mat-error *ngIf=" form.get('email')?.hasError('email')">
+            Please enter a valid email address
+        </mat-error>
+        <mat-error *ngIf="form.get('email')?.hasError('required')">
+            Your email is required
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput [type]="signUp_hide ? 'password' : 'text'" formControlName="password">
+        <div mat-icon-button matSuffix (click)="signUp_hide = !signUp_hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="signUp_hide">
+            <mat-icon>{{signUp_hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </div>
+        <mat-error *ngIf=" form.get('password')?.hasError('pattern')">
+            Password should be minimum of 8 characters
+        </mat-error>
+        <mat-error *ngIf=" form.get('password')?.hasError('required')">
+            Your password is required
+        </mat-error>
+    </mat-form-field>
+
+    <mat-slide-toggle color="accent" class="tnc" formControlName="tnc">Have you seen our T&C?</mat-slide-toggle>
+
+    <button [disabled]="form.invalid || isSpinning" mat-flat-button color="accent">SIGN UP</button>
+
+    <mat-progress-bar color="accent" mode="indeterminate" *ngIf="isSpinning"></mat-progress-bar>
+
+</form>
+
+
+`,
+styles: [`
+
+a {
+	color: #333;
+	font-size: 14px;
+	text-decoration: none;
+	margin: 15px 0;
+}
+
+form {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	height: 100%;
+	text-align: center;
+  h1 {
+    font-size: 1.2em;
+  }
+  span {
+    font-size: 12px;
+    margin-bottom: 1em;
+  }
+	mat-form-field {
+		width: 80%;
+    
+		div {
+			cursor: pointer;
+			mat-icon {
+				font-size: 1rem;
+			}
+		}
+	}
+
+  .tnc {
+    font-size: 0.8em;
+    color: gray;
+  }
+
+  button {
+    margin: 1em 0;
+  }
+
+}
+
+
+`]
 })
 export class SignupDialogComponent implements OnInit, OnDestroy {
 

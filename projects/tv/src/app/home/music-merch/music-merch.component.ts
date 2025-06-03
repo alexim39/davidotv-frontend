@@ -5,12 +5,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
 selector: 'async-music-merch',
-imports: [CommonModule, MatToolbarModule, MatIconModule, MatCardModule, MatButtonModule, MatListModule, MatGridListModule, MatTabGroup, MatTabsModule, MatButtonModule],
+imports: [CommonModule, MatToolbarModule, MatIconModule, MatCardModule, MatButtonModule, MatListModule, MatGridListModule, MatTabsModule, MatButtonModule],
 template: `
     
     

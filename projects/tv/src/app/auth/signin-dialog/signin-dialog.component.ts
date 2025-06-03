@@ -15,7 +15,6 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
   selector: 'async-signin',
-  styleUrls: ['./signin-dialog.component.scss'],
   providers: [ AuthApiService ],
   imports: [RouterModule, MatIconModule, MatButtonModule, CommonModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatProgressBarModule],
   template: `
@@ -54,7 +53,72 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 
       <mat-progress-bar color="accent" mode="indeterminate" *ngIf="isSpinning"></mat-progress-bar>
     </form>
-  `
+  `,
+styles: [`
+
+
+span {
+	font-size: 12px;
+}
+
+a {
+	color: #333;
+	font-size: 14px;
+	text-decoration: none;
+	margin: 15px 0;
+}
+
+form {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	height: 100%;
+	text-align: center;
+  h1 {
+    font-size: 1.2em;
+  }
+	mat-form-field {
+		width: 80%;
+		margin-top: 1.5em;
+		div {
+			cursor: pointer;
+			mat-icon {
+				font-size: 1rem;
+			}
+		}
+	}
+	button {
+		margin-top: 1.5em;
+	}
+}
+
+.social-container {
+	margin: 20px 0;
+	a {
+		border: 1px solid #DDDDDD;
+		border-radius: 50%;
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		height: 40px;
+		width: 40px;
+	}
+	.github:hover {
+		background-color: #24292e;
+		color: white;
+	}
+	.twitter:hover {
+		background-color: #1DA1F2;
+		color: white;
+	}
+	.facebook:hover {
+		background-color: #4267B2;
+		color: white;
+	}
+}
+
+`]
 })
 export class SigninDialogComponent implements OnInit, OnDestroy {
 
