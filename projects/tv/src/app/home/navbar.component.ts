@@ -21,7 +21,7 @@ import { AuthComponent } from '../auth/auth.component';
       </span>
     </div>
 
-    <!-- Navigation Links -->
+    <!-- Desktop Navigation -->
     <div class="nav-links">
       <a mat-button routerLink="/">Home</a>
       <a mat-button routerLink="/videos">Videos</a>
@@ -31,46 +31,49 @@ import { AuthComponent } from '../auth/auth.component';
       <a mat-button routerLink="/upload">Upload</a>
     </div>
 
-    <!-- Actions -->
+    <!-- Desktop Actions -->
     <div class="actions">
       <button mat-stroked-button color="accent" (click)="auth()">Log In</button>
     </div>
 
     <!-- Mobile Hamburger -->
     <button mat-icon-button class="mobile-toggle" (click)="toggleMobileMenu()">
-      <mat-icon>menu</mat-icon>
+      <mat-icon>{{ mobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
     </button>
   </div>
-
-  <!-- Mobile menu -->
-  <div class="mobile-menu" [class.open]="mobileMenuOpen">
-    <a mat-button routerLink="/">Home</a>
-    <a mat-button routerLink="/videos">Videos</a>
-    <a mat-button routerLink="/fan-art">Fan Art</a>
-    <a mat-button routerLink="/music">Music</a>
-    <a mat-button routerLink="/store">Store</a>
-    <a mat-button routerLink="/upload">Upload</a>
-    <button mat-stroked-button color="accent" (click)="auth()">Log In</button>
-  </div>
 </mat-toolbar>
+
+<!-- Slide-in Mobile Menu -->
+<div class="mobile-menu-overlay" [class.show]="mobileMenuOpen" (click)="toggleMobileMenu()"></div>
+<nav class="mobile-slide-menu" [class.open]="mobileMenuOpen">
+  <a mat-button routerLink="/" (click)="toggleMobileMenu()">Home</a>
+  <a mat-button routerLink="/videos" (click)="toggleMobileMenu()">Videos</a>
+  <a mat-button routerLink="/fan-art" (click)="toggleMobileMenu()">Fan Art</a>
+  <a mat-button routerLink="/music" (click)="toggleMobileMenu()">Music</a>
+  <a mat-button routerLink="/store" (click)="toggleMobileMenu()">Store</a>
+  <a mat-button routerLink="/upload" (click)="toggleMobileMenu()">Upload</a>
+  <button mat-stroked-button color="accent" (click)="auth(); toggleMobileMenu()">Log In</button>
+</nav>
+
 `,
   styles: [`
+
+
 .navbar {
   background-color: #fff;
   color: #222;
-  padding: 0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.08);
 
   .navbar-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
     max-width: 1200px;
     margin: auto;
     padding: 0 16px;
     height: 64px;
     position: relative;
+    width: 100%;
   }
 
   .logo {
@@ -81,20 +84,17 @@ import { AuthComponent } from '../auth/auth.component';
 
   .logo-icon {
     font-size: 26px;
-    //color: #e53935; /* YouTube red */
-    color: #8f0045; /* YouTube red */
+    color: #8f0045;
     margin-bottom: 6px;
   }
 
   .brand-name {
     font-size: 20px;
     font-weight: 700;
-    letter-spacing: 0.5px;
     color: #000;
   }
 
   .tv-red {
-    //color: #e53935;
     color: #8f0045;
     font-weight: 700;
     font-style: italic;
@@ -115,24 +115,6 @@ import { AuthComponent } from '../auth/auth.component';
     display: none;
   }
 
-  .mobile-menu {
-    display: none;
-    flex-direction: column;
-    background-color: #f9f9f9;
-    padding: 16px;
-    border-top: 1px solid #e0e0e0;
-
-    a, button {
-      margin-bottom: 8px;
-      width: 100%;
-      text-align: left;
-    }
-
-    &.open {
-      display: flex;
-    }
-  }
-
   @media (max-width: 768px) {
     .nav-links,
     .actions {
@@ -144,6 +126,54 @@ import { AuthComponent } from '../auth/auth.component';
     }
   }
 }
+
+.mobile-slide-menu {
+  position: fixed;
+  top: 64px;
+  right: 0;
+  width: 80%;
+  max-width: 320px;
+  height: 100%;
+  background-color: #fff;
+  box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 1001;
+
+  a,
+  button {
+    margin-bottom: 16px;
+    width: 100%;
+    text-align: left;
+  }
+
+  &.open {
+    transform: translateX(0);
+  }
+}
+
+.mobile-menu-overlay {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 64px);
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease-in-out;
+  z-index: 1000;
+
+  &.show {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+
 `]
 })
 export class NavbarComponent {
