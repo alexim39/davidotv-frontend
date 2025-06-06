@@ -125,7 +125,6 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
     }
 
     .highlight {
-      //color: #e53935;
       color: #8f0045;
     }
 
@@ -250,6 +249,7 @@ export class BannerComponent {
       } else {
         this.progress = 0;
       }
+      this.cdr.detectChanges();
     }, 1000);
   }
 

@@ -1,146 +1,391 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
-selector: 'async-footer',
-imports: [CommonModule, MatDividerModule, MatToolbarModule, MatButtonModule, MatIconModule],
-template: `
-   
-   
-   <mat-divider></mat-divider> <mat-toolbar class="footer-toolbar">
-  <div class="footer-content">
-    <span class="copyright-text">
-      &copy; {{ currentYear }} DavidoTV | Made by Fans for Fans 
-    </span>
+  selector: 'async-footer',
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatIconModule,
+    MatInputModule,
+    MatFormFieldModule,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
+  template: `
+    <footer class="main-footer">
+      <div class="footer-content">
+        <!-- Company Info Section -->
+        <div class="footer-section company-info">
+          <div class="footer-logo">
+            <img src="./img/logo.PNG" alt="Davido Fans Hub" loading="lazy">
+            <p class="tagline">Built by fans for fans</p>
+          </div>
+          <p class="company-description">
+            DavidoTv is the fans premier destination for all things Davido. 
+            We provide exclusive content, news, and updates about the Afrobeat superstar.
+          </p>
+          <div class="contact-info">
+            <p><mat-icon>email</mat-icon> info&#64;davidotv.com</p>
+            <!-- <p><mat-icon>phone</mat-icon> +1 (234) 567-8900</p> -->
+          </div>
+        </div>
 
-    <span class="spacer"></span> <div class="social-icons">
-      <button mat-icon-button
-              *ngFor="let link of socialLinks"
-              (click)="openSocialLink(link.url)">
-        <mat-icon *ngIf="!link.icon.startsWith('assets/')">{{ link.icon }}</mat-icon>
-        <img *ngIf="link.icon.startsWith('assets/')" [src]="link.icon" [alt]="link.name" class="custom-social-icon">
-      </button>
-    </div>
-  </div>
-</mat-toolbar>
+        <!-- Quick Links Section -->
+        <div class="footer-section quick-links">
+          <h3 class="section-title">Quick Links</h3>
+          <nav>
+            <ul>
+              <li><a mat-button routerLink="/about">About Us</a></li>
+              <li><a mat-button routerLink="/news">Latest News</a></li>
+              <li><a mat-button routerLink="/events">Events</a></li>
+              <li><a mat-button routerLink="/gallery">Gallery</a></li>
+              <li><a mat-button routerLink="/contact">Contact</a></li>
+            </ul>
+          </nav>
+        </div>
 
-`,
-styles: [`
-    
-    
-    .footer-toolbar {
-  height: auto; // Allow toolbar to adjust height based on content
-  padding: 16px 20px; // Padding for top/bottom and left/right
-  background-color: #f5f5f5; // Light gray background for the footer
-  color: #555; // Default text color
-  display: flex;
-  align-items: center; // Vertically center content
-  justify-content: center; // Horizontally center the content container
+        <!-- Legal Links Section -->
+        <div class="footer-section legal-links">
+          <h3 class="section-title">Legal</h3>
+          <nav>
+            <ul>
+              <li><a mat-button routerLink="/privacy">Privacy Policy</a></li>
+              <li><a mat-button routerLink="/terms">Terms of Service</a></li>
+              <li><a mat-button routerLink="/cookies">Cookie Policy</a></li>
+              <li><a mat-button routerLink="/faq">FAQ</a></li>
+            </ul>
+          </nav>
+        </div>
 
-  .footer-content {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    max-width: 1200px; // Constrain width for better layout on large screens
-    margin: 0 auto; // Center the content within the toolbar
-    flex-wrap: wrap; // Allow content to wrap on smaller screens
-    justify-content: space-between; // Space out copyright and social icons
-  }
+        <!-- Newsletter Section -->
+        <div class="footer-section newsletter">
+          <h3 class="section-title">Stay Updated</h3>
+          <p class="newsletter-description">
+            Subscribe to our newsletter for exclusive updates, news, and offers.
+          </p>
+          <form [formGroup]="subscriptionForm" (ngSubmit)="onSubscribe()" class="subscription-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Your Email</mat-label>
+              <input matInput formControlName="email" type="email" required>
+              <mat-error *ngIf="subscriptionForm.get('email')?.hasError('required')">
+                Email is required
+              </mat-error>
+              <mat-error *ngIf="subscriptionForm.get('email')?.hasError('email')">
+                Please enter a valid email
+              </mat-error>
+            </mat-form-field>
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit"
+              [disabled]="subscriptionForm.invalid || isSubmitting"
+              aria-label="Subscribe to newsletter"
+            >
+              <span *ngIf="!isSubmitting">Subscribe</span>
+              <span *ngIf="isSubmitting">Subscribing...</span>
+            </button>
+          </form>
+          <div *ngIf="subscriptionSuccess" class="subscription-success">
+            <mat-icon>check_circle</mat-icon>
+            <span>Thank you for subscribing!</span>
+          </div>
+        </div>
+      </div>
 
-  .copyright-text {
-    font-size: 0.95em; // Slightly smaller font size
-    white-space: nowrap; // Prevent text from wrapping prematurely
-    margin-right: 20px; // Space between text and social icons when wrapped
-  }
+      <!-- Footer Bottom -->
+      <div class="footer-bottom">
+        <div class="social-links">
+          <a mat-icon-button href="https://www.facebook.com/davidoofficial2/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+            <mat-icon svgIcon="facebook"></mat-icon>
+          </a>
+          <a mat-icon-button href="https://x.com/davido" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+            <mat-icon svgIcon="twitter"></mat-icon>
+          </a>
+          <a mat-icon-button href="https://www.instagram.com/davido/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <mat-icon svgIcon="instagram"></mat-icon>
+          </a>
+          <a mat-icon-button href="https://www.youtube.com/channel/UCkBV3nBa0iRdxEGc4DUS3xA" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+            <mat-icon svgIcon="youtube"></mat-icon>
+          </a>
+          <a mat-icon-button href="https://music.apple.com/us/artist/davido/254654363" target="_blank" rel="noopener noreferrer" aria-label="Apple Music">
+            <mat-icon svgIcon="apple"></mat-icon>
+          </a>
+        </div>
+        <div class="copyright">
+          <p>&copy; {{currentYear}} DavidoTV. All rights reserved.</p>
+          <p class="credits">Built by fans for fans<mat-icon>favorite</mat-icon></p>
+        </div>
+      </div>
+    </footer>
+  `,
+  styles: [`
+    .main-footer {
+      background-color: #0a0a0a;
+      color: rgba(255, 255, 255, 0.9);
+      padding: 48px 0 0;
+      font-family: 'Roboto', sans-serif;
+      line-height: 1.6;
+    }
 
-  .spacer {
-    flex: 1 1 auto; // Pushes social icons to the right
-  }
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 40px;
+    }
 
-  .social-icons {
-    display: flex;
-    gap: 8px; // Space between social icons
+    .footer-section {
+      h3.section-title {
+        color: white;
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 20px;
+        position: relative;
+        padding-bottom: 8px;
 
-    .mat-mdc-icon-button {
-      // Ensure specific icon size if needed for better visual consistency
-      width: 40px;
-      height: 40px;
-      line-height: 40px;
-      font-size: 24px; // Size for Material Icons
-
-      mat-icon {
-        color: #757575; // Icon color
-        transition: color 0.2s ease-in-out; // Smooth color transition on hover
+        &::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          width: 40px;
+          height: 2px;
+          background: #ff5500;
+        }
       }
 
-      &:hover mat-icon {
-        color: #3f51b5; // Change color on hover (e.g., Material primary color)
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          margin-bottom: 8px;
+
+          a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            padding: 0;
+            font-size: 14px;
+
+            &:hover {
+              color: white;
+            }
+
+            mat-icon {
+              vertical-align: middle;
+              margin-right: 8px;
+              font-size: 16px;
+            }
+          }
+        }
       }
     }
 
-    .custom-social-icon {
-      width: 24px; // Standard size for custom SVG icons
-      height: 24px;
-      filter: grayscale(100%); // Make them black & white by default like in screenshot
-      transition: filter 0.2s ease-in-out;
+    .company-info {
+      .footer-logo {
+        margin-bottom: 16px;
 
-      &:hover {
-        filter: grayscale(0%); // Colorize on hover
+        img {
+          height: 40px;
+          margin-bottom: 8px;
+        }
+
+        .tagline {
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 10px;
+          margin: -1em 0 0;
+        }
+      }
+
+      .company-description {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+
+      .contact-info {
+        p {
+          display: flex;
+          align-items: center;
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 14px;
+          margin: 8px 0;
+
+          mat-icon {
+            margin-right: 8px;
+            font-size: 16px;
+            color: #ff5500;
+          }
+        }
       }
     }
-  }
-}
 
-// Responsive adjustments for smaller screens
-@media (max-width: 768px) {
-  .footer-toolbar .footer-content {
-    flex-direction: column; // Stack copyright and social icons vertically
-    align-items: center; // Center content when stacked
-    text-align: center;
-  }
+    .newsletter {
+      .newsletter-description {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
 
-  .copyright-text {
-    margin-bottom: 15px; // Add space between stacked elements
-    margin-right: 0; // Remove right margin when stacked
-  }
+      .subscription-form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
 
-  .social-icons {
-    justify-content: center; // Center social icons when stacked
-  }
-}
+        mat-form-field {
+          width: 100%;
 
-`]
+          ::ng-deep .mat-form-field-outline {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+          }
+
+          ::ng-deep .mat-form-field-label {
+            color: rgba(255, 255, 255, 0.7);
+          }
+
+          ::ng-deep .mat-input-element {
+            color: white;
+          }
+        }
+
+        button {
+          align-self: flex-start;
+          font-weight: 500;
+        }
+      }
+
+      .subscription-success {
+        display: flex;
+        align-items: center;
+        color: #4caf50;
+        margin-top: 12px;
+        font-size: 14px;
+
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+
+    .footer-bottom {
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 20px 24px;
+      text-align: center;
+
+      .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 16px;
+
+        a {
+          color: rgba(255, 255, 255, 0.7);
+          transition: color 0.3s ease;
+
+          &:hover {
+            color: white;
+            transform: translateY(-2px);
+          }
+
+          mat-icon {
+            font-size: 24px;
+          }
+        }
+      }
+
+      .copyright {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 12px;
+
+        p {
+          margin: 4px 0;
+        }
+
+        .credits {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-top: 8px;
+
+          mat-icon {
+            color: #ff5500;
+            font-size: 14px;
+            margin: 4px 0 0 2px;
+          }
+        }
+      }
+    }
+
+    @media (max-width: 768px) {
+      .footer-content {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding-bottom: 32px;
+      }
+
+      .footer-section {
+        margin-bottom: 0;
+      }
+
+      .subscription-form {
+        flex-direction: column;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
+
+    @media (max-width: 480px) {
+      .footer-content {
+        padding: 0 16px 24px;
+      }
+
+      .footer-bottom {
+        padding: 16px;
+      }
+    }
+  `]
 })
 export class FooterComponent {
-    currentYear: number = new Date().getFullYear();
+  currentYear: number = new Date().getFullYear();
+  subscriptionForm: FormGroup;
+  isSubmitting = false;
+  subscriptionSuccess = false;
 
-  socialLinks = [
-    { name: 'Instagram', icon: 'camera_alt', url: 'https://www.instagram.com/davidoofficial' },
-    { name: 'Twitter', icon: 'close', url: 'https://twitter.com/davido' }, // Using a custom icon name for clarity, you'd map this to actual icon/svg
-    { name: 'YouTube', icon: 'ondemand_video', url: 'https://www.youtube.com/user/davido' },
-    { name: 'TikTok', icon: 'music_note', url: 'https://www.tiktok.com/@davido' }, // Using a generic icon
-    { name: 'More Links', icon: 'menu', url: '#' } // Generic menu icon as seen in screenshot
-  ];
-
-  // Placeholder for social media icon handling - you'd likely use a custom SVG for exact brand logos
-  // For basic Material Icons, they can be directly used.
-  getSocialIcon(iconName: string): string {
-    switch (iconName) {
-      case 'logo_twitter': return '.img/twitter_icon.svg'; // Path to your Twitter SVG
-      case 'ondemand_video': return 'play_arrow'; // Material Icon for YouTube-like symbol
-      // ... handle other custom icons if needed, otherwise use Material Icons
-      default: return iconName; // Directly use material icon name
-    }
+  constructor(private fb: FormBuilder) {
+    this.subscriptionForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
   }
 
-  // Method to handle clicking on social links
-  openSocialLink(url: string): void {
-    if (url) {
-      window.open(url, '_blank');
+  onSubscribe() {
+    if (this.subscriptionForm.valid) {
+      this.isSubmitting = true;
+      
+      // Simulate API call
+      setTimeout(() => {
+        this.isSubmitting = false;
+        this.subscriptionSuccess = true;
+        this.subscriptionForm.reset();
+        
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+          this.subscriptionSuccess = false;
+        }, 5000);
+      }, 1500);
     }
   }
 }
