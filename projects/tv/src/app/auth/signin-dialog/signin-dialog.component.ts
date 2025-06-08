@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy  } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef  } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AuthComponent } from '../auth.component';
@@ -9,13 +9,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { AuthApiService } from '../auth.service';
+import { AuthService } from '../auth.service';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { HttpErrorResponse } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
   selector: 'async-signin',
-  providers: [ AuthApiService ],
+  providers: [ AuthService ],
   imports: [RouterModule, MatIconModule, MatButtonModule, CommonModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatProgressBarModule],
   template: `
     <form [formGroup]="form" (ngSubmit)="onSignIn(form.value)" class="signin">
@@ -51,7 +53,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 
       <a (click)="closeDialog()" [routerLink]="['/fp']">Forgot your password?</a>
 
-      <mat-progress-bar color="accent" mode="indeterminate" *ngIf="isSpinning"></mat-progress-bar>
+      <mat-progress-bar color="accent" mode="indeterminate" *ngIf="isSpinning"/>
     </form>
   `,
 styles: [`
@@ -128,11 +130,13 @@ export class SigninDialogComponent implements OnInit, OnDestroy {
   isSpinning: boolean = false;
   currentRouteCourseId = ''
 
+  private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef);
 
   constructor(
     private thisDialogRef: MatDialogRef<AuthComponent>,
     private router: Router,
-    private authAPI: AuthApiService,
+    private auth: AuthService,
   ) {}
 
 
@@ -163,45 +167,29 @@ export class SigninDialogComponent implements OnInit, OnDestroy {
     this.isSpinning = true;
 
     this.subscriptions.push(
-      this.authAPI.signIn(formObject).subscribe(res => {
+      this.auth.signIn(formObject).subscribe({
 
-        if (this.currentRouteCourseId.length === 24) {
-          // user viewing from course detail page
-          // may be user is already logged
-          
-          this.closeDialog();
-          this.isSpinning = false;
-          this.router.navigate([`/portal/courses/details/${this.currentRouteCourseId}`]);
-          
-        } else {
-          this.closeDialog();
-          this.isSpinning = false;
-          this.router.navigate(['/portal']);
-        }
+          next: (response) => {
+            if (response.success) {
+              localStorage.setItem('authToken', response.message); // Save token to localStorage
+              this.router.navigateByUrl('dashboard');
+            }
+          },
+          error: (error: HttpErrorResponse) => {
+            this.isSpinning = false;
 
-      }, error => {
-        this.isSpinning = false;
-        if (error.code == 404) {// user not found
-         /*  Swal.fire({
-            position: 'bottom',
-            icon: 'warning',
-            text: "Check your email or password",
-            showConfirmButton: false,
-            timer: 4000
-          }); */
-        }
-        if (error.code == 400) {// invalid credentail
-         /*  Swal.fire({
-            position: 'bottom',
-            icon: 'warning',
-            text: "Check your email or password",
-            showConfirmButton: false,
-            timer: 4000
-          }); */
-        }
+            let errorMessage = 'Server error occurred, please try again.'; // default error message.
+            if (error.error && error.error.message) {
+              errorMessage = error.error.message; // Use backend's error message if available.
+            }  
+            this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
+            this.cdr.markForCheck();
+          }
+
       })
     )
   }
+
 
 
   closeDialog(): void {
@@ -211,9 +199,7 @@ export class SigninDialogComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     // unsubscribe list
-    this.subscriptions.forEach(subscription => {
-      subscription.unsubscribe();
-    });
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }  
 
 }

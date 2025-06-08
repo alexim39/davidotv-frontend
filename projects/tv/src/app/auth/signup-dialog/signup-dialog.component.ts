@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthComponent } from '../auth.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -11,13 +11,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { AuthApiService } from '../auth.service';
+import { AuthService } from '../auth.service';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { HttpErrorResponse } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
 selector: 'async-signup',
-providers: [AuthApiService],
+providers: [AuthService],
 imports: [RouterModule, MatIconModule, MatSlideToggleModule, MatButtonModule, CommonModule, ReactiveFormsModule, FormsModule, MatFormFieldModule, MatInputModule, MatProgressBarModule],
 template: `
 
@@ -28,24 +30,24 @@ template: `
     <span>Use your email to sign up</span>
 
     <mat-form-field appearance="outline">
-        <mat-label>Last name</mat-label>
-        <input matInput placeholder="Surname" formControlName="lastname">
-        <mat-error *ngIf="form.get('lastname')?.hasError('required')">
+        <mat-label>First name</mat-label>
+        <input matInput formControlName="name">
+        <mat-error *ngIf="form.get('name')?.hasError('required')">
             Your surname is required
         </mat-error>
-        <mat-error *ngIf=" form.get('lastname')?.hasError('pattern')">
-            Enter a valid surname
+        <mat-error *ngIf=" form.get('name')?.hasError('pattern')">
+            Enter a valid name
         </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
         <mat-label>First name</mat-label>
-        <input matInput formControlName="firstname">
-        <mat-error *ngIf="form.get('firstname')?.hasError('required')">
+        <input matInput formControlName="surname">
+        <mat-error *ngIf="form.get('surname')?.hasError('required')">
             Your first name is required
         </mat-error>
-        <mat-error *ngIf="form.get('firstname')?.hasError('pattern')">
-            Enter a valid first name
+        <mat-error *ngIf="form.get('surname')?.hasError('pattern')">
+            Enter a valid surname
         </mat-error>
     </mat-form-field>
 
@@ -139,24 +141,26 @@ export class SignupDialogComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   isSpinning = false;
 
+  private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef);
 
   constructor(
     private thisDialogRef: MatDialogRef<AuthComponent>,
     private router: Router,
-    private authAPI: AuthApiService,
+    private auth: AuthService,
     public dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
     this.form = new FormGroup({
-      lastname: new FormControl('', {
+      surname: new FormControl('', {
         validators:
           [
             Validators.required,
             Validators.pattern('[A-Za-z]{2,80}')
           ], updateOn: 'change'
       }),
-      firstname: new FormControl('', {
+      name: new FormControl('', {
         validators:
           [
             Validators.required,
@@ -191,31 +195,22 @@ export class SignupDialogComponent implements OnInit, OnDestroy {
     this.isSpinning = true;
 
     this.subscriptions.push(
-      this.authAPI.signUp(formObject).subscribe( res => {
-        // redirect to login page
-        //this.router.navigate(['/login'])
-        this.thisDialogRef.close()
-       /*  Swal.fire({
-          position: 'bottom',
-          icon: 'success',
-          text: 'Your account has been created',
-          showConfirmButton: true,
-          confirmButtonText: 'Login now',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // show login
-            this.openAuthComponent();
-          } 
-        }) */
-      }, error => {
-        this.isSpinning = false;
-       /*  Swal.fire({
-          position: 'bottom',
-          icon: 'info',
-          text: 'Server error occured, please try again',
-          showConfirmButton: false,
-          timer: 4000
-        }); */
+      this.auth.signUp(formObject).subscribe({
+        next: () => {
+          this.thisDialogRef.close()
+          // notify of success
+          // show the sign in panel
+        }, 
+        error: (error: HttpErrorResponse) => {
+          this.isSpinning = false;
+
+          let errorMessage = 'Server error occurred, please try again.'; // default error message.
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message; // Use backend's error message if available.
+          }  
+          this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
+          this.cdr.markForCheck();
+        }
       })
     )
   }
@@ -226,9 +221,7 @@ export class SignupDialogComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     // unsubscribe list
-    this.subscriptions.forEach(subscription => {
-      subscription.unsubscribe();
-    });
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
 }

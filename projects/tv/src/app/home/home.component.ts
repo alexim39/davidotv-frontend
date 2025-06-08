@@ -3,47 +3,124 @@ import { Component } from '@angular/core';
 import { TrendingComponent } from './trending.component';
 import { MerchandiseComponent } from './merchandise.component';
 import { CommunityComponent } from './community.component';
+import { VideoItem } from '../videos/videos.service';
+import { BannerComponent } from './banner.component';
+import { NotificationBannerComponent } from './notification-banner.component';
 
 @Component({
   selector: 'async-home',
   imports: [
    TrendingComponent,
     MerchandiseComponent,
-    CommunityComponent
+    CommunityComponent,
+    BannerComponent,
+    NotificationBannerComponent
+
   ],
   template: `
-
-
-<async-trending [videos]="trendingVideos"/>
-          
-<async-merchandise [featuredMerch]="featuredMerch"/>
-          
-<async-community [fanPosts]="fanPosts"/>
-          
-          
+  <!-- top banner notification -->
+  <async-notification-banner/>
+  <async-banner/>
+  <async-trending [videos]="trendingVideos"/>
+  <async-merchandise [featuredMerch]="featuredMerch"/>
+  <async-community [fanPosts]="fanPosts"/>
+        
   `,
-  styles: [`
-
-  `]
+  styles: [``]
 })
 export class HomeComponent {
 
-    trendingVideos = [
+    trendingVideos: VideoItem[] = [
     {
-      thumbnail: './img/davido-banner.png',
+      id: 'NnWe5Lhi0G8',
+      title: 'Davido - Feel',
+      thumbnail: 'https://img.youtube.com/vi/NnWe5Lhi0G8/hqdefault.jpg',
+      channel: 'Davido Official',
+      channelIcon: 'https://example.com/channel-icon.jpg',
+      views: '1.2M views',
+      date: '2 days ago'
+    },
+
+    {
+      thumbnail: 'https://img.youtube.com/vi/anPYTDj0Lrc/hqdefault.jpg',
       title: 'Davido - Jowo (Official Video)',
       channel: 'Davido Official',
       channelIcon: './img/davido-banner.png',
       views: '5.2M views',
-      date: '2 weeks ago'
+      date: '2 weeks ago',
+      id: 'anPYTDj0Lrc'
     },
     {
-      thumbnail: './img/davido-banner.png',
+      thumbnail: 'https://img.youtube.com/vi/l6QMJniQWxQ/hqdefault.jpg',
       title: 'Davido Performs Live at Wireless Festival',
       channel: 'Festival Highlights',
       channelIcon: './img/davido-banner.png',
       views: '1.8M views',
-      date: '3 weeks ago'
+      date: '3 weeks ago',
+      id: 'l6QMJniQWxQ'
+    },
+    {
+      thumbnail: 'https://img.youtube.com/vi/7adDm9YACpE/hqdefault.jpg',
+      title: 'Davido Performs Live at Wireless Festival',
+      channel: 'Festival Highlights',
+      channelIcon: './img/davido-banner.png',
+      views: '1.8M views',
+      date: '3 weeks ago',
+      id: '7adDm9YACpE'
+    },
+    {
+      thumbnail: 'https://img.youtube.com/vi/helEv0kGHd4/hqdefault.jpg',
+      title: 'Davido Performs Live at Wireless Festival',
+      channel: 'Festival Highlights',
+      channelIcon: './img/davido-banner.png',
+      views: '1.8M views',
+      date: '3 weeks ago',
+      id: 'helEv0kGHd4'
+    },
+    {
+      thumbnail: 'https://img.youtube.com/vi/3Iyuym-Gci0/hqdefault.jpg',
+      title: 'Davido Performs Live at Wireless Festival',
+      channel: 'Festival Highlights',
+      channelIcon: './img/davido-banner.png',
+      views: '1.8M views',
+      date: '3 weeks ago',
+      id: '3Iyuym-Gci0'
+    },
+    {
+      thumbnail: 'https://img.youtube.com/vi/1x5tIv6GC1o/hqdefault.jpg',
+      title: 'Davido Performs Live at Wireless Festival',
+      channel: 'Festival Highlights',
+      channelIcon: './img/davido-banner.png',
+      views: '1.8M views',
+      date: '3 weeks ago',
+      id: '1x5tIv6GC1o'
+    },
+    {
+      thumbnail: 'https://img.youtube.com/vi/fpAopipfdAs/hqdefault.jpg',
+      title: 'Davido Performs Live at Wireless Festival',
+      channel: 'Festival Highlights',
+      channelIcon: './img/davido-banner.png',
+      views: '1.8M views',
+      date: '3 weeks ago',
+      id: 'fpAopipfdAs'
+    },
+    {
+      thumbnail: 'https://img.youtube.com/vi/SbgKpHi-Cao/hqdefault.jpg',
+      title: 'Davido Performs Live at Wireless Festival',
+      channel: 'Festival Highlights',
+      channelIcon: './img/davido-banner.png',
+      views: '1.8M views',
+      date: '3 weeks ago',
+      id: 'SbgKpHi-Cao'
+    },
+    {
+      thumbnail: 'https://img.youtube.com/vi/8ORvJcpe2Oc/hqdefault.jpg',
+      title: 'Davido Performs Live at Wireless Festival',
+      channel: 'Festival Highlights',
+      channelIcon: './img/davido-banner.png',
+      views: '1.8M views',
+      date: '3 weeks ago',
+      id: '8ORvJcpe2Oc'
     },
   ];
 

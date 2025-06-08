@@ -11,26 +11,30 @@ import { AuthComponent } from '../auth/auth.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatDividerModule } from '@angular/material/divider';
+import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'async-navbar',
-  imports: [
-    CommonModule,
-    MatToolbarModule, 
-    MatButtonModule, 
-    MatIconModule, 
-    MatFormFieldModule, 
-    MatInputModule,
-    MatMenuModule,
-    MatBadgeModule,
-    FormsModule,
-    MatDividerModule
-  ],
-  template: `
+selector: 'async-navbar',
+imports: [
+  CommonModule,
+  MatToolbarModule, 
+  MatButtonModule, 
+  MatIconModule, 
+  MatFormFieldModule, 
+  MatInputModule,
+  MatMenuModule,
+  MatBadgeModule,
+  FormsModule,
+  MatDividerModule,
+  RouterModule
+],
+template: `
+  
+
 <mat-toolbar class="navbar" color="primary">
   <div class="navbar-container">
     <!-- Logo -->
-    <div class="logo">
+    <div class="logo" mat-button routerLink="/">
       <mat-icon class="logo-icon">live_tv</mat-icon>
       <span class="brand-name">
         Davido<span class="tv-red">TV</span>
@@ -145,6 +149,8 @@ import { MatDividerModule } from '@angular/material/divider';
   <button *ngIf="!isAuthenticated" mat-stroked-button color="accent" (click)="auth(); toggleMobileMenu()">Log In</button>
   <button *ngIf="isAuthenticated" mat-stroked-button color="warn" (click)="logout(); toggleMobileMenu()">Log Out</button>
 </nav>
+
+
 `,
   styles: [`
 .navbar {
@@ -175,6 +181,7 @@ import { MatDividerModule } from '@angular/material/divider';
     align-items: center;
     gap: 6px;
     min-width: 140px;
+    cursor: pointer;
   }
 
   .logo-icon {
@@ -429,7 +436,7 @@ import { MatDividerModule } from '@angular/material/divider';
 export class NavbarComponent {
   mobileMenuOpen = false;
   searchQuery = '';
-  isAuthenticated = true; // This should come from your auth service
+  isAuthenticated = false; // This should come from your auth service
   notificationsCount = 3; // Example notification count
   imageSource: string = ''; // User avatar image source
 

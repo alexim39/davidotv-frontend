@@ -7,7 +7,6 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { NavbarComponent } from './navbar.component';
-import { BannerComponent } from './banner.component';
 import { FooterComponent } from './footer.component';
 import { RouterModule } from '@angular/router';
 
@@ -20,10 +19,8 @@ import { RouterModule } from '@angular/router';
     MatSidenavModule,
     MatListModule,
     NavbarComponent,
-    BannerComponent,
     FooterComponent,
-    RouterModule,
-    
+    RouterModule,    
   ],
   template: `
     <async-navbar (menuToggle)="toggleSidenav()"/>
@@ -72,14 +69,15 @@ import { RouterModule } from '@angular/router';
             </a>
             <a mat-list-item routerLink="/store" routerLinkActive="active" (click)="closeSidenavOnMobile()">
               <mat-icon>storefront</mat-icon>
-              <span>Official Store</span>
+              <span>Store</span>
             </a>
           </mat-nav-list>
         </mat-sidenav>
         
         <mat-sidenav-content class="content">
-          <async-banner/>
+          
           <router-outlet/>
+          
           <async-footer/>
         </mat-sidenav-content>
       </mat-sidenav-container>

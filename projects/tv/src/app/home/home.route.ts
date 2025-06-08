@@ -1,9 +1,8 @@
 import { Routes } from "@angular/router";
 import { HomeContainerComponent } from "./home-container.component";
 import { HomeComponent } from "./home.component";
-/* import { IndexComponent } from "./index.component";
-import { IndexBodyComponent } from "./index-body.component";
-import { SigninComponent } from "../auth/signin/signin.component"; */
+import { VideoPlayerComponent } from "../videos/video-player/video-player.component";
+
 
 export const HomeRoutes: Routes = [
     {
@@ -20,13 +19,17 @@ export const HomeRoutes: Routes = [
                         redirectTo: 'signin',
                         pathMatch: 'full'
                     }, */
-                    /* {
-                        path: 'signin',
-                        component: SigninComponent,
-                        title: "MarketSpase Platform Page - Auth verification",
-                    } */
+                  /*  { path: 'watch/:id', 
+                    component: VideoPlayerComponent, 
+                    title: 'Watch Video'
+                   }, */
                 //]
-            },           
+            }, 
+            { 
+                path: 'watch/:id', 
+                component: VideoPlayerComponent, 
+                title: 'Watch Video - DavidoTV',
+            },          
         ]
     }
 ];

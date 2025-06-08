@@ -3,10 +3,11 @@ import { Component, Input } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
+import { VideoItem } from "../videos/videos.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'async-trending',
-  standalone: true,
   imports: [CommonModule, MatCardModule, MatIconModule, MatButtonModule],
   template: `
     <section class="trending-section">
@@ -17,7 +18,7 @@ import { MatIconModule } from "@angular/material/icon";
       </div>
       
       <div class="video-grid">
-        <mat-card *ngFor="let video of videos" class="video-card">
+        <mat-card *ngFor="let video of videos" class="video-card" (click)="goToVideo(video.id)">
           <img mat-card-image [src]="video.thumbnail" [alt]="video.title" loading="lazy">
           <mat-card-content>
             <div class="video-info">
@@ -153,5 +154,12 @@ import { MatIconModule } from "@angular/material/icon";
   `]
 })
 export class TrendingComponent {
-  @Input() videos: any[] = [];
+  @Input() videos: VideoItem[] = [];
+
+  constructor(private router: Router) {}
+
+
+  goToVideo(videoId: string) {
+    this.router.navigate(['/watch', videoId]);
+  }
 }
