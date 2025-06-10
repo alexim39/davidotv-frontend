@@ -26,7 +26,7 @@ import { MatSliderModule } from '@angular/material/slider';
       <header class="app-header">
         <div class="header-content">
           <div class="logo-container">
-            <img src="./img/logo.PNG" alt="DavidoTv Logo" class="logo">
+            <img src="./img/logo2.PNG" alt="DavidoTv Logo" class="logo">
             <h1>DavidoTv</h1>
           </div>
           <div class="header-actions">
@@ -76,6 +76,7 @@ import { MatSliderModule } from '@angular/material/slider';
                   step="1"
                   aria-label="Video progress"
                 >
+                <input matSliderThumb [(ngModel)]="currentTime">
                 </mat-slider>
               </div>
               <div class="controls-container">
@@ -970,15 +971,20 @@ export class VideoPlayerComponent implements OnInit {
     window.addEventListener('message', this.handleYouTubeMessages.bind(this));
   }
 
+
   setupPlayerStatePolling() {
     // Poll player state since we can't reliably get all events from YouTube iframe
     setInterval(() => {
       if (this.playerReady) {
         this.getCurrentTime();
-        this.getDuration();
+        // Only get duration if we don't have it yet
+        if (!this.duration) {
+          this.getDuration();
+        }
       }
     }, 1000);
   }
+
 
   handleYouTubeMessages(event: MessageEvent) {
     if (event.origin !== 'https://www.youtube.com') return;
@@ -991,6 +997,8 @@ export class VideoPlayerComponent implements OnInit {
           this.playerReady = true;
           this.player = data.target;
           if (this.autoplay) this.playVideo();
+          // Get initial duration
+          this.getDuration();
           break;
           
         case 'onStateChange':
@@ -1002,22 +1010,40 @@ export class VideoPlayerComponent implements OnInit {
     }
   }
 
+
   handleStateChange(state: number) {
-    // 0 = ended, 1 = playing, 2 = paused
-    this.isPlaying = state === 1;
+    // YouTube player states:
+    // -1 (unstarted)
+    // 0 (ended)
+    // 1 (playing)
+    // 2 (paused)
+    // 3 (buffering)
+    // 5 (video cued)
+    
+    if (state === 1) {
+      this.isPlaying = true;
+      this.showOverlay = false;
+    } else if (state === 2 || state === 0) {
+      this.isPlaying = false;
+    }
     
     if (state === 0) { // Video ended
       this.handleVideoEnded();
     }
+    
+    this.resetControlsTimer();
   }
 
   loadVideo(videoId: string) {
     const isDavidoVideo = this.davidoVideos.some(v => v.id === videoId);
-    const url = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=0&disablekb=1&fs=1&iv_load_policy=3`;
+    const url = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=0&disablekb=1&fs=1&iv_load_policy=3&origin=${window.location.origin}`;
     this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
     this.showOverlay = true;
     this.isPlaying = false;
     this.updateVideoInfo(videoId);
+    
+    // Reset player ready state when loading new video
+    this.playerReady = false;
   }
 
   updateVideoInfo(videoId: string) {
@@ -1077,22 +1103,31 @@ export class VideoPlayerComponent implements OnInit {
   }
 
   seekVideo(event: any) {
-    const time = event.value;
+    const time = event.value || event;
     this.currentTime = time;
     
     if (this.playerReady) {
       this.player.seekTo(time, true);
+      if (!this.isPlaying) {
+        this.player.playVideo();
+        this.isPlaying = true;
+      }
     } else {
       const iframe = this.videoFrame.nativeElement;
       iframe.contentWindow?.postMessage(
         `{"event":"command","func":"seekTo","args":[${time},true]}`,
         '*'
       );
+      if (!this.isPlaying) {
+        iframe.contentWindow?.postMessage(
+          '{"event":"command","func":"playVideo","args":""}',
+          '*'
+        );
+        this.isPlaying = true;
+      }
     }
     
-    if (this.isPlaying) {
-      this.resetControlsTimer();
-    }
+    this.resetControlsTimer();
   }
 
 
@@ -1167,15 +1202,18 @@ export class VideoPlayerComponent implements OnInit {
   }
 
   handleVideoEnded() {
-    if (this.repeatMode === 'one') {
-      this.seekVideo({ value: 0 });
-      this.playVideo();
-    } else if (this.repeatMode === 'all') {
-      this.playNextVideo();
-    } else {
-      this.isPlaying = false;
-      this.showOverlay = true;
-      this.showControls = true;
+    switch (this.repeatMode) {
+      case 'one':
+        this.seekVideo({ value: 0 });
+        this.playVideo();
+        break;
+      case 'all':
+        this.playNextVideo();
+        break;
+      default:
+        this.isPlaying = false;
+        this.showOverlay = true;
+        this.showControls = true;
     }
   }
 

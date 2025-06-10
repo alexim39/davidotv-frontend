@@ -29,7 +29,13 @@ export const HomeRoutes: Routes = [
                 path: 'watch/:id', 
                 component: VideoPlayerComponent, 
                 title: 'Watch Video - DavidoTV',
-            },          
+            },    
+            {   path: 'videos', 
+                loadChildren: () => import('../videos/videos.route').then(r => r.VideosRoutes) 
+            },      
+            {   path: 'audio', 
+                loadChildren: () => import('../audio/audio.route').then(r => r.AudioRoutes) 
+            },      
         ]
     }
 ];

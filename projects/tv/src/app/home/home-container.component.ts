@@ -36,38 +36,46 @@ import { RouterModule } from '@angular/router';
           (keydown.escape)="sidenavOpen = false">
           
           <mat-nav-list>
-            <a mat-list-item routerLink="/" routerLinkActive="active" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>home</mat-icon>
               <span>Home</span>
             </a>
-            <a mat-list-item routerLink="/trending" routerLinkActive="active" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/videos/trending" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
               <mat-icon>local_fire_department</mat-icon>
               <span>Trending</span>
             </a>
-            <a mat-list-item routerLink="/subscriptions" routerLinkActive="active" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/audio/player" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
+              <mat-icon>play_circle</mat-icon>
+              <span>Music</span>
+            </a>
+            <a mat-list-item routerLink="/videos" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
+              <mat-icon>music_video</mat-icon>
+              <span>Videos</span>
+            </a>
+           <!--  <a mat-list-item routerLink="/subscriptions" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
               <mat-icon>subscriptions</mat-icon>
               <span>Subscriptions</span>
-            </a>
+            </a> -->
             <mat-divider></mat-divider>
-            <a mat-list-item routerLink="/library" routerLinkActive="active" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/library" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>video_library</mat-icon>
               <span>Library</span>
             </a>
-            <a mat-list-item routerLink="/history" routerLinkActive="active" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/history" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>history</mat-icon>
               <span>History</span>
             </a>
             <mat-divider></mat-divider>
             <h3 matSubheader>FAN COMMUNITY</h3>
-            <a mat-list-item routerLink="/groups" routerLinkActive="active" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/groups" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>groups</mat-icon>
               <span>Fan Groups</span>
             </a>
-            <a mat-list-item routerLink="/events" routerLinkActive="active" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/events" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>event</mat-icon>
               <span>Events</span>
             </a>
-            <a mat-list-item routerLink="/store" routerLinkActive="active" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>storefront</mat-icon>
               <span>Store</span>
             </a>

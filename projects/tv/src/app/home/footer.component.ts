@@ -24,7 +24,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
         <!-- Company Info Section -->
         <div class="footer-section company-info">
           <div class="footer-logo">
-            <img src="./img/logo.PNG" alt="Davido Fans Hub" loading="lazy">
+            <img src="./img/logo2.PNG" alt="Davido Fans Hub" loading="lazy">
             <p class="tagline">Built by fans for fans</p>
           </div>
           <p class="company-description">
@@ -103,19 +103,19 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
       <div class="footer-bottom">
         <div class="social-links">
           <a mat-icon-button href="https://www.facebook.com/davidoofficial2/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-            <mat-icon svgIcon="facebook"></mat-icon>
+            <i class="fa fa-facebook-square" aria-hidden="true"></i>
           </a>
           <a mat-icon-button href="https://x.com/davido" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-            <mat-icon svgIcon="twitter"></mat-icon>
+            <i class="fa fa-twitter" aria-hidden="true"></i>
           </a>
           <a mat-icon-button href="https://www.instagram.com/davido/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-            <mat-icon svgIcon="instagram"></mat-icon>
+            <i class="fa fa-instagram" aria-hidden="true"></i>
           </a>
           <a mat-icon-button href="https://www.youtube.com/channel/UCkBV3nBa0iRdxEGc4DUS3xA" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-            <mat-icon svgIcon="youtube"></mat-icon>
+            <i class="fa fa-youtube-square" aria-hidden="true"></i>
           </a>
           <a mat-icon-button href="https://music.apple.com/us/artist/davido/254654363" target="_blank" rel="noopener noreferrer" aria-label="Apple Music">
-            <mat-icon svgIcon="apple"></mat-icon>
+            <i class="fa fa-apple" aria-hidden="true"></i>
           </a>
         </div>
         <div class="copyright">
@@ -159,7 +159,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
           bottom: 0;
           width: 40px;
           height: 2px;
-          background: #ff5500;
+          //background: #ff5500;
+          background: #8f0045;
         }
       }
 
@@ -201,10 +202,15 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
           margin-bottom: 8px;
         }
 
+
         .tagline {
-          color: rgba(255, 255, 255, 0.7);
-          font-size: 10px;
+          color: #ccc;
+          font-size: 8.5px;
           margin: -1em 0 0;
+          border: 1px solid #ccc;
+          padding: 0.2rem 0.5rem;
+          width: fit-content;
+          border-radius: 10px;
         }
       }
 
@@ -225,7 +231,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
           mat-icon {
             margin-right: 8px;
             font-size: 16px;
-            color: #ff5500;
+            //color: #ff5500;
+            color: #8f0045;
           }
         }
       }
@@ -320,7 +327,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
           margin-top: 8px;
 
           mat-icon {
-            color: #ff5500;
+            //color: #ff5500;
+            color: #8f0045;
             font-size: 14px;
             margin: 4px 0 0 2px;
           }

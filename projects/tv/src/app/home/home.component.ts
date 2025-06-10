@@ -21,7 +21,7 @@ import { NotificationBannerComponent } from './notification-banner.component';
   <!-- top banner notification -->
   <async-notification-banner/>
   <async-banner/>
-  <async-trending [videos]="trendingVideos"/>
+  <async-trending/>
   <async-merchandise [featuredMerch]="featuredMerch"/>
   <async-community [fanPosts]="fanPosts"/>
         
@@ -30,7 +30,7 @@ import { NotificationBannerComponent } from './notification-banner.component';
 })
 export class HomeComponent {
 
-    trendingVideos: VideoItem[] = [
+   /*  trendingVideos: VideoItem[] = [
     {
       id: 'NnWe5Lhi0G8',
       title: 'Davido - Feel',
@@ -122,7 +122,7 @@ export class HomeComponent {
       date: '3 weeks ago',
       id: '8ORvJcpe2Oc'
     },
-  ];
+  ]; */
 
   featuredMerch = [
     {

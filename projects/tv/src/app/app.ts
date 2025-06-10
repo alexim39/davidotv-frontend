@@ -1,9 +1,25 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-
+import { RouterModule } from '@angular/router';
 @Component({
 selector: 'async-root',
-imports: [RouterOutlet],
-template: `<router-outlet />`
+imports: [RouterModule],
+template: `
+    <div class="container">
+        <router-outlet />
+    </div>
+`,
+styles: `
+.container {
+  animation: fadeInAnimation ease 3s;
+}
+@keyframes fadeInAnimation {
+  0% {
+      opacity: 0;
+  }
+  100% {
+      opacity: 1;
+  }
+}
+`
 })
 export class App {}

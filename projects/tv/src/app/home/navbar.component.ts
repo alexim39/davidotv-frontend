@@ -58,12 +58,12 @@ template: `
 
     <!-- Desktop Navigation -->
     <div class="nav-links">
-      <a mat-button routerLink="/">Home</a>
-      <a mat-button routerLink="/videos">Videos</a>
-      <a mat-button routerLink="/fan-art">Fan Art</a>
-      <a mat-button routerLink="/music">Music</a>
-      <a mat-button routerLink="/store">Store</a>
-      <a mat-button routerLink="/upload">Upload</a>
+      <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      <a mat-button routerLink="/videos" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Videos</a>
+      <a mat-button routerLink="/audio/player" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Music</a>
+      <a mat-button routerLink="/fan-art" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Fan Groups</a>
+      <a mat-button routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Store</a>
+      <a mat-button routerLink="/upload" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Upload</a>
     </div>
 
     <!-- Desktop Actions -->
@@ -128,8 +128,8 @@ template: `
 
   <a mat-button routerLink="/" (click)="toggleMobileMenu()">Home</a>
   <a mat-button routerLink="/videos" (click)="toggleMobileMenu()">Videos</a>
-  <a mat-button routerLink="/fan-art" (click)="toggleMobileMenu()">Fan Art</a>
-  <a mat-button routerLink="/music" (click)="toggleMobileMenu()">Music</a>
+  <a mat-button routerLink="/audio/player" (click)="toggleMobileMenu()">Music</a>
+  <a mat-button routerLink="/fan-art" (click)="toggleMobileMenu()">Fan Groups</a>
   <a mat-button routerLink="/store" (click)="toggleMobileMenu()">Store</a>
   <a mat-button routerLink="/upload" (click)="toggleMobileMenu()">Upload</a>
 
@@ -436,7 +436,7 @@ template: `
 export class NavbarComponent {
   mobileMenuOpen = false;
   searchQuery = '';
-  isAuthenticated = false; // This should come from your auth service
+  isAuthenticated = true; // This should come from your auth service
   notificationsCount = 3; // Example notification count
   imageSource: string = ''; // User avatar image source
 
