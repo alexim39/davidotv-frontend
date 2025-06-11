@@ -50,7 +50,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
             <mat-icon class="section-icon" aria-hidden="false" aria-label="Trending now">local_fire_department</mat-icon>
             <h2 class="section-title">Trending Now</h2>
           </div>
-          <a mat-button routerLink="trending/videos" class="see-all" aria-label="See all trending videos">
+          <a mat-button routerLink="videos/trending" class="see-all" aria-label="See all trending videos">
             See all
             <mat-icon>arrow_forward</mat-icon>
           </a>
@@ -623,7 +623,7 @@ export class TrendingComponent implements OnInit, OnDestroy {
 
   private fetchTrendingVideos() {
     this.loading = true;
-    this.trendingSub = this.youtube.getTrendingDavidoVideos(60).pipe(
+    this.trendingSub = this.youtube.getTrendingVideos().pipe(
       catchError((error: HttpErrorResponse) => {
         console.error('Error fetching trending videos:', error);
         return of(null);
@@ -635,7 +635,7 @@ export class TrendingComponent implements OnInit, OnDestroy {
           this.videos = response.items.map((item: any) => ({
             id: item.id,
             snippet: item.snippet,
-            channelIcon: './img/logo.PNG',
+            channelIcon: './img/ytch.jpeg', // Placeholder for channel icon
             date: new Date(item.snippet.publishedAt).toDateString(),
             title: item.snippet.title,
             thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default.url,

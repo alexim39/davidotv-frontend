@@ -68,6 +68,12 @@ template: `
 
     <!-- Desktop Actions -->
     <div class="actions">
+
+     <!-- Theme Toggle Button -->
+      <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
+        <mat-icon>{{ isDarkTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
+      </button>
+
       <button *ngIf="!isAuthenticated" mat-stroked-button color="accent" (click)="auth()">Log In</button>
       
       <div *ngIf="isAuthenticated" class="user-actions">
@@ -133,6 +139,11 @@ template: `
   <a mat-button routerLink="/store" (click)="toggleMobileMenu()">Store</a>
   <a mat-button routerLink="/upload" (click)="toggleMobileMenu()">Upload</a>
 
+   <!-- Theme Toggle Button -->
+    <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
+      <mat-icon>{{ isDarkTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
+    </button>
+
   <div *ngIf="isAuthenticated" class="mobile-user-section">
     <a mat-button routerLink="/profile" (click)="toggleMobileMenu()">
       <div class="mobile-user-avatar">
@@ -154,8 +165,8 @@ template: `
 `,
   styles: [`
 .navbar {
-  background-color: #fff;
-  color: #222;
+  //background-color: #fff;
+  //color: #222;
   box-shadow: 0 2px 4px rgba(0,0,0,0.08);
   position: fixed; /* Changed from sticky to fixed */
   top: 0;
@@ -169,7 +180,6 @@ template: `
     align-items: center;
     justify-content: space-between;
     max-width: 1400px;
-    //margin: 0 auto; /* Remove vertical margin */
     padding: 0 24px;
     height: 100%; /* Use parent height */
     width: 100%;
@@ -326,9 +336,8 @@ template: `
   right: 0;
   width: 80%;
   max-width: 320px;
-  //height: calc(100% - 64px);
    height: calc(100vh - 64px);
-  background-color: #fff;
+  //background-color: #fff;
   box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -402,7 +411,7 @@ template: `
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #f5f5f5;
+      //background-color: #f5f5f5;
     }
 
     .mobile-avatar-img {
@@ -420,7 +429,7 @@ template: `
   width: 100%;
   //height: calc(100% - 64px);
    height: calc(100vh - 64px);
-  background-color: rgba(0, 0, 0, 0.4);
+  //background-color: rgba(0, 0, 0, 0.4);
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease-in-out;
@@ -441,6 +450,18 @@ export class NavbarComponent {
   imageSource: string = ''; // User avatar image source
 
   readonly dialog = inject(MatDialog);
+
+  isDarkTheme = false; // Example theme toggle state
+
+ toggleTheme() {
+    this.isDarkTheme = !this.isDarkTheme;
+    const body = document.body;
+    if (this.isDarkTheme) {
+      body.classList.add('dark-theme');
+    } else {
+      body.classList.remove('dark-theme');
+    }
+  }
 
   toggleMobileMenu() {
     this.mobileMenuOpen = !this.mobileMenuOpen;

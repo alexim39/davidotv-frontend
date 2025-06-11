@@ -29,7 +29,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
           </div>
           <p class="company-description">
             DavidoTv is the fans premier destination for all things Davido. 
-            We provide exclusive content, news, and updates about the Afrobeat superstar.
+            We built a community and provide exclusive content, news, and updates about the Afrobeat superstar.
           </p>
           <div class="contact-info">
             <p><mat-icon>email</mat-icon> info&#64;davidotv.com</p>

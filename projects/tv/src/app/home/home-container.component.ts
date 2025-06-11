@@ -93,7 +93,7 @@ import { RouterModule } from '@angular/router';
   `,
   styles: [`
     /* Variables */
-    :root {
+    /* :root {
       --primary: #8f0045;
       --accent: #282828;
       --background: #f9f9f9;
@@ -102,11 +102,11 @@ import { RouterModule } from '@angular/router';
       --desktop-navbar-height: 64px;
       --mobile-breakpoint: 600px;
       --tablet-breakpoint: 960px;
-    }
+    } */
 
     /* Main layout */
     .page-container {
-      background-color: var(--background);
+      //background-color: var(--background);
       min-height: 100vh;
       margin-top: 4em;
     }
@@ -121,7 +121,7 @@ import { RouterModule } from '@angular/router';
     /* Sidenav styles */
   .app-sidenav {
   width: var(--desktop-sidenav-width);
-  background-color: #fff;
+  //background-color: #fff;
   padding-top: 12px;
 
   mat-nav-list {
@@ -136,14 +136,14 @@ import { RouterModule } from '@angular/router';
       text-decoration: none;
       gap: 24px;
       font-size: 9.5px;
-      color: #8f0045;
+      //color: #8f0045;
       transition: background-color 0.2s;
 
       mat-icon {
         font-size: 20px;
         width: 24px;
         height: 24px;
-        color: #606060;
+        //color: #606060;
         transition: color 0.2s;
         vertical-align: middle;
         margin-right: 8px;
@@ -154,32 +154,32 @@ import { RouterModule } from '@angular/router';
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        color: #606060;
+        //color: #606060;
         font-size: 14px;
         margin-top: -10px;
       }
 
       &:hover {
-        background-color: #f2f2f2;
+        //background-color: #f2f2f2;
       }
 
       &.active {
-        background-color: #e6e6e6;
+        //background-color: #e6e6e6;
         font-weight: 600;
 
         mat-icon {
-          color: var(--primary);
+          //color: var(--primary);
         }
 
         span {
-          color: var(--primary);
+          //color: var(--primary);
         }
       }
     }
 
     h3 {
       font-size: 11px;
-      color: #606060;
+      //color: #606060;
       padding: 12px 16px 4px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -201,7 +201,7 @@ import { RouterModule } from '@angular/router';
     .content {
       padding: 16px;
       min-height: calc(100vh - var(--desktop-navbar-height));
-      background-color: var(--background);
+      //background-color: var(--background);
 
       @media (max-width: var(--mobile-breakpoint)) {
         min-height: calc(100vh - var(--mobile-navbar-height));
@@ -234,7 +234,7 @@ import { RouterModule } from '@angular/router';
       
       .section-icon {
         margin-right: 8px;
-        color: var(--primary);
+        //color: var(--primary);
       }
       
       h2 {
@@ -245,7 +245,7 @@ import { RouterModule } from '@angular/router';
       }
       
       .see-all {
-        color: var(--primary);
+        //color: var(--primary);
       }
 
       @media (max-width: var(--mobile-breakpoint)) {

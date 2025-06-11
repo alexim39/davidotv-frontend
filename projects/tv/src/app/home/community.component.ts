@@ -64,7 +64,7 @@ import { MatButtonModule } from '@angular/material/button';
   styles: [`
     .community-section {
       padding: 2rem;
-      background: #fafafa;
+      //background: #fafafa;
       margin-top: 2rem;
       border-radius: 10px;
     }
@@ -78,7 +78,7 @@ import { MatButtonModule } from '@angular/material/button';
 
     .section-icon {
       margin-right: 8px;
-      color: #8f0045;
+      //color: #8f0045;
     }
 
     
