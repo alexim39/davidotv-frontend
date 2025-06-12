@@ -70,9 +70,9 @@ template: `
     <div class="actions">
 
      <!-- Theme Toggle Button -->
-      <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
-        <mat-icon>{{ isDarkTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
-      </button>
+    <!-- <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
+      <mat-icon>{{ isDarkTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
+    </button> -->
 
       <button *ngIf="!isAuthenticated" mat-stroked-button color="accent" (click)="auth()">Log In</button>
       
@@ -139,10 +139,10 @@ template: `
   <a mat-button routerLink="/store" (click)="toggleMobileMenu()">Store</a>
   <a mat-button routerLink="/upload" (click)="toggleMobileMenu()">Upload</a>
 
-   <!-- Theme Toggle Button -->
-    <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
-      <mat-icon>{{ isDarkTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
-    </button>
+  <!-- Theme Toggle Button -->
+  <!-- <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
+    <mat-icon>{{ isDarkTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
+  </button> -->
 
   <div *ngIf="isAuthenticated" class="mobile-user-section">
     <a mat-button routerLink="/profile" (click)="toggleMobileMenu()">
@@ -165,8 +165,6 @@ template: `
 `,
   styles: [`
 .navbar {
-  //background-color: #fff;
-  //color: #222;
   box-shadow: 0 2px 4px rgba(0,0,0,0.08);
   position: fixed; /* Changed from sticky to fixed */
   top: 0;
@@ -203,7 +201,6 @@ template: `
   .brand-name {
     font-size: 20px;
     font-weight: 700;
-    color: #000;
   }
 
   .tv-red {
@@ -243,17 +240,16 @@ template: `
 
     .search-button {
       width: 64px;
-      background: #f8f8f8;
+      background: transparent;
       border: none;
       border-left: 1px solid #ddd;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #555;
 
       &:hover {
-        background: #f0f0f0;
+        background:rgb(36, 36, 36);
       }
     }
   }
@@ -278,7 +274,7 @@ template: `
   }
 
   .action-icon {
-    color: #333;
+    color: #333333;
   }
 
   .user-avatar {
@@ -336,8 +332,8 @@ template: `
   right: 0;
   width: 80%;
   max-width: 320px;
-   height: calc(100vh - 64px);
-  //background-color: #fff;
+  height: calc(100vh - 64px);
+  background: black;
   box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -379,14 +375,14 @@ template: `
 
       .search-button {
         width: 48px;
-        background: #f8f8f8;
+        height: 100%;
+        background: transparent;
         border: none;
         border-left: 1px solid #ddd;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #555;
       }
     }
   }
@@ -411,7 +407,6 @@ template: `
       display: flex;
       align-items: center;
       justify-content: center;
-      //background-color: #f5f5f5;
     }
 
     .mobile-avatar-img {
@@ -427,9 +422,8 @@ template: `
   top: 64px;
   left: 0;
   width: 100%;
-  //height: calc(100% - 64px);
-   height: calc(100vh - 64px);
-  //background-color: rgba(0, 0, 0, 0.4);
+  height: calc(100vh - 64px);
+  background-color: rgba(0, 0, 0, 0.4);
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease-in-out;

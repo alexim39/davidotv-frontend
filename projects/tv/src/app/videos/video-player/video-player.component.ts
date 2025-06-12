@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, HostListener } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, HostListener, OnDestroy, NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
@@ -8,26 +8,35 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+
+// Declare YT for TypeScript to recognize the global YouTube API object
+declare global {
+  interface Window {
+    onYouTubeIframeAPIReady: () => void;
+    YT: any; // YouTube API type
+  }
+}
 
 @Component({
   selector: 'async-video-player',
   imports: [
-    CommonModule, 
-    FormsModule, 
-    MatIconModule, 
+    CommonModule,
+    FormsModule,
+    MatIconModule,
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatSliderModule // <-- Make sure this is present
+    MatSliderModule,
+    MatSlideToggleModule
   ],
   template: `
     <div class="app-container">
-      <!-- App Header -->
       <header class="app-header">
         <div class="header-content">
           <div class="logo-container">
             <img src="./img/logo2.PNG" alt="DavidoTv Logo" class="logo">
-            <h1>DavidoTv</h1>
+            <h1>DavidoTV</h1>
           </div>
           <div class="header-actions">
             <button mat-button class="subscribe-btn">
@@ -42,13 +51,13 @@ import { MatSliderModule } from '@angular/material/slider';
       </header>
 
       <main class="main-content">
-        <!-- Video Section -->
         <section class="video-section">
           <div class="video-container" *ngIf="safeUrl; else loadingTpl">
             <div class="video-wrapper">
               <iframe
                 #videoFrame
                 [src]="safeUrl"
+                [class.hidden]="isLoading"
                 width="100%"
                 height="100%"
                 frameborder="0"
@@ -61,24 +70,12 @@ import { MatSliderModule } from '@angular/material/slider';
               ></iframe>
             </div>
 
-            <!-- Repeat Indicator -->
             <div class="repeat-indicator" *ngIf="repeatMode !== 'none'">
               Repeat {{ repeatMode === 'one' ? '1' : 'All' }}
             </div>
 
-            <!-- Video Controls -->
             <div class="video-controls" *ngIf="!isLoading" [class.hidden]="!showControls && isPlaying">
-              <div class="progress-bar">
-                <mat-slider 
-                  min="0" 
-                  [max]="duration" 
-                  (input)="seekVideo($event)"
-                  step="1"
-                  aria-label="Video progress"
-                >
-                <input matSliderThumb [(ngModel)]="currentTime">
-                </mat-slider>
-              </div>
+              
               <div class="controls-container">
                 <div class="left-controls">
                   <button mat-icon-button (click)="togglePlayPause()" aria-label="Play/Pause">
@@ -101,7 +98,22 @@ import { MatSliderModule } from '@angular/material/slider';
                   </button>
                 </div>
               </div>
+
+             <div class="progress-bar">
+                <mat-slider 
+                  min="0" 
+                  [max]="duration" 
+                  (input)="seekVideo($event)"
+                  step="1"
+                  aria-label="Video progress"
+                >
+                  <input matSliderThumb [value]="currentTime">
+                </mat-slider>
+              </div>
+              
             </div>
+
+              
           </div>
 
           <ng-template #loadingTpl>
@@ -111,7 +123,6 @@ import { MatSliderModule } from '@angular/material/slider';
             </div>
           </ng-template>
 
-          <!-- Video Info Section -->
           <div class="video-info-container" *ngIf="!isLoading">
             <div class="video-meta">
               <div class="video-stats">
@@ -165,7 +176,6 @@ import { MatSliderModule } from '@angular/material/slider';
             </div>
           </div>
 
-          <!-- Comments Section -->
           <div class="comments-section" *ngIf="!isLoading">
             <div class="comments-header">
               <h3>{{ comments.length }} Comments</h3>
@@ -220,7 +230,6 @@ import { MatSliderModule } from '@angular/material/slider';
           </div>
         </section>
 
-        <!-- Recommendations Sidebar -->
         <aside class="recommendations-sidebar" *ngIf="!isLoading">
           <div class="sidebar-header">
             <h3>Up Next</h3>
@@ -246,616 +255,9 @@ import { MatSliderModule } from '@angular/material/slider';
       </main>
     </div>
   `,
-  styles: [`
-    /* Global Styles */
-    :host {
-      display: block;
-      background-color: #0f0f0f;
-      color: #f1f1f1;
-      font-family: 'Roboto', sans-serif;
-    }
-
-    /* App Header */
-    .app-header {
-      position: relative;
-      top: 0;
-      z-index: 100;
-      background-color: #0f0f0f;
-      padding: 0 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1800px;
-      margin: 0 auto;
-      padding: 12px 0;
-    }
-
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .logo {
-      height: 30px;
-      width: auto;
-    }
-
-    .logo-container h1 {
-      font-size: 1.5rem;
-      font-weight: 500;
-      margin: 0;
-      color: #fff;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .subscribe-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .premium-btn {
-      background: linear-gradient(90deg, #ff4b2b, #ff416c);
-      font-weight: 500;
-    }
-
-    /* Main Content Layout */
-    .main-content {
-      display: flex;
-      max-width: 1800px;
-      margin: 0 auto;
-      padding: 24px 16px;
-      gap: 24px;
-    }
-
-    .video-section {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .recommendations-sidebar {
-      width: 402px;
-      flex-shrink: 0;
-    }
-
-    /* Video Container */
-    .video-container {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16/9;
-      background-color: #000;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-
-    .video-controls {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-      padding: 12px 16px;
-      z-index: 10;
-      transition: opacity 0.3s ease;
-    }
-
-    .video-controls.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .video-container:hover .video-controls:not(.hidden) {
-      opacity: 1;
-    }
-
-    .progress-bar {
-      margin-bottom: 8px;
-    }
-
-    .controls-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .left-controls, .right-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .time-display {
-      font-size: 0.9rem;
-      color: #fff;
-      margin: 0 12px;
-    }
-
-    button.mat-icon-button {
-      color: white;
-      transition: transform 0.2s ease;
-    }
-
-    button.mat-icon-button:hover {
-      transform: scale(1.1);
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    button.mat-icon-button.active {
-      color: #ff4b2b;
-    }
-
-    .video-wrapper {
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Responsive Controls */
-    @media (max-width: 768px) {
-      .video-controls {
-        padding: 8px;
-      }
-      
-      .time-display {
-        font-size: 0.8rem;
-        margin: 0 8px;
-      }
-      
-      button.mat-icon-button {
-        width: 36px;
-        height: 36px;
-        line-height: 36px;
-      }
-      
-      .play-button mat-icon {
-        font-size: 48px;
-        width: 48px;
-        height: 48px;
-      }
-    }
-
-    .play-button {
-      background: transparent;
-      border: none;
-      color: white;
-      cursor: pointer;
-      margin-bottom: 16px;
-      padding: 0;
-    }
-
-    .play-button mat-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
-      transition: transform 0.2s;
-    }
-
-    .play-button:hover mat-icon {
-      transform: scale(1.1);
-    }
-
-    /* Loading State */
-    .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      gap: 16px;
-    }
-
-    .loading-text {
-      color: #aaa;
-      font-size: 1rem;
-    }
-
-    /* Video Info */
-    .video-info-container {
-      margin-top: 16px;
-    }
-
-    .video-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 16px;
-      border-bottom: 1px solid #3f3f3f;
-    }
-
-    .video-stats {
-      color: #aaa;
-      font-size: 0.9rem;
-      display: flex;
-      gap: 12px;
-    }
-
-    .video-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .video-actions button {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .video-actions button.active {
-      color: #ff4b2b;
-    }
-
-    /* Video Description */
-    .video-description {
-      padding: 16px 0;
-      border-bottom: 1px solid #3f3f3f;
-    }
-
-    .video-description h2 {
-      font-size: 1.25rem;
-      font-weight: 500;
-      margin: 0 0 16px 0;
-    }
-
-    .creator-info {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-
-    .creator-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .creator-details {
-      flex: 1;
-    }
-
-    .creator-details h3 {
-      font-size: 1rem;
-      font-weight: 500;
-      margin: 0 0 4px 0;
-    }
-
-    .creator-details p {
-      font-size: 0.8rem;
-      color: #aaa;
-      margin: 0;
-    }
-
-    .description-text {
-      margin-left: 64px;
-      position: relative;
-    }
-
-    .description-text p {
-      margin: 0 0 8px 0;
-      line-height: 1.5;
-      white-space: pre-line;
-    }
-
-    .show-more-btn {
-      color: #aaa;
-      font-weight: 500;
-      padding: 0;
-      min-width: auto;
-    }
-
-    /* Comments Section */
-    .comments-section {
-      padding: 16px 0;
-    }
-
-    .comments-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-    }
-
-    .comments-header h3 {
-      font-size: 1.1rem;
-      font-weight: 500;
-      margin: 0;
-    }
-
-    .sort-comments {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #aaa;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-
-    .add-comment {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .comment-form {
-      flex: 1;
-    }
-
-    .comment-form input {
-      width: 100%;
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid #3f3f3f;
-      color: white;
-      padding: 8px 0;
-      font-size: 0.9rem;
-      outline: none;
-    }
-
-    .comment-form input:focus {
-      border-bottom-color: #ff4b2b;
-    }
-
-    .comment-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    /* Comments List */
-    .comments-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .comment {
-      display: flex;
-      gap: 16px;
-    }
-
-    .comment-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .comment-content {
-      flex: 1;
-    }
-
-    .comment-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 4px;
-    }
-
-    .comment-header h4 {
-      font-size: 0.9rem;
-      font-weight: 500;
-      margin: 0;
-    }
-
-    .comment-time {
-      font-size: 0.8rem;
-      color: #aaa;
-    }
-
-    .comment-text {
-      font-size: 0.9rem;
-      margin: 0 0 8px 0;
-      line-height: 1.4;
-    }
-
-    .comment-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .comment-actions button {
-      min-width: auto;
-      padding: 0;
-    }
-
-    .likes-count {
-      font-size: 0.8rem;
-      color: #aaa;
-    }
-
-    /* Recommendations Sidebar */
-    .recommendations-sidebar {
-      padding-top: 8px;
-    }
-
-    .sidebar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .sidebar-header h3 {
-      font-size: 1rem;
-      font-weight: 500;
-      margin: 0;
-    }
-
-    .autoplay-toggle {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #aaa;
-      font-size: 0.9rem;
-    }
-
-    .recommendation-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .recommendation-item {
-      display: flex;
-      gap: 8px;
-      cursor: pointer;
-    }
-
-    .thumbnail-container {
-      position: relative;
-      flex-shrink: 0;
-    }
-
-    .thumbnail {
-      width: 168px;
-      height: 94px;
-      border-radius: 4px;
-      object-fit: cover;
-    }
-
-    .duration {
-      position: absolute;
-      bottom: 4px;
-      right: 4px;
-      background-color: rgba(0, 0, 0, 0.8);
-      padding: 2px 4px;
-      border-radius: 2px;
-      font-size: 0.7rem;
-    }
-
-    .video-details {
-      flex: 1;
-    }
-
-    .video-details h4 {
-      font-size: 0.9rem;
-      font-weight: 500;
-      margin: 0 0 4px 0;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .creator, .views {
-      font-size: 0.8rem;
-      color: #aaa;
-      margin: 0;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 1200px) {
-      .main-content {
-        flex-direction: column;
-      }
-
-      .recommendations-sidebar {
-        width: 100%;
-      }
-
-      .recommendation-item {
-        gap: 16px;
-      }
-
-      .thumbnail {
-        width: 240px;
-        height: 135px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .header-content {
-        padding: 8px 0;
-      }
-
-      .premium-btn {
-        display: none;
-      }
-
-      .video-meta {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-
-      .creator-info {
-        flex-wrap: wrap;
-      }
-
-      .description-text {
-        margin-left: 0;
-      }
-
-      .recommendation-item {
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .thumbnail {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 16/9;
-      }
-    }
-
-    /* Add to your styles */
-    .video-actions button.active {
-      color: #ff4b2b;
-    }
-
-    .repeat-indicator {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      z-index: 5;
-    }
-
-    mat-slider {
-      width: 100%;
-    }
-
-    .mat-slider-track-background {
-      background-color: rgba(255, 255, 255, 0.2) !important;
-    }
-
-    .mat-slider-track-fill {
-      background-color: #ff4b2b !important;
-    }
-
-    .mat-slider-thumb {
-      background-color: #ff4b2b !important;
-    }
-
-    .mat-slider-thumb-label {
-      background-color: #ff4b2b !important;
-    }
-  `]
+  styleUrls: ['./video-player.component.scss'],
 })
-export class VideoPlayerComponent implements OnInit {
+export class VideoPlayerComponent implements OnInit, OnDestroy {
   safeUrl: SafeResourceUrl | null = null;
   videoTitle = 'Davido - New Hit Single (Official Video)';
   videoDescription = `Official music video for Davido's latest hit single. 
@@ -888,18 +290,20 @@ export class VideoPlayerComponent implements OnInit {
   // Player state
   currentVideoId: string = '';
   isPlaying = false;
-  player: any;
+  player: any; // Type as 'any' for YouTube player object
   playerReady = false;
   isMuted = false;
   isFullscreen = false;
   currentTime = 0;
   duration = 0;
 
+  pendingAutoPlay: boolean = false;
+
   // Playlist management
   davidoVideos = [
-    { id: 'IDynlmdQ-0o', title: 'Davido - Fall', duration: '4:25', thumbnail: 'https://i.ytimg.com/vi/IDynlmdQ-0o/mqdefault.jpg', views: '245M views', date: '5 years ago' },
-    { id: 'gGdGFtwCNBE', title: 'Davido - IF', duration: '3:32', thumbnail: 'https://i.ytimg.com/vi/gGdGFtwCNBE/mqdefault.jpg', views: '187M views', date: '4 years ago' },
-    { id: 'qV2N6hJ2gXk', title: 'Davido - Assurance', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/qV2N6hJ2gXk/mqdefault.jpg', views: '98M views', date: '3 years ago' }
+    { id: 'NnWe5Lhi0G8', title: 'Davido - Fall', duration: '4:25', thumbnail: 'https://i.ytimg.com/vi/NnWe5Lhi0G8/mqdefault.jpg', views: '245M views', date: '5 years ago' },
+    { id: 'helEv0kGHd4', title: 'Davido - IF', duration: '3:32', thumbnail: 'https://i.ytimg.com/vi/helEv0kGHd4/mqdefault.jpg', views: '187M views', date: '4 years ago' },
+    { id: 'l6QMJniQWxQ', title: 'Davido - Assurance', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/l6QMJniQWxQ/mqdefault.jpg', views: '98M views', date: '3 years ago' }
   ];
   currentVideoIndex = 0;
 
@@ -935,11 +339,16 @@ export class VideoPlayerComponent implements OnInit {
 
   @ViewChild('videoFrame') videoFrame!: ElementRef<HTMLIFrameElement>;
 
+  private playerStateInterval: any;
+  private updateInterval: any = null;
+
+
   constructor(
     private route: ActivatedRoute, 
     private sanitizer: DomSanitizer,
     private snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone // Inject NgZone
   ) {}
 
   ngOnInit() {
@@ -949,101 +358,204 @@ export class VideoPlayerComponent implements OnInit {
       this.currentVideoIndex = this.davidoVideos.findIndex(v => v.id === videoId);
       this.loadVideo(videoId);
     }
-    this.setupMessageListener();
+
+    // Assign onYouTubeIframeAPIReady to a global function and ensure it runs in Angular's zone
+    window.onYouTubeIframeAPIReady = () => this.ngZone.run(() => this.onYouTubeIframeAPIReady());
     this.loadYouTubeAPI();
-    this.setupPlayerStatePolling();
   }
 
   ngOnDestroy() {
-    window.removeEventListener('message', this.handleYouTubeMessages);
-    clearInterval(this.controlsTimeout);
+    // Clear the interval to prevent memory leaks
+    if (this.playerStateInterval) {
+      clearInterval(this.playerStateInterval);
+    }
+    // Destroy the YouTube player instance
+    if (this.player && typeof this.player.destroy === 'function') {
+      this.player.destroy();
+    }
+    clearTimeout(this.controlsTimeout);
+    // Remove the global onYouTubeIframeAPIReady reference to prevent issues on component re-creation
+    if (window.onYouTubeIframeAPIReady === this.onYouTubeIframeAPIReady) {
+      (window as any).onYouTubeIframeAPIReady = undefined; 
+    }
   }
 
   loadYouTubeAPI() {
-    if (!(window as any).YT) {
+    // Check if the YouTube API script is already loaded
+    if (!(window as any).YT || typeof (window as any).YT.Player === 'undefined') {
       const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      document.body.appendChild(tag);
+      tag.src = 'https://www.youtube.com/iframe_api'; // Official YouTube Iframe API script URL
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+    } else {
+      // If API is already loaded (e.g., navigating back to component, or hot module reload)
+      // Call the ready function directly within Angular's zone
+      this.ngZone.run(() => this.onYouTubeIframeAPIReady());
     }
   }
 
-  setupMessageListener() {
-    window.addEventListener('message', this.handleYouTubeMessages.bind(this));
+  onYouTubeIframeAPIReady() {
+    // Only create a new player if it doesn't exist or if it's been destroyed
+    // Checking `getPlayerState` is a way to see if it's a valid player object
+    if (!this.player || typeof this.player.getPlayerState !== 'function') {
+      // Destroy existing player if it somehow persisted but is not functional
+      if (this.player && typeof this.player.destroy === 'function') {
+        this.player.destroy();
+      }
+
+      this.player = new window.YT.Player(this.videoFrame.nativeElement, {
+        videoId: this.currentVideoId,
+        playerVars: {
+          enablejsapi: 1,
+          rel: 0,
+          modestbranding: 1,
+          controls: 0, // Custom controls handled by app
+          disablekb: 1,
+          fs: 1,
+          iv_load_policy: 3,
+          origin: window.location.origin,
+          autoplay: this.autoplay ? 1 : 0
+        },
+        events: {
+          'onReady': this.onPlayerReady.bind(this),
+          'onStateChange': this.onPlayerStateChange.bind(this)
+        }
+      });
+    } else {
+      // If player already exists and is functional, just load the new video
+      this.player.loadVideoById(this.currentVideoId);
+      if (this.autoplay) {
+        this.player.playVideo();
+      }
+    }
   }
 
+ onPlayerReady(event: any) {
+    this.ngZone.run(() => {
+      this.playerReady = true;
+      this.isLoading = false;
 
-  setupPlayerStatePolling() {
-    // Poll player state since we can't reliably get all events from YouTube iframe
-    setInterval(() => {
-      if (this.playerReady) {
-        this.getCurrentTime();
-        // Only get duration if we don't have it yet
-        if (!this.duration) {
-          this.getDuration();
+      this.duration = this.player.getDuration();
+      this.startUpdateLoop();
+
+      if (this.pendingAutoPlay) {
+        this.playVideo();
+        this.pendingAutoPlay = false;
+      }
+      
+      // Get initial duration
+      this.player.getDuration().then((duration: number) => {
+        this.duration = duration;
+      }).catch(() => {
+        // If we can't get duration immediately, it will be polled later
+        this.duration = 0;
+      });
+
+      // Get initial current time
+      this.player.getCurrentTime().then((time: number) => {
+        this.currentTime = time;
+      }).catch(() => {
+        this.currentTime = 0;
+      });
+
+      this.startPlayerStatePolling();
+      
+      if (this.autoplay) {
+        this.playVideo();
+      }
+    });
+  }
+
+  onPlayerStateChange(event: any) {
+    // Ensure all state updates happen within Angular's zone
+    this.ngZone.run(() => {
+      const state = event.data; // YouTube player states: -1, 0, 1, 2, 3, 5
+      
+      if (state === window.YT.PlayerState.PLAYING) {
+        this.isPlaying = true;
+        this.showOverlay = false;
+        // If duration wasn't correctly fetched onReady, try again when video starts playing
+        if (this.duration === 0 || isNaN(this.duration)) {
+          this.getDuration(); 
+        }
+      } else if (state === window.YT.PlayerState.PAUSED || state === window.YT.PlayerState.ENDED) {
+        this.isPlaying = false;
+      }
+      
+      if (state === window.YT.PlayerState.ENDED) { // Video ended
+        this.handleVideoEnded();
+      }
+      
+      this.resetControlsTimer();
+    });
+  }
+
+  startPlayerStatePolling() {
+    // Clear any existing interval to prevent multiple polls running
+    if (this.playerStateInterval) {
+      clearInterval(this.playerStateInterval);
+    }
+    
+    // Set up a new interval to poll current time and duration
+    this.playerStateInterval = setInterval(() => {
+      if (this.playerReady && this.player) {
+        try {
+          // Get current time
+          this.player.getCurrentTime().then((time: number) => {
+            this.ngZone.run(() => {
+              this.currentTime = time;
+            });
+          }).catch(() => {});
+
+          // Refresh duration periodically (in case it wasn't available initially)
+          if (this.duration <= 0 || isNaN(this.duration)) {
+            this.player.getDuration().then((duration: number) => {
+              this.ngZone.run(() => {
+                this.duration = duration;
+              });
+            }).catch(() => {});
+          }
+        } catch (error) {
+          console.error('Error polling player state:', error);
         }
       }
-    }, 1000);
+    }, 1000); // Poll every second
   }
 
-
-  handleYouTubeMessages(event: MessageEvent) {
-    if (event.origin !== 'https://www.youtube.com') return;
-    
-    try {
-      const data = JSON.parse(event.data);
-      
-      switch (data.event) {
-        case 'onReady':
-          this.playerReady = true;
-          this.player = data.target;
-          if (this.autoplay) this.playVideo();
-          // Get initial duration
-          this.getDuration();
-          break;
-          
-        case 'onStateChange':
-          this.handleStateChange(data.info);
-          break;
-      }
-    } catch (e) {
-      console.error('Error parsing YouTube message', e);
-    }
-  }
-
-
-  handleStateChange(state: number) {
-    // YouTube player states:
-    // -1 (unstarted)
-    // 0 (ended)
-    // 1 (playing)
-    // 2 (paused)
-    // 3 (buffering)
-    // 5 (video cued)
-    
-    if (state === 1) {
-      this.isPlaying = true;
-      this.showOverlay = false;
-    } else if (state === 2 || state === 0) {
-      this.isPlaying = false;
-    }
-    
-    if (state === 0) { // Video ended
-      this.handleVideoEnded();
-    }
-    
-    this.resetControlsTimer();
-  }
-
-  loadVideo(videoId: string) {
-    const isDavidoVideo = this.davidoVideos.some(v => v.id === videoId);
+  loadVideo(videoId: string, autoPlay: boolean = false) {
+    this.currentVideoId = videoId;
+    // Correct YouTube iframe URL format
     const url = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=0&disablekb=1&fs=1&iv_load_policy=3&origin=${window.location.origin}`;
     this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    
     this.showOverlay = true;
     this.isPlaying = false;
+    this.isLoading = true; // Indicate loading state for the new video
+    this.duration = 0; // Reset duration
+    this.currentTime = 0; // Reset current time to 0 for the new video
+    this.playerReady = false; // Reset player ready state for the new load
+
     this.updateVideoInfo(videoId);
     
-    // Reset player ready state when loading new video
-    this.playerReady = false;
+    // If the player object already exists and is functional, load the new video via API
+    // This handles navigating between videos without full component re-initialization
+    if (this.player && typeof this.player.loadVideoById === 'function') {
+      this.player.loadVideoById(videoId);
+    }
+
+    
+ this.playerReady = false;
+ this.pendingAutoPlay = autoPlay; // new flag
+    // If the player is ready, we can play immediately
+    if (this.playerReady && autoPlay) {
+      this.playVideo();
+    } else {
+      // Otherwise, wait for onPlayerReady to handle autoplay
+      this.pendingAutoPlay = autoPlay;
+    }
+    
+    // Update current video index based on the new video ID
+    this.currentVideoIndex = this.davidoVideos.findIndex(v => v.id === videoId);
   }
 
   updateVideoInfo(videoId: string) {
@@ -1056,38 +568,53 @@ export class VideoPlayerComponent implements OnInit {
   }
 
   onVideoLoad() {
-    this.isLoading = false;
-    this.resetControlsTimer();
+    // This event signifies the iframe itself has loaded. The YouTube player inside still needs to be ready.
+    // The actual video loading state and player readiness is managed by onPlayerReady from YouTube API.
+    // No specific action needed here that isn't covered by onPlayerReady.
   }
+
+  private startUpdateLoop() {
+    this.stopUpdateLoop();
+    this.updateInterval = setInterval(() => {
+      if (this.playerReady && this.player && typeof this.player.getCurrentTime === 'function') {
+        const time = this.player.getCurrentTime();
+        if (!isNaN(time)) {
+          this.ngZone.run(() => {
+            this.currentTime = time;
+          });
+        }
+      }
+    }, 1000);
+  }
+
+  private stopUpdateLoop() {
+  if (this.updateInterval) {
+    clearInterval(this.updateInterval);
+    this.updateInterval = null;
+  }
+}
+
+
+
+
 
   // Player control methods
   playVideo() {
     if (this.playerReady) {
-      this.player.playVideo();
-      this.isPlaying = true;
-      this.showOverlay = false;
-    } else {
-      // Fallback if API isn't ready
-      const iframe = this.videoFrame.nativeElement;
-      iframe.contentWindow?.postMessage(
-        '{"event":"command","func":"playVideo","args":""}',
-        '*'
-      );
-      this.isPlaying = true;
-      this.showOverlay = false;
+      this.ngZone.run(() => {
+        this.player.playVideo();
+        this.isPlaying = true;
+        this.showOverlay = false;
+      });
     }
     this.resetControlsTimer();
   }
 
   pauseVideo() {
     if (this.playerReady) {
-      this.player.pauseVideo();
-    } else {
-      const iframe = this.videoFrame.nativeElement;
-      iframe.contentWindow?.postMessage(
-        '{"event":"command","func":"pauseVideo","args":""}',
-        '*'
-      );
+      this.ngZone.run(() => {
+        this.player.pauseVideo();
+      });
     }
     this.isPlaying = false;
     this.showControls = true;
@@ -1102,36 +629,24 @@ export class VideoPlayerComponent implements OnInit {
     }
   }
 
-  seekVideo(event: any) {
-    const time = event.value || event;
-    this.currentTime = time;
+ seekVideo(event: any) {
+    // Handle both MatSlider events and direct number inputs
+    const time = typeof event === 'number' ? event : event.value;
     
-    if (this.playerReady) {
-      this.player.seekTo(time, true);
-      if (!this.isPlaying) {
-        this.player.playVideo();
-        this.isPlaying = true;
+    this.ngZone.run(() => {
+      this.currentTime = time; // Update current time immediately for smooth slider movement
+      
+      if (this.playerReady) {
+        this.player.seekTo(time, true); // Seek with immediate playback
+        if (!this.isPlaying) {
+          this.player.playVideo(); // Start playing after seek if it was paused
+          this.isPlaying = true;
+        }
       }
-    } else {
-      const iframe = this.videoFrame.nativeElement;
-      iframe.contentWindow?.postMessage(
-        `{"event":"command","func":"seekTo","args":[${time},true]}`,
-        '*'
-      );
-      if (!this.isPlaying) {
-        iframe.contentWindow?.postMessage(
-          '{"event":"command","func":"playVideo","args":""}',
-          '*'
-        );
-        this.isPlaying = true;
-      }
-    }
+    });
     
     this.resetControlsTimer();
   }
-
-
-
 
   toggleMute() {
     this.isMuted = !this.isMuted;
@@ -1142,14 +657,7 @@ export class VideoPlayerComponent implements OnInit {
       } else {
         this.player.unMute();
       }
-    } else {
-      const iframe = this.videoFrame.nativeElement;
-      iframe.contentWindow?.postMessage(
-        `{"event":"command","func":"${this.isMuted ? 'mute' : 'unMute'}","args":""}`,
-        '*'
-      );
     }
-    
     this.resetControlsTimer();
   }
 
@@ -1165,30 +673,39 @@ export class VideoPlayerComponent implements OnInit {
       document.exitFullscreen?.();
       this.isFullscreen = false;
     }
-    
     this.resetControlsTimer();
   }
 
-  getCurrentTime() {
-    if (this.playerReady) {
-      this.player.getCurrentTime().then((time: number) => {
-        this.currentTime = time;
-      });
-    }
-  }
-
-  getDuration() {
-    if (this.playerReady) {
+ getDuration() {
+    if (this.playerReady && this.player) {
       this.player.getDuration().then((duration: number) => {
-        this.duration = duration;
+        this.ngZone.run(() => {
+          if (!isNaN(duration) && duration > 0) {
+            this.duration = duration;
+          } else {
+            // If we get an invalid duration, try again later
+            setTimeout(() => this.getDuration(), 1000);
+          }
+        });
+      }).catch((error: any) => {
+        console.error('Error getting duration:', error);
+        // Retry after a delay
+        setTimeout(() => this.getDuration(), 1000);
       });
     }
   }
 
-  formatTime(seconds: number): string {
+ formatTime(seconds: number): string {
+    if (isNaN(seconds) || seconds < 0) seconds = 0;
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  }
+
+  @HostListener('mousemove')
+  @HostListener('keydown')
+  onUserActivity() {
+    this.resetControlsTimer();
   }
 
   resetControlsTimer() {
@@ -1204,11 +721,11 @@ export class VideoPlayerComponent implements OnInit {
   handleVideoEnded() {
     switch (this.repeatMode) {
       case 'one':
-        this.seekVideo({ value: 0 });
-        this.playVideo();
+        this.seekVideo({ value: 0 }); // Seek to the beginning of the current video
+        this.playVideo(); // Play the current video again
         break;
       case 'all':
-        this.playNextVideo();
+        this.playNextVideo(true); // Play the next video, and loop to the first if at end
         break;
       default:
         this.isPlaying = false;
@@ -1217,16 +734,25 @@ export class VideoPlayerComponent implements OnInit {
     }
   }
 
-  playNextVideo() {
+  playNextVideo(loop: boolean = false) {
     if (this.davidoVideos.length > 0) {
       let nextIndex = this.currentVideoIndex + 1;
       if (nextIndex >= this.davidoVideos.length) {
-        nextIndex = 0;
+        if (loop) {
+          nextIndex = 0; // Loop back to the first video
+        } else {
+          // If not looping, stop playback and reset state
+          this.isPlaying = false;
+          this.showOverlay = true;
+          this.showControls = true;
+          return;
+        }
       }
       const nextVideo = this.davidoVideos[nextIndex];
       this.currentVideoIndex = nextIndex;
-      this.router.navigate(['/videos', nextVideo.id]);
-      this.loadVideo(nextVideo.id);
+      this.router.navigate(['/watch', nextVideo.id]);
+      this.loadVideo(nextVideo.id, true);
+      this.playVideo(); // Automatically play the next video
     }
   }
 
@@ -1234,22 +760,26 @@ export class VideoPlayerComponent implements OnInit {
     if (this.davidoVideos.length > 0) {
       let prevIndex = this.currentVideoIndex - 1;
       if (prevIndex < 0) {
-        prevIndex = this.davidoVideos.length - 1;
+        prevIndex = this.davidoVideos.length - 1; // Loop to the last video
       }
       const prevVideo = this.davidoVideos[prevIndex];
       this.currentVideoIndex = prevIndex;
-      this.router.navigate(['/videos', prevVideo.id]);
-      this.loadVideo(prevVideo.id);
+      this.router.navigate(['/watch', prevVideo.id]);
+      this.loadVideo(prevVideo.id, true);
+      this.playVideo(); // Automatically play the previous video
     }
   }
 
   toggleRepeatMode() {
     if (this.repeatMode === 'none') {
       this.repeatMode = 'one';
+      this.snackBar.open('Repeat One', '', { duration: 1000 });
     } else if (this.repeatMode === 'one') {
       this.repeatMode = 'all';
+      this.snackBar.open('Repeat All', '', { duration: 1000 });
     } else {
       this.repeatMode = 'none';
+      this.snackBar.open('Repeat Off', '', { duration: 1000 });
     }
   }
 
@@ -1317,7 +847,7 @@ export class VideoPlayerComponent implements OnInit {
   }
 
   navigateToVideo(videoId: string) {
-    this.router.navigate(['/videos', videoId]);
+    this.router.navigate(['/watch', videoId]);
     this.loadVideo(videoId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }

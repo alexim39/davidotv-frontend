@@ -217,7 +217,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       }
 
       .see-all {
-        color: #8f0045;;
+        //color: #8f0045;;
         display: flex;
         align-items: center;
         gap: 4px;
@@ -321,7 +321,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       padding: 2px 8px;
       border-radius: 4px;
       background-color: #FF4D4D;
-      color: white;
+      //color: white;
     }
 
     .duration-overlay {
@@ -329,7 +329,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       bottom: 8px;
       right: 8px;
       background: rgba(0, 0, 0, 0.8);
-      color: white;
+      //color: white;
       padding: 2px 6px;
       border-radius: 4px;
       font-size: 12px;
@@ -365,13 +365,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: #1A1A1A;
+      //color: #1A1A1A;
       transition: color 0.2s ease;
     }
 
     .channel-name {
       font-size: 0.875rem;
-      color: #666;
+      //color: #666;
       margin: 0 0 4px;
       display: -webkit-box;
       -webkit-line-clamp: 1;
@@ -384,7 +384,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       align-items: center;
       gap: 6px;
       font-size: 0.75rem;
-      color: #888;
+      //color: #888;
 
       .separator {
         font-size: 0.5rem;
@@ -407,7 +407,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
       &:hover:not([disabled]) {
         background: #FF4D4D;
-        color: white;
+        //color: white;
         transform: scale(1.1);
       }
 
@@ -463,7 +463,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
     .loading-text {
       font-size: 0.875rem;
-      color: #666;
+      //color: #666;
       font-weight: 500;
     }
 
@@ -480,13 +480,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
         font-size: 48px;
         width: 48px;
         height: 48px;
-        color: #AAA;
+        //color: #AAA;
       }
 
       h3 {
         font-size: 1.25rem;
         font-weight: 500;
-        color: #333;
+        //color: #333;
         margin: 0;
       }
 
@@ -623,7 +623,7 @@ export class TrendingComponent implements OnInit, OnDestroy {
 
   private fetchTrendingVideos() {
     this.loading = true;
-    this.trendingSub = this.youtube.getTrendingVideos().pipe(
+    this.trendingSub = this.youtube.getTrendingVideos(75).pipe(
       catchError((error: HttpErrorResponse) => {
         console.error('Error fetching trending videos:', error);
         return of(null);
