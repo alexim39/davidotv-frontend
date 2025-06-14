@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,10 +9,13 @@ import {
   animate,
 } from '@angular/animations';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Router, RouterModule } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { AuthComponent } from '../auth/auth.component';
 
 @Component({
   selector: 'async-banner',
-  imports: [CommonModule, MatCardModule, MatButtonModule],
+  imports: [CommonModule, MatCardModule, MatButtonModule, RouterModule],
   animations: [
     trigger('bannerFadeSlide', [
      /* transition(':enter', [
@@ -61,8 +64,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
         </div>
 
         <div class="banner-buttons">
-          <button mat-flat-button color="primary">Join Now</button>
-          <button mat-stroked-button color="accent">Watch Trending</button>
+          <button mat-flat-button color="primary" (click)="authDialog()">Join Now</button>
+          <button mat-stroked-button color="accent" (click)="loadTrending()">Watch Trending</button>
         </div>
       </div>
 
@@ -201,7 +204,8 @@ export class BannerComponent {
     'Join thousands of Davido fans sharing exclusive videos, covers, fan art, and more.',
     'Upload your remix of Davido songs, and fan art to share with the community.',
     'Vote for your favorite Davido performances and remixes.',
-    'Win customized shirts, caps, etc, and exclusive content by being an active fan.'
+    'Get customized Davido shirts, caps, etc, and exclusive content by being an active fan.',
+    'Be part of an active Davido community and get free giveaways'
   ];
 
   videoUrls: string[] = [
@@ -219,7 +223,9 @@ export class BannerComponent {
   progress = 0;
   intervalId: any;
 
-  constructor(private sanitizer: DomSanitizer, private cdr: ChangeDetectorRef) {
+  readonly dialog = inject(MatDialog);
+
+  constructor(private sanitizer: DomSanitizer, private cdr: ChangeDetectorRef, private router: Router) {
     this.safeVideoUrl = this.sanitizeUrl(this.videoUrls[this.currentVideoIndex]);
 
     // Rotate messages
@@ -239,7 +245,7 @@ export class BannerComponent {
       this.currentVideoIndex = (this.currentVideoIndex + 1) % this.videoUrls.length;
       this.safeVideoUrl = this.sanitizeUrl(this.videoUrls[this.currentVideoIndex]);
       this.progress = 0;
-      this.cdr.markForCheck();
+      this.cdr.detectChanges(); 
     }, 60000);
 
     // Progress bar update every 1 second
@@ -255,5 +261,13 @@ export class BannerComponent {
 
   private sanitizeUrl(url: string): SafeResourceUrl {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+
+  authDialog() {
+     this.dialog.open(AuthComponent);
+   }
+
+  loadTrending(): void {
+    this.router.navigate(['/videos/trending']);
   }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,9 +6,16 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { Subscription } from 'rxjs';
+import { FooterService } from './footer.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { UserInterface, UserService } from '../../common/services/user.service';
 
 @Component({
   selector: 'async-footer',
+  providers: [FooterService],
   imports: [
     CommonModule,
     MatButtonModule,
@@ -17,6 +24,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
     MatFormFieldModule,
     FormsModule,
     ReactiveFormsModule,
+    MatProgressBarModule
   ],
   template: `
     <footer class="main-footer">
@@ -73,7 +81,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
           <form [formGroup]="subscriptionForm" (ngSubmit)="onSubscribe()" class="subscription-form">
             <mat-form-field appearance="outline">
               <mat-label>Your Email</mat-label>
-              <input matInput formControlName="email" type="email" required>
+              <input matInput formControlName="email" type="email" required class="subscription-input">
               <mat-error *ngIf="subscriptionForm.get('email')?.hasError('required')">
                 Email is required
               </mat-error>
@@ -81,9 +89,10 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
                 Please enter a valid email
               </mat-error>
             </mat-form-field>
+            <mat-progress-bar mode="indeterminate" *ngIf="isSubmitting"></mat-progress-bar>
             <button 
               mat-raised-button 
-              color="primary" 
+              color="accent" 
               type="submit"
               [disabled]="subscriptionForm.invalid || isSubmitting"
               aria-label="Subscribe to newsletter"
@@ -200,6 +209,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
         img {
           height: 40px;
           margin-bottom: 8px;
+          //border-radius: 8px;
         }
 
 
@@ -252,6 +262,10 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 
         mat-form-field {
           width: 100%;
+
+          .subscription-input {
+            color: white;
+          }
 
           ::ng-deep .mat-form-field-outline {
             background-color: rgba(255, 255, 255, 0.1);
@@ -367,11 +381,17 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
     }
   `]
 })
-export class FooterComponent {
+export class FooterComponent implements OnInit {
   currentYear: number = new Date().getFullYear();
   subscriptionForm: FormGroup;
   isSubmitting = false;
   subscriptionSuccess = false;
+  subscriptions: Subscription[] = [];
+
+  private emailSubscription =  inject(FooterService)
+  private snackBar = inject(MatSnackBar);
+  private userService = inject(UserService);
+  user: UserInterface | null = null;
 
   constructor(private fb: FormBuilder) {
     this.subscriptionForm = this.fb.group({
@@ -379,21 +399,47 @@ export class FooterComponent {
     });
   }
 
-  onSubscribe() {
-    if (this.subscriptionForm.valid) {
-      this.isSubmitting = true;
-      
-      // Simulate API call
-      setTimeout(() => {
-        this.isSubmitting = false;
-        this.subscriptionSuccess = true;
-        this.subscriptionForm.reset();
-        
-        // Hide success message after 5 seconds
-        setTimeout(() => {
-          this.subscriptionSuccess = false;
-        }, 5000);
-      }, 1500);
-    }
+  ngOnInit() {
+    this.subscriptions.push(
+      this.userService.getCurrentUser$.subscribe({
+        next: (user) => {
+          this.user = user;
+          //console.log('current user ',this.user)
+        }
+      })
+    )
   }
+
+ onSubscribe() {
+  if (this.subscriptionForm.valid) {
+    this.isSubmitting = true;
+    const formObject = this.subscriptionForm.value;
+
+    this.subscriptions.push(
+      this.emailSubscription.subscribe(formObject).subscribe({
+        next: (response) => {
+          this.isSubmitting = false;
+          this.subscriptionSuccess = true;
+          this.subscriptionForm.reset();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.subscriptionSuccess = false;
+
+          let errorMessage = 'Server error occurred, please try again.'; // default error message.
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message; // Use backend's error message if available.
+          }  
+          this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
+          this.isSubmitting = false;
+
+        }
+      })
+    )
+  }
+}
+
+   ngOnDestroy() {
+    // unsubscribe list
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  } 
 }

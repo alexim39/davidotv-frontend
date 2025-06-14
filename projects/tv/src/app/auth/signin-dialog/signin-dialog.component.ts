@@ -13,6 +13,7 @@ import { AuthService } from '../auth.service';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { UserInterface, UserService } from '../../common/services/user.service';
 
 
 @Component({
@@ -42,7 +43,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
               <mat-icon>{{signIn_hide ? 'visibility_off' : 'visibility'}}</mat-icon>
           </div>
           <mat-error *ngIf=" form.get('password')?.hasError('pattern')">
-              Password should be minimum of 8 characters
+              Password should be 8 characters min.
           </mat-error>
           <mat-error *ngIf=" form.get('password')?.hasError('required')">
               Your password is required
@@ -124,43 +125,35 @@ form {
 })
 export class SigninDialogComponent implements OnInit, OnDestroy {
 
-  signIn_hide = true;
-  subscriptions: Subscription[] = [];
   form!: FormGroup;
-  isSpinning: boolean = false;
-  currentRouteCourseId = ''
+  signIn_hide = true;
+  isSpinning = false;
+  subscriptions: Subscription[] = [];
+  subscriptionSuccess = false;
+  user: UserInterface | null = null;
 
+  // Inject services
+  private auth = inject(AuthService);
+  private userService = inject(UserService);
   private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
+  private dialogRef = inject(MatDialogRef<SigninDialogComponent>);
   private cdr = inject(ChangeDetectorRef);
-
-  constructor(
-    private thisDialogRef: MatDialogRef<AuthComponent>,
-    private router: Router,
-    private auth: AuthService,
-  ) {}
-
-
+  
   ngOnInit(): void {
-    // check current route of user
-    const parts = this.router.url.split('/');
-    this.currentRouteCourseId = parts[parts.length - 1]; // This will print "64f1a27ce709366c3d55e247"
-
     this.form = new FormGroup({
       email: new FormControl('', {
-        validators:
-          [
-            Validators.required,
-            Validators.email
-          ], updateOn: 'change'
+        validators: [Validators.required, Validators.email],
+        updateOn: 'change'
       }),
       password: new FormControl('', {
-        validators:
-          [
-            Validators.required,
-            Validators.pattern('[A-Za-z0-9!@#$%^&*()-_=+?/.>,<;:]{8,80}') // min of 8 any character lower/upper case with optionally any of attached special character or digit and mix of 80
-          ], updateOn: 'change'
+        validators: [
+          Validators.required,
+          Validators.pattern('[A-Za-z0-9!@#$%^&*()-_=+?/.>,<;:]{8,80}')
+        ],
+        updateOn: 'change'
       })
-    })
+    });
   }
 
   onSignIn(formObject: { email: string, password: string }): void {
@@ -168,38 +161,43 @@ export class SigninDialogComponent implements OnInit, OnDestroy {
 
     this.subscriptions.push(
       this.auth.signIn(formObject).subscribe({
-
-          next: (response) => {
-            if (response.success) {
-              localStorage.setItem('authToken', response.message); // Save token to localStorage
-              this.router.navigateByUrl('dashboard');
-            }
-          },
-          error: (error: HttpErrorResponse) => {
-            this.isSpinning = false;
-
-            let errorMessage = 'Server error occurred, please try again.'; // default error message.
-            if (error.error && error.error.message) {
-              errorMessage = error.error.message; // Use backend's error message if available.
-            }  
-            this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
-            this.cdr.markForCheck();
+        next: (response) => {
+          this.isSpinning = false;
+           this.cdr.markForCheck(); 
+          if (response.success) {
+            // Save token and update user service
+            localStorage.setItem('isAuthenticated', 'true');
+            // Close dialog and optionally navigate
+            //this.dialogRef.close();
+            window.location.reload();
           }
-
+        },
+        error: (error: HttpErrorResponse) => {
+          this.isSpinning = false;
+           this.cdr.markForCheck(); 
+          this.handleLoginFailure(error);
+        }
       })
-    )
+    );
   }
 
-
-
-  closeDialog(): void {
-    // close dialog
-    this.thisDialogRef.close()
+  private handleLoginFailure(error: HttpErrorResponse) {
+    // Pass an empty user object to indicate no user is logged in
+    this.userService.setCurrentUser({} as UserInterface);
+    localStorage.setItem('isAuthenticated', 'false');
+    let errorMessage = 'Server error occurred, please try again.'; // default error message.
+    if (error.error && error.error.message) {
+      errorMessage = error.error.message; // Use backend's error message if available.
+    }  
+    this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
   }
 
-  ngOnDestroy() {
-    // unsubscribe list
-    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  closeDialog() {
+    this.dialogRef.close();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }  
 
 }

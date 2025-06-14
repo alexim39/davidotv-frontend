@@ -33,7 +33,7 @@ template: `
         <mat-label>First name</mat-label>
         <input matInput formControlName="name">
         <mat-error *ngIf="form.get('name')?.hasError('required')">
-            Your surname is required
+            Your name is required
         </mat-error>
         <mat-error *ngIf=" form.get('name')?.hasError('pattern')">
             Enter a valid name
@@ -41,13 +41,13 @@ template: `
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-        <mat-label>First name</mat-label>
-        <input matInput formControlName="surname">
-        <mat-error *ngIf="form.get('surname')?.hasError('required')">
+        <mat-label>Last name</mat-label>
+        <input matInput formControlName="lastname">
+        <mat-error *ngIf="form.get('lastname')?.hasError('required')">
             Your first name is required
         </mat-error>
-        <mat-error *ngIf="form.get('surname')?.hasError('pattern')">
-            Enter a valid surname
+        <mat-error *ngIf="form.get('lastname')?.hasError('pattern')">
+            Enter a valid last name
         </mat-error>
     </mat-form-field>
 
@@ -69,7 +69,7 @@ template: `
             <mat-icon>{{signUp_hide ? 'visibility_off' : 'visibility'}}</mat-icon>
         </div>
         <mat-error *ngIf=" form.get('password')?.hasError('pattern')">
-            Password should be minimum of 8 characters
+            Password should be 8 characters min.
         </mat-error>
         <mat-error *ngIf=" form.get('password')?.hasError('required')">
             Your password is required
@@ -153,7 +153,7 @@ export class SignupDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.form = new FormGroup({
-      surname: new FormControl('', {
+      lastname: new FormControl('', {
         validators:
           [
             Validators.required,
@@ -196,9 +196,11 @@ export class SignupDialogComponent implements OnInit, OnDestroy {
 
     this.subscriptions.push(
       this.auth.signUp(formObject).subscribe({
-        next: () => {
+        next: (response) => {
+          this.isSpinning = false;
           this.thisDialogRef.close()
           // notify of success
+          this.snackBar.open(response.message, 'Ok',{duration: 3000});
           // show the sign in panel
         }, 
         error: (error: HttpErrorResponse) => {

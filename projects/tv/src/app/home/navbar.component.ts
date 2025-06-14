@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,10 +11,15 @@ import { AuthComponent } from '../auth/auth.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatDividerModule } from '@angular/material/divider';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { UserInterface, UserService } from '../common/services/user.service';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { AuthService } from '../auth/auth.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
 selector: 'async-navbar',
+providers: [AuthService],
 imports: [
   CommonModule,
   MatToolbarModule, 
@@ -63,7 +68,7 @@ template: `
       <a mat-button routerLink="/audio/player" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Music</a>
       <a mat-button routerLink="/fan-art" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Fan Groups</a>
       <a mat-button routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Store</a>
-      <a mat-button routerLink="/upload" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Upload</a>
+      <button mat-button routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="uploadContent()">Upload</button>
     </div>
 
     <!-- Desktop Actions -->
@@ -74,7 +79,7 @@ template: `
       <mat-icon>{{ isDarkTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
     </button> -->
 
-      <button *ngIf="!isAuthenticated" mat-stroked-button color="accent" (click)="auth()">Log In</button>
+      <button *ngIf="!isAuthenticated" mat-stroked-button color="accent" (click)="authDialog()">Log In</button>
       
       <div *ngIf="isAuthenticated" class="user-actions">
         <button mat-icon-button class="action-icon" [matBadge]="notificationsCount" matBadgeColor="warn">
@@ -137,7 +142,7 @@ template: `
   <a mat-button routerLink="/audio/player" (click)="toggleMobileMenu()">Music</a>
   <a mat-button routerLink="/fan-art" (click)="toggleMobileMenu()">Fan Groups</a>
   <a mat-button routerLink="/store" (click)="toggleMobileMenu()">Store</a>
-  <a mat-button routerLink="/upload" (click)="toggleMobileMenu()">Upload</a>
+  <a mat-button (click)="uploadContent(); toggleMobileMenu()">Upload</a>
 
   <!-- Theme Toggle Button -->
   <!-- <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
@@ -157,7 +162,7 @@ template: `
     </a>
   </div>
 
-  <button *ngIf="!isAuthenticated" mat-stroked-button color="accent" (click)="auth(); toggleMobileMenu()">Log In</button>
+  <button *ngIf="!isAuthenticated" mat-stroked-button color="accent" (click)="authDialog(); toggleMobileMenu()">Log In</button>
   <button *ngIf="isAuthenticated" mat-stroked-button color="warn" (click)="logout(); toggleMobileMenu()">Log Out</button>
 </nav>
 
@@ -436,16 +441,49 @@ template: `
 }
 `]
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnDestroy, OnInit {
   mobileMenuOpen = false;
   searchQuery = '';
-  isAuthenticated = true; // This should come from your auth service
+  isAuthenticated = false; // This should come from your auth service
   notificationsCount = 3; // Example notification count
   imageSource: string = ''; // User avatar image source
 
   readonly dialog = inject(MatDialog);
 
   isDarkTheme = false; // Example theme toggle state
+
+  private userService = inject(UserService);
+  user: UserInterface | null = null;
+  subscriptions: Subscription[] = [];
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+ constructor() {}
+
+  ngOnInit(): void {
+    const authFlag = localStorage.getItem('isAuthenticated');
+    if (authFlag === 'true') {
+      
+     /*  this.userService.getCurrentUser$.subscribe({
+        next: (user) => {
+          this.user = user;
+          console.log('user ',this.user)
+        }
+      }) */
+
+      this.subscriptions.push(
+        this.userService.getUser().subscribe({
+          next: (response) => {
+            if (response.success) {
+              this.userService.setCurrentUser(response.user);
+              this.isAuthenticated = true;
+            }
+          }
+        })
+      );
+
+    }
+  }
 
  toggleTheme() {
     this.isDarkTheme = !this.isDarkTheme;
@@ -461,20 +499,52 @@ export class NavbarComponent {
     this.mobileMenuOpen = !this.mobileMenuOpen;
   }
 
-  auth() {
+  authDialog() {
     this.dialog.open(AuthComponent);
     // After successful auth, set isAuthenticated to true and load user image
   }
 
   logout() {
     this.isAuthenticated = false;
-    // Add your logout logic here
+
+    // Clear any stored session data
+    localStorage.clear();
+  
+    // Call backend signOut API
+    this.subscriptions.push(
+      this.authService.signOut({}).subscribe({
+        next: (response) => {
+          if (response.success) {
+            localStorage.removeItem('isAuthenticated'); // Remove token from localStorage
+            // Navigate to the login page
+            this.router.navigate(['/'], { replaceUrl: true });
+          }
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('Error during sign out:', error);
+          this.router.navigate(['/'], { replaceUrl: true });
+        }
+      })
+    );
+    //this.scrollToTop(null); // Close the drawer if on mobile
   }
 
   onSearch() {
     if (this.searchQuery.trim()) {
       // Implement your search functionality
       console.log('Searching for:', this.searchQuery);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  uploadContent(): void {    
+    if (this.isAuthenticated) {
+      this.router.navigateByUrl('upload');
+    } else {
+      this.authDialog();
     }
   }
 }

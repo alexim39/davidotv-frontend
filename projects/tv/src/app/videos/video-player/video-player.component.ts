@@ -9,6 +9,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { PlaylistService } from './playlist.service';
+import { YoutubeService } from '../../common/services/youtube.service';
 
 // Declare YT for TypeScript to recognize the global YouTube API object
 declare global {
@@ -122,6 +124,7 @@ declare global {
               <p class="loading-text">Loading Davido's content...</p>
             </div>
           </ng-template>
+          
 
           <div class="video-info-container" *ngIf="!isLoading">
             <div class="video-meta">
@@ -300,6 +303,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   pendingAutoPlay: boolean = false;
 
   // Playlist management
+  //davidoVideos: any = [];
   davidoVideos = [
     { id: 'NnWe5Lhi0G8', title: 'Davido - Fall', duration: '4:25', thumbnail: 'https://i.ytimg.com/vi/NnWe5Lhi0G8/mqdefault.jpg', views: '245M views', date: '5 years ago' },
     { id: 'helEv0kGHd4', title: 'Davido - IF', duration: '3:32', thumbnail: 'https://i.ytimg.com/vi/helEv0kGHd4/mqdefault.jpg', views: '187M views', date: '4 years ago' },
@@ -348,20 +352,36 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private snackBar: MatSnackBar,
     private router: Router,
-    private ngZone: NgZone // Inject NgZone
+    private ngZone: NgZone, // Inject NgZone
+    private youtubeService: PlaylistService
   ) {}
 
   ngOnInit() {
     const videoId = this.route.snapshot.paramMap.get('id');
     if (videoId) {
       this.currentVideoId = videoId;
-      this.currentVideoIndex = this.davidoVideos.findIndex(v => v.id === videoId);
+      this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
       this.loadVideo(videoId);
     }
+
+      
+  this.youtubeService.getDavidoVideos().subscribe(videos => {
+    this.davidoVideos = videos;
+    this.recommendedVideos = videos;
+
+    /* const videoId = this.route.snapshot.paramMap.get('id') || videos[0]?.id;
+    if (videoId) {
+      this.currentVideoId = videoId;
+      this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
+      this.loadVideo(videoId);
+    } */
+  });
+
 
     // Assign onYouTubeIframeAPIReady to a global function and ensure it runs in Angular's zone
     window.onYouTubeIframeAPIReady = () => this.ngZone.run(() => this.onYouTubeIframeAPIReady());
     this.loadYouTubeAPI();
+
   }
 
   ngOnDestroy() {
@@ -522,7 +542,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }, 1000); // Poll every second
   }
 
-  loadVideo(videoId: string, autoPlay: boolean = false) {
+ loadVideo(videoId: string, autoPlay: boolean = false) {
     this.currentVideoId = videoId;
     // Correct YouTube iframe URL format
     const url = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=0&disablekb=1&fs=1&iv_load_policy=3&origin=${window.location.origin}`;
@@ -555,11 +575,12 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
     
     // Update current video index based on the new video ID
-    this.currentVideoIndex = this.davidoVideos.findIndex(v => v.id === videoId);
-  }
+    this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
+  } 
+
 
   updateVideoInfo(videoId: string) {
-    const video = this.davidoVideos.find(v => v.id === videoId);
+    const video = this.davidoVideos.find((v: any) => v.id === videoId);
     if (video) {
       this.videoTitle = video.title;
       this.uploadDate = new Date();
@@ -593,10 +614,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.updateInterval = null;
   }
 }
-
-
-
-
 
   // Player control methods
   playVideo() {

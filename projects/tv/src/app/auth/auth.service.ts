@@ -10,7 +10,7 @@ export interface SignUpInterface {
   email: string;
   password: string;
   name: string;
-  surname: string;
+  lastname: string;
 }
 
 @Injectable()

@@ -7,7 +7,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { NavbarComponent } from './navbar.component';
-import { FooterComponent } from './footer.component';
+import { FooterComponent } from './footer/footer.component';
 import { RouterModule } from '@angular/router';
 
 
