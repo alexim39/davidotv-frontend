@@ -17,6 +17,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
 import { timeAgo as timeAgoUtil } from '../../common/utils/time.util';
 import { ChangeDetectorRef } from '@angular/core';
+import { YoutubeService, YoutubeVideo } from "../../common/services/youtube.service";
 
 @Component({
   selector: 'async-trending-all',
@@ -43,7 +44,7 @@ import { ChangeDetectorRef } from '@angular/core';
         <button mat-icon-button (click)="goBack()" aria-label="Back button">
           <mat-icon>arrow_back</mat-icon>
         </button>
-        <h1>Trending Videos</h1>
+        <h1>Davido's Trending Videos</h1>
         <span class="spacer"></span>
         <button mat-icon-button [matMenuTriggerFor]="sortMenu" aria-label="Sort options">
           <mat-icon>sort</mat-icon>
@@ -124,11 +125,11 @@ import { ChangeDetectorRef } from '@angular/core';
             </div>
 
             <!-- No results -->
-            <div *ngIf="!loading && filteredVideos.length === 0 && videos.length > 0" class="no-results">
+            <div *ngIf="!loading && filteredVideos.length === 0 && !error" class="no-results">
               <mat-icon class="no-results-icon">search_off</mat-icon>
               <h3>No videos found</h3>
               <p>Try adjusting your search or filter criteria</p>
-              <button mat-raised-button color="primary" (click)="resetFilters()">Reset Filters</button>
+              <button mat-flat-button color="primary" (click)="resetFilters()">Reset Filters</button>
             </div>
 
             <!-- Error state -->
@@ -168,7 +169,7 @@ export class TrendingAllComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private videoService: VideoService,
+    private youtubeService: YoutubeService,
     private cdr: ChangeDetectorRef 
   ) {}
 
@@ -176,34 +177,19 @@ export class TrendingAllComponent implements OnInit, OnDestroy {
     this.loadVideos();
   }
 
- /*  loadVideos() {
-    this.loading = true;
-    this.error = null;
-    
-    this.videoSubscription = this.videoService.getDavidoVideos().subscribe({
-      next: (response) => {
-        this.videos = response.data || [];
-        this.filteredVideos = [...this.videos];
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Failed to load videos. Please try again later.';
-        this.loading = false;
-        console.error('Error loading videos:', err);
-      }
-    });
-  } */
+
 
     loadVideos() {
       this.loading = true;
       this.error = null;
       
-      this.videoSubscription = this.videoService.getDavidoVideos().subscribe({
-        next: (response) => {
+      this.videoSubscription = this.youtubeService.getTrendingVideos().subscribe({
+        next: (response: any) => {
+          console.log('trending response ', response)
           this.videos = response.data || [];
           this.filteredVideos = [...this.videos];
           this.loading = false;
-          this.cdr.detectChanges(); // <-- add this
+          this.cdr.detectChanges(); 
         },
         error: (err) => {
           this.error = 'Failed to load videos. Please try again later.';

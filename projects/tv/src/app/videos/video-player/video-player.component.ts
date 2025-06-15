@@ -43,7 +43,7 @@ declare global {
             <h1>DavidoTV</h1>
           </div>
           <div class="header-actions">
-            <button mat-button class="subscribe-btn">
+            <button mat-raised-button class="subscribe-btn">
               <mat-icon>notifications</mat-icon>
               Subscribe
             </button>

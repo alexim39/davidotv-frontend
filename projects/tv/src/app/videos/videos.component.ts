@@ -16,6 +16,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
 import { timeAgo as timeAgoUtil } from '../common/utils/time.util';
+import { YoutubeService } from "../common/services/youtube.service";
 
 @Component({
   selector: 'async-videos',
@@ -44,7 +45,7 @@ import { timeAgo as timeAgoUtil } from '../common/utils/time.util';
         <button mat-icon-button (click)="goBack()" aria-label="Back button">
           <mat-icon>arrow_back</mat-icon>
         </button>
-        <h1>Davido's Videos</h1>
+        <h1>Davido's Related Videos</h1>
         <span class="spacer"></span>
         <button mat-icon-button [matMenuTriggerFor]="sortMenu" aria-label="Sort options">
           <mat-icon>sort</mat-icon>
@@ -128,7 +129,7 @@ import { timeAgo as timeAgoUtil } from '../common/utils/time.util';
           <mat-icon class="no-results-icon">search_off</mat-icon>
           <h3>No videos found</h3>
           <p>Try adjusting your search or filter criteria</p>
-          <button mat-raised-button color="primary" (click)="resetFilters()">Reset Filters</button>
+          <button mat-flat-button color="primary" (click)="resetFilters()">Reset Filters</button>
         </div>
 
         <!-- Error state -->
@@ -168,7 +169,7 @@ export class VideosComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private videoService: VideoService,
+    private youtubeService: YoutubeService,
     private cdr: ChangeDetectorRef 
   ) {}
 
@@ -181,12 +182,13 @@ export class VideosComponent implements OnInit, OnDestroy {
       this.loading = true;
       this.error = null;
       
-      this.videosSubscription = this.videoService.getDavidoVideos().subscribe({
-        next: (response) => {
+      this.videosSubscription = this.youtubeService.getAllVideos().subscribe({
+        next: (response: any) => {
+          console.log('video response ',response)
           this.videos = response.data || [];
           this.filteredVideos = [...this.videos];
           this.loading = false;
-          this.cdr.detectChanges(); // <-- add this
+          this.cdr.detectChanges(); 
         },
         error: (err) => {
           this.error = 'Failed to load videos. Please try again later.';

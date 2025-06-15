@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { timeAgo as timeAgoUtil } from '../../common/utils/time.util';
 import { HomeService } from "../home.service";
 import { Subscription } from 'rxjs';
+import { YoutubeService } from "../../common/services/youtube.service";
 
 @Component({
   selector: 'async-trending',
@@ -115,7 +116,7 @@ import { Subscription } from 'rxjs';
                         <h3 class="video-title" [matTooltip]="video.title">{{video.title}}</h3>
                         <p class="channel-name">{{video.channel}}</p>
                         <div class="video-stats">
-                          <span class="views">tv views {{video.views}}</span>
+                          <span class="views">Views {{video.views}}</span>
                           <span class="separator">•</span>
                           <span class="date"> {{ timeAgo(video.publishedAt) }} </span>
                         </div>
@@ -156,7 +157,7 @@ import { Subscription } from 'rxjs';
           <h3>No videos found</h3>
           <p>We couldn't load trending videos at this time. Please try again.</p>
           <button 
-            mat-raised-button 
+            mat-flat-button 
             color="primary" 
             (click)="retry()"
             aria-label="Retry loading videos"
@@ -182,7 +183,7 @@ export class TrendingComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private homeService: HomeService
+    private youtubeService: YoutubeService
   ) {
     this.videos = []; // Initialize videos array
     this.updateItemsPerView(false);
@@ -198,10 +199,10 @@ export class TrendingComponent implements OnInit, OnDestroy {
 
   private fetchVideos() {
     this.loading = true;
-    this.videoSubscription = this.homeService.getDavidoVideos().subscribe({
-      next: (response) => {
+    this.videoSubscription = this.youtubeService.getTrendingVideos().subscribe({
+      next: (response: any) => {
         console.log('data ',response)
-        if (response && response.data) {
+        if (response) {
           this.videos = response.data.map((video: any) => ({
             youtubeVideoId: video.youtubeVideoId,
             channelIcon: './img/ytch.jpeg',

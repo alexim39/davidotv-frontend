@@ -36,7 +36,7 @@ imports: [
 template: `
   
 
-<mat-toolbar class="navbar" color="primary">
+<mat-toolbar class="navbar">
   <div class="navbar-container">
     <!-- Logo -->
     <div class="logo" mat-button routerLink="/">
@@ -75,7 +75,7 @@ template: `
     <div class="actions">
 
      <!-- Theme Toggle Button -->
-    <!-- <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
+   <!--  <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
       <mat-icon>{{ isDarkTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
     </button> -->
 
@@ -145,7 +145,7 @@ template: `
   <a mat-button (click)="uploadContent(); toggleMobileMenu()">Upload</a>
 
   <!-- Theme Toggle Button -->
-  <!-- <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
+ <!--  <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
     <mat-icon>{{ isDarkTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
   </button> -->
 
@@ -483,9 +483,15 @@ export class NavbarComponent implements OnDestroy, OnInit {
       );
 
     }
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      this.isDarkTheme = true;
+      document.body.classList.add('dark-theme');
+    }
   }
 
- toggleTheme() {
+/*  toggleTheme() {
     this.isDarkTheme = !this.isDarkTheme;
     const body = document.body;
     if (this.isDarkTheme) {
@@ -493,6 +499,18 @@ export class NavbarComponent implements OnDestroy, OnInit {
     } else {
       body.classList.remove('dark-theme');
     }
+  } */
+
+  toggleTheme() {
+    this.isDarkTheme = !this.isDarkTheme;
+    const body = document.body;
+    if (this.isDarkTheme) {
+      body.classList.add('dark-theme');
+    } else {
+      body.classList.remove('dark-theme');
+    }
+    // Optionally persist theme preference
+    localStorage.setItem('theme', this.isDarkTheme ? 'dark' : 'light');
   }
 
   toggleMobileMenu() {

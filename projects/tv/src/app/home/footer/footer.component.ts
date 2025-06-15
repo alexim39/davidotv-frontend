@@ -36,8 +36,9 @@ import { UserInterface, UserService } from '../../common/services/user.service';
             <p class="tagline">Built by fans for fans</p>
           </div>
           <p class="company-description">
-            DavidoTv is the fans premier destination for all things Davido. 
-            We built a community and provide exclusive content, news, and updates about the Afrobeat superstar.
+            DavidoTV is the premier fan destination for all things Davido. 
+            We've built a community that provides exclusive content, news, and updates about the Afrobeat superstar.
+
           </p>
           <div class="contact-info">
             <p><mat-icon>email</mat-icon> info&#64;davidotv.com</p>
