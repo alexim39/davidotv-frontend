@@ -11,6 +11,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { PlaylistService } from './playlist.service';
 import { YoutubeService } from '../../common/services/youtube.service';
+import { timeAgo as timeAgoUtil } from '../../common/utils/time.util';
 
 // Declare YT for TypeScript to recognize the global YouTube API object
 declare global {
@@ -22,6 +23,7 @@ declare global {
 
 @Component({
   selector: 'async-video-player',
+  providers: [PlaylistService],
   imports: [
     CommonModule,
     FormsModule,
@@ -242,15 +244,14 @@ declare global {
             </div>
           </div>
           <div class="recommendation-list">
-            <div class="recommendation-item" *ngFor="let video of recommendedVideos" (click)="navigateToVideo(video.id)">
+            <div class="recommendation-item" *ngFor="let video of recommendedVideos" (click)="navigateToVideo(video.youtubeVideoId)">
               <div class="thumbnail-container">
-                <img [src]="video.thumbnail" alt="{{ video.title }}" class="thumbnail">
-                <span class="duration">{{ video.duration }}</span>
+              <img [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" alt="{{ video.title }}" class="thumbnail">                <span class="duration">{{ video.duration }}</span>
               </div>
               <div class="video-details">
                 <h4>{{ video.title }}</h4>
                 <p class="creator">Davido</p>
-                <p class="views">{{ video.views }} views • {{ video.date }}</p>
+                <p class="views">{{ video.views }} views • {{ timeAgo(video.publishedAt) }} </p>
               </div>
             </div>
           </div>
@@ -303,12 +304,19 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   pendingAutoPlay: boolean = false;
 
   // Playlist management
-  //davidoVideos: any = [];
-  davidoVideos = [
-    { id: 'NnWe5Lhi0G8', title: 'Davido - Fall', duration: '4:25', thumbnail: 'https://i.ytimg.com/vi/NnWe5Lhi0G8/mqdefault.jpg', views: '245M views', date: '5 years ago' },
-    { id: 'helEv0kGHd4', title: 'Davido - IF', duration: '3:32', thumbnail: 'https://i.ytimg.com/vi/helEv0kGHd4/mqdefault.jpg', views: '187M views', date: '4 years ago' },
-    { id: 'l6QMJniQWxQ', title: 'Davido - Assurance', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/l6QMJniQWxQ/mqdefault.jpg', views: '98M views', date: '3 years ago' }
-  ];
+  davidoVideos: any[] = [];
+
+  // Playlist management
+  /* davidoVideos = [
+    { youtubeVideoId: 'NnWe5Lhi0G8', title: 'Davido - Fall', duration: '4:25', thumbnail: 'https://i.ytimg.com/vi/NnWe5Lhi0G8/mqdefault.jpg', views: '245M views', publishedAt: '5 years ago' },
+    { youtubeVideoId: 'helEv0kGHd4', title: 'Davido - IF', duration: '3:32', thumbnail: 'https://i.ytimg.com/vi/helEv0kGHd4/mqdefault.jpg', views: '187M views', publishedAt: '4 years ago' },
+    { youtubeVideoId: 'l6QMJniQWxQ', title: 'Davido - Assurance', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/l6QMJniQWxQ/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
+    { youtubeVideoId: '8ORvJcpe2Oc', title: 'Davido - Assurance', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/8ORvJcpe2Oc/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
+    { youtubeVideoId: 'oiHh2-6jmnU', title: 'Davido - Assurance', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/oiHh2-6jmnU/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
+    { youtubeVideoId: '3Iyuym-Gci0', title: 'Davido - Fall', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/3Iyuym-Gci0/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
+    { youtubeVideoId: 'QGrxqOcZpZU', title: 'Davido - Fall', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/QGrxqOcZpZU/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
+    { youtubeVideoId: 'dAD73UeU6Dw', title: 'Davido - Fall', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/dAD73UeU6Dw/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
+  ]; */
   currentVideoIndex = 0;
 
   // Repeat mode
@@ -365,17 +373,13 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
 
       
-  this.youtubeService.getDavidoVideos().subscribe(videos => {
-    this.davidoVideos = videos;
-    this.recommendedVideos = videos;
-
-    /* const videoId = this.route.snapshot.paramMap.get('id') || videos[0]?.id;
-    if (videoId) {
-      this.currentVideoId = videoId;
-      this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
-      this.loadVideo(videoId);
-    } */
-  });
+    this.youtubeService.getDavidoVideos().subscribe({
+      next: (response) => {
+        console.log('video response ',response)
+        this.davidoVideos = response.data;
+        this.recommendedVideos = response.data;;
+      }
+    });
 
 
     // Assign onYouTubeIframeAPIReady to a global function and ensure it runs in Angular's zone
@@ -383,6 +387,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.loadYouTubeAPI();
 
   }
+
 
   ngOnDestroy() {
     // Clear the interval to prevent memory leaks
@@ -414,7 +419,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  onYouTubeIframeAPIReady() {
+  /* onYouTubeIframeAPIReady() {
     // Only create a new player if it doesn't exist or if it's been destroyed
     // Checking `getPlayerState` is a way to see if it's a valid player object
     if (!this.player || typeof this.player.getPlayerState !== 'function') {
@@ -448,9 +453,48 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         this.player.playVideo();
       }
     }
-  }
+  } */
 
- onPlayerReady(event: any) {
+    onYouTubeIframeAPIReady() {
+      // If the ViewChild is not yet available, retry after a short delay
+      if (!this.videoFrame || !this.videoFrame.nativeElement) {
+        setTimeout(() => this.onYouTubeIframeAPIReady(), 100);
+        return;
+      }
+
+      // ...existing code...
+      if (!this.player || typeof this.player.getPlayerState !== 'function') {
+        if (this.player && typeof this.player.destroy === 'function') {
+          this.player.destroy();
+        }
+
+        this.player = new window.YT.Player(this.videoFrame.nativeElement, {
+          videoId: this.currentVideoId,
+          playerVars: {
+            enablejsapi: 1,
+            rel: 0,
+            modestbranding: 1,
+            controls: 0,
+            disablekb: 1,
+            fs: 1,
+            iv_load_policy: 3,
+            origin: window.location.origin,
+            autoplay: this.autoplay ? 1 : 0
+          },
+          events: {
+            'onReady': this.onPlayerReady.bind(this),
+            'onStateChange': this.onPlayerStateChange.bind(this)
+          }
+        });
+      } else {
+        this.player.loadVideoById(this.currentVideoId);
+        if (this.autoplay) {
+          this.player.playVideo();
+        }
+      }
+    }
+
+ /* onPlayerReady(event: any) {
     this.ngZone.run(() => {
       this.playerReady = true;
       this.isLoading = false;
@@ -484,7 +528,35 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         this.playVideo();
       }
     });
-  }
+  } */
+
+    onPlayerReady(event: any) {
+      this.ngZone.run(() => {
+        this.playerReady = true;
+        this.isLoading = false;
+
+        // Synchronous call
+        const duration = this.player.getDuration();
+        this.duration = isNaN(duration) ? 0 : duration;
+
+        this.startUpdateLoop();
+
+        if (this.pendingAutoPlay) {
+          this.playVideo();
+          this.pendingAutoPlay = false;
+        }
+
+        // Synchronous call
+        const time = this.player.getCurrentTime();
+        this.currentTime = isNaN(time) ? 0 : time;
+
+        this.startPlayerStatePolling();
+
+        if (this.autoplay) {
+          this.playVideo();
+        }
+      });
+    }
 
   onPlayerStateChange(event: any) {
     // Ensure all state updates happen within Angular's zone
@@ -510,7 +582,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     });
   }
 
-  startPlayerStatePolling() {
+  /* startPlayerStatePolling() {
     // Clear any existing interval to prevent multiple polls running
     if (this.playerStateInterval) {
       clearInterval(this.playerStateInterval);
@@ -534,6 +606,41 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
                 this.duration = duration;
               });
             }).catch(() => {});
+          }
+        } catch (error) {
+          console.error('Error polling player state:', error);
+        }
+      }
+    }, 1000); // Poll every second
+  }
+ */
+
+  startPlayerStatePolling() {
+    // Clear any existing interval to prevent multiple polls running
+    if (this.playerStateInterval) {
+      clearInterval(this.playerStateInterval);
+    }
+    
+    // Set up a new interval to poll current time and duration
+    this.playerStateInterval = setInterval(() => {
+      if (this.playerReady && this.player) {
+        try {
+          // Get current time (synchronous)
+          const time = this.player.getCurrentTime();
+          if (!isNaN(time)) {
+            this.ngZone.run(() => {
+              this.currentTime = time;
+            });
+          }
+
+          // Refresh duration periodically (in case it wasn't available initially)
+          if (this.duration <= 0 || isNaN(this.duration)) {
+            const duration = this.player.getDuration();
+            if (!isNaN(duration) && duration > 0) {
+              this.ngZone.run(() => {
+                this.duration = duration;
+              });
+            }
           }
         } catch (error) {
           console.error('Error polling player state:', error);
@@ -767,8 +874,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       }
       const nextVideo = this.davidoVideos[nextIndex];
       this.currentVideoIndex = nextIndex;
-      this.router.navigate(['/watch', nextVideo.id]);
-      this.loadVideo(nextVideo.id, true);
+      this.router.navigate(['/watch', nextVideo.youtubeVideoId]);
+      this.loadVideo(nextVideo.youtubeVideoId, true);
       this.playVideo(); // Automatically play the next video
     }
   }
@@ -781,8 +888,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       }
       const prevVideo = this.davidoVideos[prevIndex];
       this.currentVideoIndex = prevIndex;
-      this.router.navigate(['/watch', prevVideo.id]);
-      this.loadVideo(prevVideo.id, true);
+      this.router.navigate(['/watch', prevVideo.youtubeVideoId]);
+      this.loadVideo(prevVideo.youtubeVideoId, true);
       this.playVideo(); // Automatically play the previous video
     }
   }
@@ -865,7 +972,12 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   navigateToVideo(videoId: string) {
     this.router.navigate(['/watch', videoId]);
-    this.loadVideo(videoId);
+    this.loadVideo(videoId, true);
+    this.playVideo(); 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  timeAgo(date: string | Date): string {
+    return timeAgoUtil(date);
   }
 }

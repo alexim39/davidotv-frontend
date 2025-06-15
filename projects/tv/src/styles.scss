@@ -1,8 +1,8 @@
 @use '@angular/material' as mat;
 
 html {
-  color-scheme: light;
-  //color-scheme: light dark;
+  //color-scheme: light;
+  color-scheme: light dark;
   @include mat.theme((
     color: mat.$rose-palette,
     typography: Roboto,

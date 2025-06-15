@@ -44,7 +44,7 @@ import { RouterModule } from '@angular/router';
               <mat-icon>local_fire_department</mat-icon>
               <span>Trending</span>
             </a>
-            <a mat-list-item routerLink="/audio/player" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/music/player" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
               <mat-icon>play_circle</mat-icon>
               <span>Music</span>
             </a>

@@ -1,6 +1,6 @@
 
 import { Component } from '@angular/core';
-import { TrendingComponent } from './trending.component';
+import { TrendingComponent } from './trending/trending.component';
 import { MerchandiseComponent } from './merchandise.component';
 import { CommunityComponent } from './community.component';
 import { VideoItem } from '../videos/videos.service';

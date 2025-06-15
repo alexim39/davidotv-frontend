@@ -1,3 +1,34 @@
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { ApiService } from '../../common/services/api.service';
+
+
+@Injectable()
+export class PlaylistService {
+ constructor(private apiService: ApiService) {}
+
+  /**
+   * Get video data from the backend API.
+   * @returns An Observable that emits the API response or an error.
+   */
+  getDavidoVideos(): Observable<any> {
+    return this.apiService.get<any>(`youtube/videos`, undefined, undefined, true);
+  }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 /* import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
@@ -28,7 +59,10 @@ export class PlaylistService {
 }
  */
 
-import { HttpClient, HttpParams } from '@angular/common/http';
+
+
+
+/* import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -69,4 +103,4 @@ export class PlaylistService {
       )
     );
   }
-}
+} */
