@@ -15,12 +15,11 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
 import { timeAgo as timeAgoUtil } from '../common/utils/time.util';
-import { VideoItem, VideoService } from "../videos/videos.service";
 import { YoutubeService } from "../common/services/youtube.service";
 
 @Component({
   selector: 'async-official',
-  providers: [VideoService],
+  providers: [],
   imports: [
     CommonModule, 
     MatCardModule, 
@@ -150,8 +149,8 @@ import { YoutubeService } from "../common/services/youtube.service";
   styleUrls: ['./official.component.scss']
 })
 export class OfficialComponent implements OnInit, OnDestroy {
-  videos: VideoItem[] = [];
-  filteredVideos: VideoItem[] = [];
+  videos: any[] = [];
+  filteredVideos: any[] = [];
   loading = false;
   loadingMore = false;
   error: string | null = null;

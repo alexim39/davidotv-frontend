@@ -3,7 +3,6 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
-import { VideoService } from "../videos.service";
 import { Router, ActivatedRoute } from "@angular/router";
 import { MatChipsModule } from "@angular/material/chips";
 import { Subscription } from "rxjs";
@@ -21,7 +20,7 @@ import { YoutubeService, YoutubeVideo } from "../../common/services/youtube.serv
 
 @Component({
   selector: 'async-trending-all',
-  providers: [VideoService],
+  providers: [],
   imports: [
     CommonModule, 
     MatCardModule, 

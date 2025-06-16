@@ -3,7 +3,6 @@ import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from "@
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
-import { VideoItem, VideoService } from "./videos.service";
 import { Router, ActivatedRoute } from "@angular/router";
 import { MatChipsModule } from "@angular/material/chips";
 import { Subscription, fromEvent } from "rxjs";
@@ -21,7 +20,7 @@ import { throttleTime } from 'rxjs/operators';
 
 @Component({
   selector: 'async-videos',
-  providers: [VideoService],
+  providers: [],
   imports: [
     CommonModule, 
     MatCardModule, 
@@ -153,7 +152,7 @@ import { throttleTime } from 'rxjs/operators';
   styleUrls: ['./videos.component.scss']
 })
 export class VideosComponent implements OnInit, OnDestroy {
-  allVideos: VideoItem[] = []
+  allVideos: any[] = []
   /* allVideos: DavidoVideo[] = [
     { youtubeVideoId: 'NnWe5Lhi0G8', title: 'Davido - Fall',  thumbnail: 'https://i.ytimg.com/vi/NnWe5Lhi0G8/mqdefault.jpg', views: '245M views', publishedAt: '5 years ago' },
     { youtubeVideoId: 'helEv0kGHd4', title: 'Davido - IF',  thumbnail: 'https://i.ytimg.com/vi/helEv0kGHd4/mqdefault.jpg', views: '187M views', publishedAt: '4 years ago' },
@@ -164,8 +163,8 @@ export class VideosComponent implements OnInit, OnDestroy {
     { youtubeVideoId: 'QGrxqOcZpZU', title: 'Davido - Fall',  thumbnail: 'https://i.ytimg.com/vi/QGrxqOcZpZU/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
     { youtubeVideoId: 'dAD73UeU6Dw', title: 'Davido - Fall',  thumbnail: 'https://i.ytimg.com/vi/dAD73UeU6Dw/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
   ]; */
-  videos: VideoItem[] = [];
-  filteredVideos: VideoItem[] = [];
+  videos: any[] = [];
+  filteredVideos: any[] = [];
   loading = false;
   error: string | null = null;
   
