@@ -6,7 +6,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { VideoItem, VideoService } from "./videos.service";
 import { Router, ActivatedRoute } from "@angular/router";
 import { MatChipsModule } from "@angular/material/chips";
-import { Subscription } from "rxjs";
+import { Subscription, fromEvent } from "rxjs";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatInputModule } from '@angular/material/input';
@@ -17,6 +17,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
 import { timeAgo as timeAgoUtil } from '../common/utils/time.util';
 import { YoutubeService } from "../common/services/youtube.service";
+import { throttleTime } from 'rxjs/operators';
 
 @Component({
   selector: 'async-videos',
@@ -105,10 +106,11 @@ import { YoutubeService } from "../common/services/youtube.service";
             </div>
             <mat-card-content>
               <div class="video-info">
+                <!-- <img src="./img/ytch.jpeg" alt="Channel" class="channel-icon" loading="lazy"> -->
                 <img src="./img/ytch.jpeg" alt="Channel" class="channel-icon" loading="lazy">
                 <div class="video-meta">
                   <h3>{{ video.title }}</h3>
-                  <p class="channel-name">Davido</p>
+                  <p class="channel-name">{{ video.channel }}</p>
                   <div class="video-stats">
                     <span class="stat-item">
                       <mat-icon class="stat-icon">visibility</mat-icon>
@@ -166,6 +168,13 @@ export class VideosComponent implements OnInit, OnDestroy {
   selectedCategory = 'all';
   private videosSubscription?: Subscription;
 
+   // Infinite scroll state
+  private page = 0;
+  private pageSize = 30;
+  private allLoaded = false;
+  private scrollSubscription?: Subscription;
+
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -175,29 +184,54 @@ export class VideosComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadVideos();
+    // Listen to scroll events on the container
+    setTimeout(() => this.initScrollListener());
+  }
+
+  private initScrollListener() {
+    const container = document.querySelector('.trending-all-container');
+    if (!container) return;
+    this.scrollSubscription = fromEvent(container, 'scroll')
+      .pipe(throttleTime(200))
+      .subscribe(() => {
+        if (this.loading || this.allLoaded) return;
+        const threshold = 200; // px from bottom
+        if (container.scrollTop + container.clientHeight >= container.scrollHeight - threshold) {
+          this.loadVideos();
+        }
+      });
   }
 
 
     loadVideos() {
-      this.loading = true;
-      this.error = null;
-      
-      this.videosSubscription = this.youtubeService.getAllVideos().subscribe({
-        next: (response: any) => {
-          console.log('video response ',response)
-          this.videos = response.data || [];
-          this.filteredVideos = [...this.videos];
-          this.loading = false;
-          this.cdr.detectChanges(); 
-        },
-        error: (err) => {
-          this.error = 'Failed to load videos. Please try again later.';
-          this.loading = false;
-          this.cdr.detectChanges(); // <-- add this
-          console.error('Error loading videos:', err);
+    if (this.loading || this.allLoaded) return;
+    this.loading = true;
+    this.error = null;
+
+    this.youtubeService.getAllVideos(this.pageSize, true).subscribe({
+      next: (response: any) => {
+        const newVideos = response.data || [];
+        if (newVideos.length < this.pageSize) {
+          this.allLoaded = true;
         }
-      });
-    }
+        // Avoid duplicates
+        const newUnique = newVideos.filter(
+          (v: any) => !this.videos.some(existing => existing.youtubeVideoId === v.youtubeVideoId)
+        );
+        this.videos = [...this.videos, ...newUnique];
+        this.filteredVideos = [...this.videos];
+        this.page++;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.error = 'Failed to load videos. Please try again later.';
+        this.loading = false;
+        this.cdr.detectChanges();
+        console.error('Error loading videos:', err);
+      }
+    });
+  }
 
   // Sorting
   sortBy(property: 'title' | 'views' | 'publishedAt') {
@@ -267,8 +301,9 @@ export class VideosComponent implements OnInit, OnDestroy {
     this.loadVideos();
   }
 
-  ngOnDestroy() {
+   ngOnDestroy() {
     this.videosSubscription?.unsubscribe();
+    this.scrollSubscription?.unsubscribe();
   }
 
   // Handle scroll event (currently does nothing, but required for template binding)

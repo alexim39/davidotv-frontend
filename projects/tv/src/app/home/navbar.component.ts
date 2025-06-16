@@ -65,7 +65,7 @@ template: `
     <div class="nav-links">
       <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
       <a mat-button routerLink="/videos" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Videos</a>
-      <a mat-button routerLink="/audio/player" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Music</a>
+      <a mat-button routerLink="/official/videos" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Official</a>
       <a mat-button routerLink="/fan-art" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Fan Groups</a>
       <a mat-button routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Store</a>
       <button mat-button routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="uploadContent()">Upload</button>
@@ -139,7 +139,7 @@ template: `
 
   <a mat-button routerLink="/" (click)="toggleMobileMenu()">Home</a>
   <a mat-button routerLink="/videos" (click)="toggleMobileMenu()">Videos</a>
-  <a mat-button routerLink="/audio/player" (click)="toggleMobileMenu()">Music</a>
+  <a mat-button routerLink="/official/videos" (click)="toggleMobileMenu()">Official</a>
   <a mat-button routerLink="/fan-art" (click)="toggleMobileMenu()">Fan Groups</a>
   <a mat-button routerLink="/store" (click)="toggleMobileMenu()">Store</a>
   <a mat-button (click)="uploadContent(); toggleMobileMenu()">Upload</a>

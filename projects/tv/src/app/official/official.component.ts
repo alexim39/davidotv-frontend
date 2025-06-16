@@ -19,7 +19,7 @@ import { VideoItem, VideoService } from "../videos/videos.service";
 import { YoutubeService } from "../common/services/youtube.service";
 
 @Component({
-  selector: 'async-music',
+  selector: 'async-official',
   providers: [VideoService],
   imports: [
     CommonModule, 
@@ -45,7 +45,7 @@ import { YoutubeService } from "../common/services/youtube.service";
         <button mat-icon-button (click)="goBack()" aria-label="Back button">
           <mat-icon>arrow_back</mat-icon>
         </button>
-        <h1>Davido's Music Videos</h1>
+        <h1>Davido's Official Videos</h1>
         <span class="spacer"></span>
         <button mat-icon-button [matMenuTriggerFor]="sortMenu" aria-label="Sort options">
           <mat-icon>sort</mat-icon>
@@ -142,9 +142,9 @@ import { YoutubeService } from "../common/services/youtube.service";
       </div>
     </div>
   `,
-  styleUrls: ['./music.component.scss']
+  styleUrls: ['./official.component.scss']
 })
-export class MusicComponent implements OnInit, OnDestroy {
+export class OfficialComponent implements OnInit, OnDestroy {
   allVideos: VideoItem[] = []
   /* allVideos: DavidoVideo[] = [
     { youtubeVideoId: 'NnWe5Lhi0G8', title: 'Davido - Fall',  thumbnail: 'https://i.ytimg.com/vi/NnWe5Lhi0G8/mqdefault.jpg', views: '245M views', publishedAt: '5 years ago' },

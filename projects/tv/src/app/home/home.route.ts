@@ -33,8 +33,8 @@ export const HomeRoutes: Routes = [
             {   path: 'videos', 
                 loadChildren: () => import('../videos/videos.route').then(r => r.VideosRoutes) 
             },      
-            {   path: 'music', 
-                loadChildren: () => import('../music/music.route').then(r => r.MusicRoutes) 
+            {   path: 'official', 
+                loadChildren: () => import('../official/official.route').then(r => r.OfficialRoutes) 
             },      
         ]
     }

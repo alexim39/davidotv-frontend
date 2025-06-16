@@ -108,7 +108,7 @@ import { YoutubeService, YoutubeVideo } from "../../common/services/youtube.serv
                     <img src="./img/ytch.jpeg" alt="Channel" class="channel-icon" loading="lazy">
                     <div class="video-meta">
                       <h3>{{ video.title }}</h3>
-                      <p class="channel-name">Davido</p>
+                      <p class="channel-name">{{ video.channel }}</p>
                       <div class="video-stats">
                         <span class="stat-item">
                           <mat-icon class="stat-icon">visibility</mat-icon>

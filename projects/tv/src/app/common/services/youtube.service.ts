@@ -47,49 +47,53 @@ export class YoutubeService {
    * @param limit Number of videos to return
    * @param forceRefresh Bypass cache and force refresh
    */
-getTrendingVideos(limit: number = 12, forceRefresh: boolean = false): Observable<YoutubeVideo[]> {
+  getTrendingVideos(limit: number = 12, forceRefresh: boolean = false): Observable<YoutubeVideo[]> {
     if (!forceRefresh && this.trendingCache.value.length > 0) {
-        return this.trendingCache.asObservable().pipe(
-            map(videos => videos.slice(0, limit))
-        );
+      return this.trendingCache.asObservable().pipe(
+        map(videos => videos.slice(0, limit))
+      );
     }
 
     const params = new HttpParams()
-        .set('menuType', 'trending')
-        .set('limit', limit.toString());
+      .set('menuType', 'trending')
+      .set('limit', limit.toString())
+      .set('sort', '-engagementScore,-publishedAt');
 
-    return this.apiService.get<YoutubeVideo[]>(`youtube/videos`, params).pipe(
-        tap(videos => {
-            this.trendingCache.next(videos);
-        }),
-        catchError(this.handleError)
+      
+
+    return this.apiService.get<YoutubeVideo[]>(`youtube/videos`, params ).pipe(
+      tap(videos => {
+        this.trendingCache.next(videos);
+      }),
+      catchError(this.handleError)
     );
-}
+  }
 
   /**
    * Get official Davido music videos
    * @param limit Number of videos to return
    * @param forceRefresh Bypass cache and force refresh
    */
-getMusicVideos(limit: number = 12, forceRefresh: boolean = false): Observable<YoutubeVideo[]> {
+  getMusicVideos(limit: number = 12, forceRefresh: boolean = false): Observable<YoutubeVideo[]> {
     if (!forceRefresh && this.musicCache.value.length > 0) {
-        return this.musicCache.asObservable().pipe(
-            map(videos => videos.slice(0, limit))
-        );
+      return this.musicCache.asObservable().pipe(
+        map(videos => videos.slice(0, limit))
+      );
     }
 
     const params = new HttpParams()
-        .set('menuType', 'music')
-        .set('isOfficialContent', 'true')
-        .set('limit', limit.toString());
+      .set('isOfficialContent', 'true')
+      .set('menuType', 'music')
+      .set('limit', limit.toString())
+      .set('sort', '-publishedAt');
 
-    return this.apiService.get<YoutubeVideo[]>(`youtube/videos`, params).pipe(
-        tap(videos => {
-            this.musicCache.next(videos);
-        }),
-        catchError(this.handleError)
+    return this.apiService.get<YoutubeVideo[]>(`youtube/videos`, params ).pipe(
+      tap(videos => {
+        this.musicCache.next(videos);
+      }),
+      catchError(this.handleError)
     );
-}
+  }
 
   /**
    * Get all Davido-related videos (excluding official music)
