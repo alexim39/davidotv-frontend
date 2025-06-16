@@ -43,65 +43,95 @@ export class YoutubeService {
    constructor(private apiService: ApiService) {}
 
   /**
-   * Get trending Davido-related videos
-   * @param limit Number of videos to return
-   * @param forceRefresh Bypass cache and force refresh
-   */
-  getTrendingVideos(limit: number = 12, forceRefresh: boolean = false): Observable<YoutubeVideo[]> {
-    if (!forceRefresh && this.trendingCache.value.length > 0) {
-      return this.trendingCache.asObservable().pipe(
-        map(videos => videos.slice(0, limit))
-      );
-    }
+ * Get trending Davido-related videos with infinite scroll support
+ * @param limit Number of videos to return
+ * @param page Page number for pagination
+ * @param forceRefresh Bypass cache and force refresh
+ */
+getTrendingVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<YoutubeVideo[]> {
+  // Always get current cache value safely
+  const currentCache = this.trendingCache.value || [];
 
-    const params = new HttpParams()
-      .set('menuType', 'trending')
-      .set('limit', limit.toString())
-      .set('sort', '-engagementScore,-publishedAt');
-
-      
-
-    return this.apiService.get<YoutubeVideo[]>(`youtube/videos`, params ).pipe(
-      tap(videos => {
-        this.trendingCache.next(videos);
-      }),
-      catchError(this.handleError)
+  if (!forceRefresh && page === 0 && currentCache.length > 0) {
+    return this.trendingCache.asObservable().pipe(
+      map(videos => videos.slice(0, limit))
     );
   }
+
+  const params = new HttpParams()
+    .set('menuType', 'trending')
+    .set('limit', limit.toString())
+    .set('page', page.toString())
+    .set('sort', '-engagementScore,-publishedAt');
+
+  return this.apiService.get<YoutubeVideo[]>(`youtube/videos`, params).pipe(
+    tap(videos => {
+      // Ensure videos is an array
+      const newVideos = Array.isArray(videos) ? videos : [];
+      
+      if (page === 0) {
+        // First page - replace cache
+        this.trendingCache.next(newVideos);
+      } else {
+        // Subsequent pages - append to cache
+        this.trendingCache.next([...currentCache, ...newVideos]);
+      }
+    }),
+    catchError(this.handleError)
+  );
+}
+
 
   /**
-   * Get official Davido music videos
-   * @param limit Number of videos to return
-   * @param forceRefresh Bypass cache and force refresh
-   */
-  getMusicVideos(limit: number = 12, forceRefresh: boolean = false): Observable<YoutubeVideo[]> {
-    if (!forceRefresh && this.musicCache.value.length > 0) {
-      return this.musicCache.asObservable().pipe(
-        map(videos => videos.slice(0, limit))
-      );
-    }
+ * Get official Davido music videos with infinite scroll support
+ * @param limit Number of videos to return
+ * @param page Page number for pagination
+ * @param forceRefresh Bypass cache and force refresh
+ */
+getMusicVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<YoutubeVideo[]> {
+  // Always get current cache value safely
+  const currentCache = this.musicCache.value || [];
 
-    const params = new HttpParams()
-      .set('isOfficialContent', 'true')
-      .set('menuType', 'music')
-      .set('limit', limit.toString())
-      .set('sort', '-publishedAt');
-
-    return this.apiService.get<YoutubeVideo[]>(`youtube/videos`, params ).pipe(
-      tap(videos => {
-        this.musicCache.next(videos);
-      }),
-      catchError(this.handleError)
+  if (!forceRefresh && page === 0 && currentCache.length > 0) {
+    return this.musicCache.asObservable().pipe(
+      map(videos => videos.slice(0, limit))
     );
   }
+
+  const params = new HttpParams()
+    .set('isOfficialContent', 'true')
+    .set('menuType', 'music')
+    .set('limit', limit.toString())
+    .set('page', page.toString())
+    .set('sort', '-publishedAt');
+
+  return this.apiService.get<YoutubeVideo[]>(`youtube/videos`, params).pipe(
+    tap(videos => {
+      // Ensure videos is an array
+      const newVideos = Array.isArray(videos) ? videos : [];
+      
+      if (page === 0) {
+        // First page - replace cache
+        this.musicCache.next(newVideos);
+      } else {
+        // Subsequent pages - append to cache
+        this.musicCache.next([...currentCache, ...newVideos]);
+      }
+    }),
+    catchError(this.handleError)
+  );
+}
 
   /**
    * Get all Davido-related videos (excluding official music)
    * @param limit Number of videos to return
    * @param forceRefresh Bypass cache and force refresh
    */
-  getAllVideos(limit: number = 12, forceRefresh: boolean = false): Observable<YoutubeVideo[]> {
-    if (!forceRefresh && this.videosCache.value.length > 0) {
+  getAllVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<YoutubeVideo[]> {
+    // Always get current cache value safely
+    const currentCache = this.videosCache.value || [];
+
+    if (!forceRefresh && page === 0 && currentCache.length > 0) {
       return this.videosCache.asObservable().pipe(
         map(videos => videos.slice(0, limit))
       );
@@ -110,11 +140,21 @@ export class YoutubeService {
     const params = new HttpParams()
       .set('menuType', 'videos')
       .set('limit', limit.toString())
+      .set('page', page.toString())
       .set('sort', '-publishedAt');
 
-    return this.apiService.get<YoutubeVideo[]>(`youtube/videos`, params ).pipe(
+    return this.apiService.get<YoutubeVideo[]>(`youtube/videos`, params).pipe(
       tap(videos => {
-        this.videosCache.next(videos);
+        // Ensure videos is an array
+        const newVideos = Array.isArray(videos) ? videos : [];
+        
+        if (page === 0) {
+          // First page - replace cache
+          this.videosCache.next(newVideos);
+        } else {
+          // Subsequent pages - append to cache
+          this.videosCache.next([...currentCache, ...newVideos]);
+        }
       }),
       catchError(this.handleError)
     );

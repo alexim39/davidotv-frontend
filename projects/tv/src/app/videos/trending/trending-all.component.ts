@@ -148,6 +148,12 @@ import { YoutubeService, YoutubeVideo } from "../../common/services/youtube.serv
           <!-- Similar content structure for live videos -->
         </mat-tab>
       </mat-tab-group>
+
+       <div *ngIf="loading && !error" class="loading-more">
+        <mat-spinner diameter="30" strokeWidth="2" color="accent"></mat-spinner>
+        <span>Loading more videos...</span>
+      </div>
+
     </div>
   `,
   styleUrls: ['./trending-all.component.scss'],
@@ -155,13 +161,19 @@ import { YoutubeService, YoutubeVideo } from "../../common/services/youtube.serv
 export class TrendingAllComponent implements OnInit, OnDestroy {
   videos: any[] = [];
   filteredVideos: any[] = [];
-  loading = true;
+  loading = false;
+  loadingMore = false;
   error: string | null = null;
-  currentSortOrder: 'viewCount' | 'date' | 'relevance' = 'viewCount';
+  allLoaded = false;
   
-  // Filters
+  // Pagination
+  private page = 0;
+  private readonly pageSize = 12;
+
+  // Filters and sorting
   searchQuery = '';
   selectedCategory = 'all';
+  currentSortOrder: 'viewCount' | 'date' | 'relevance' = 'viewCount';
   activeTab = 'all';
 
   private videoSubscription?: Subscription;
@@ -179,26 +191,49 @@ export class TrendingAllComponent implements OnInit, OnDestroy {
 
 
 
-    loadVideos() {
-      this.loading = true;
-      this.error = null;
+  loadVideos() {
+  if (this.loading || this.allLoaded) return;
+  
+  this.loading = true;
+  this.error = null;
+
+  this.videoSubscription = this.youtubeService.getTrendingVideos(this.pageSize, this.page, true).subscribe({
+    next: (response: any) => {
+      const newVideos = response.data || [];
       
-      this.videoSubscription = this.youtubeService.getTrendingVideos().subscribe({
-        next: (response: any) => {
-          console.log('trending response ', response)
-          this.videos = response.data || [];
-          this.filteredVideos = [...this.videos];
-          this.loading = false;
-          this.cdr.detectChanges(); 
-        },
-        error: (err) => {
-          this.error = 'Failed to load videos. Please try again later.';
-          this.loading = false;
-          this.cdr.detectChanges(); // <-- add this
-          console.error('Error loading videos:', err);
-        }
-      });
+      // If we get fewer videos than requested, we've reached the end
+      if (newVideos.length < this.pageSize) {
+        this.allLoaded = true;
+      }
+
+      // Avoid duplicates
+      const newUnique = newVideos.filter(
+        (v: any) => !this.videos.some(existing => existing.youtubeVideoId === v.youtubeVideoId)
+      );
+
+      this.videos = [...this.videos, ...newUnique];
+      this.filteredVideos = [...this.videos];
+      this.page++;
+      this.loading = false;
+      this.cdr.detectChanges();
+    },
+    error: (err) => {
+      this.error = 'Failed to load videos. Please try again later.';
+      this.loading = false;
+      this.cdr.detectChanges();
+      console.error('Error loading videos:', err);
     }
+  });
+}
+
+  onContainerScroll(event: Event): void {
+    const container = event.target as HTMLElement;
+    const threshold = 100; // px from bottom
+    
+    if (container.scrollTop + container.clientHeight >= container.scrollHeight - threshold) {
+      this.loadVideos();
+    }
+  }
 
   changeSortOrder(order: 'viewCount' | 'date' | 'relevance') {
     if (this.currentSortOrder !== order) {

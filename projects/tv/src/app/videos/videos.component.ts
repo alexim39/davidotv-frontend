@@ -142,6 +142,12 @@ import { throttleTime } from 'rxjs/operators';
           <button mat-raised-button color="primary" (click)="retryLoading()">Retry</button>
         </div>
       </div>
+
+      <div *ngIf="loading && !error" class="loading-more">
+        <mat-spinner diameter="30" strokeWidth="2" color="accent"></mat-spinner>
+        <span>Loading more videos...</span>
+      </div>
+    
     </div>
   `,
   styleUrls: ['./videos.component.scss']
@@ -202,22 +208,27 @@ export class VideosComponent implements OnInit, OnDestroy {
       });
   }
 
-
-    loadVideos() {
+  // Update the loadVideos method in VideosComponent
+  loadVideos() {
     if (this.loading || this.allLoaded) return;
+    
     this.loading = true;
     this.error = null;
 
-    this.youtubeService.getAllVideos(this.pageSize, true).subscribe({
+    this.youtubeService.getAllVideos(this.pageSize, this.page, true).subscribe({
       next: (response: any) => {
         const newVideos = response.data || [];
+        
+        // If we get fewer videos than requested, we've reached the end
         if (newVideos.length < this.pageSize) {
           this.allLoaded = true;
         }
+
         // Avoid duplicates
         const newUnique = newVideos.filter(
           (v: any) => !this.videos.some(existing => existing.youtubeVideoId === v.youtubeVideoId)
         );
+
         this.videos = [...this.videos, ...newUnique];
         this.filteredVideos = [...this.videos];
         this.page++;
@@ -307,9 +318,14 @@ export class VideosComponent implements OnInit, OnDestroy {
   }
 
   // Handle scroll event (currently does nothing, but required for template binding)
-  onContainerScroll(event: Event): void {
-    // You can implement infinite scroll or analytics here if needed
+onContainerScroll(event: Event): void {
+  const container = event.target as HTMLElement;
+  const threshold = 100; // px from bottom
+  
+  if (container.scrollTop + container.clientHeight >= container.scrollHeight - threshold) {
+    this.loadVideos();
   }
+}
 
    timeAgo(date: string | Date): string {
       return timeAgoUtil(date);

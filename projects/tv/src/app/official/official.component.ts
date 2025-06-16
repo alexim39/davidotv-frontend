@@ -140,27 +140,27 @@ import { YoutubeService } from "../common/services/youtube.service";
           <button mat-raised-button color="primary" (click)="retryLoading()">Retry</button>
         </div>
       </div>
+
+       <div *ngIf="loading && !error" class="loading-more">
+        <mat-spinner diameter="30" strokeWidth="2" color="accent"></mat-spinner>
+        <span>Loading more videos...</span>
+      </div>
     </div>
   `,
   styleUrls: ['./official.component.scss']
 })
 export class OfficialComponent implements OnInit, OnDestroy {
-  allVideos: VideoItem[] = []
-  /* allVideos: DavidoVideo[] = [
-    { youtubeVideoId: 'NnWe5Lhi0G8', title: 'Davido - Fall',  thumbnail: 'https://i.ytimg.com/vi/NnWe5Lhi0G8/mqdefault.jpg', views: '245M views', publishedAt: '5 years ago' },
-    { youtubeVideoId: 'helEv0kGHd4', title: 'Davido - IF',  thumbnail: 'https://i.ytimg.com/vi/helEv0kGHd4/mqdefault.jpg', views: '187M views', publishedAt: '4 years ago' },
-    { youtubeVideoId: 'l6QMJniQWxQ', title: 'Davido - Assurance',  thumbnail: 'https://i.ytimg.com/vi/l6QMJniQWxQ/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: '8ORvJcpe2Oc', title: 'Davido - Assurance',  thumbnail: 'https://i.ytimg.com/vi/8ORvJcpe2Oc/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: 'oiHh2-6jmnU', title: 'Davido - Assurance',  thumbnail: 'https://i.ytimg.com/vi/oiHh2-6jmnU/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: '3Iyuym-Gci0', title: 'Davido - Fall',  thumbnail: 'https://i.ytimg.com/vi/3Iyuym-Gci0/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: 'QGrxqOcZpZU', title: 'Davido - Fall',  thumbnail: 'https://i.ytimg.com/vi/QGrxqOcZpZU/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: 'dAD73UeU6Dw', title: 'Davido - Fall',  thumbnail: 'https://i.ytimg.com/vi/dAD73UeU6Dw/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-  ]; */
   videos: VideoItem[] = [];
   filteredVideos: VideoItem[] = [];
   loading = false;
+  loadingMore = false;
   error: string | null = null;
+  allLoaded = false;
   
+  // Pagination
+  private page = 0;
+  private readonly pageSize = 12;
+
   // Filters
   searchQuery = '';
   selectedCategory = 'all';
@@ -178,26 +178,42 @@ export class OfficialComponent implements OnInit, OnDestroy {
   }
 
 
-    loadVideos() {
-      this.loading = true;
-      this.error = null;
+ loadVideos() {
+  if (this.loading || this.allLoaded) return;
+  
+  this.loading = true;
+  this.error = null;
+
+  this.videosSubscription = this.youtubeService.getMusicVideos(this.pageSize, this.page, true).subscribe({
+    next: (response: any) => {
+      const newVideos = response.data || [];
       
-      this.videosSubscription = this.youtubeService.getMusicVideos().subscribe({
-        next: (response: any) => {
-          console.log('music response ',response)
-          this.videos = response.data || [];
-          this.filteredVideos = [...this.videos];
-          this.loading = false;
-          this.cdr.detectChanges(); 
-        },
-        error: (err) => {
-          this.error = 'Failed to load videos. Please try again later.';
-          this.loading = false;
-          this.cdr.detectChanges(); // <-- add this
-          console.error('Error loading videos:', err);
-        }
-      });
+      // If we get fewer videos than requested, we've reached the end
+      if (newVideos.length < this.pageSize) {
+        this.allLoaded = true;
+      }
+
+      // Avoid duplicates
+      const newUnique = newVideos.filter(
+        (v: any) => !this.videos.some(existing => existing.youtubeVideoId === v.youtubeVideoId)
+      );
+
+      this.videos = [...this.videos, ...newUnique];
+      this.filteredVideos = [...this.videos];
+      this.page++;
+      this.loading = false;
+      this.cdr.detectChanges();
+    },
+    error: (err) => {
+      this.error = 'Failed to load videos. Please try again later.';
+      this.loading = false;
+      this.cdr.detectChanges();
+      console.error('Error loading videos:', err);
     }
+  });
+}
+
+  
 
   // Sorting
   sortBy(property: 'title' | 'views' | 'publishedAt') {
@@ -273,7 +289,12 @@ export class OfficialComponent implements OnInit, OnDestroy {
 
   // Handle scroll event (currently does nothing, but required for template binding)
   onContainerScroll(event: Event): void {
-    // You can implement infinite scroll or analytics here if needed
+    const container = event.target as HTMLElement;
+    const threshold = 100; // px from bottom
+    
+    if (container.scrollTop + container.clientHeight >= container.scrollHeight - threshold) {
+      this.loadVideos();
+    }
   }
 
    timeAgo(date: string | Date): string {
