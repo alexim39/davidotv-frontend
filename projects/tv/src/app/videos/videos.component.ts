@@ -91,10 +91,10 @@ import { throttleTime } from 'rxjs/operators';
       <!-- video content -->
       <div class="video-content">
         <!-- Loading state -->
-        <div *ngIf="loading" class="loading-container">
+        <!-- <div *ngIf="loading" class="loading-container">
           <mat-spinner diameter="50" strokeWidth="2" color="accent"></mat-spinner>
           <p class="loading-text">Loading Davido videos...</p>
-        </div>
+        </div> -->
 
         <!-- Videos grid -->
         <div *ngIf="videos.length > 0" class="video-grid">
@@ -144,7 +144,7 @@ import { throttleTime } from 'rxjs/operators';
 
       <div *ngIf="loading && !error" class="loading-more">
         <mat-spinner diameter="30" strokeWidth="2" color="accent"></mat-spinner>
-        <span>Loading more videos...</span>
+        <span>Loading videos...</span>
       </div>
     
     </div>

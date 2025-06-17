@@ -248,7 +248,6 @@ display: none;
       justify-content: space-between;
       align-items: center;
       padding-bottom: 16px;
-      border-bottom: 1px solid #3f3f3f;
     }
 
     .video-stats {
@@ -256,6 +255,8 @@ display: none;
       font-size: 0.9rem;
       display: flex;
       gap: 12px;
+      justify-content: center;
+      align-items: center;
     }
 
     .video-actions {
@@ -535,11 +536,20 @@ display: none;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
-
-    .creator, .views {
+    .youtube {
+      color: #666;
+    }
+    .creator, .views, .likes, .dislikes, .upload-date {
       font-size: 0.8rem;
       color: #666;
       margin: 0;
+    }
+
+    .views, .likes, .dislikes {
+      font-weight: bolder;
+      mat-icon {
+        font-size: 0.8rem;
+      }
     }
 
     /* Responsive Design */
@@ -632,3 +642,262 @@ display: none;
     .mat-slider-thumb-label {
       background-color: #ff4b2b !important;
     }
+.video-controls.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.video-meta-container {
+  margin: 16px 0;
+  padding-bottom: 12px;
+
+  // Music Title Section
+  .music-title {
+    margin-bottom: -12px;
+    display: flex;
+    flex-direction: column;
+    //gap: 1px;
+    opacity: 0.8;
+    
+    .song-title {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: normal;
+
+      //color: white;
+      line-height: 1.3;
+      letter-spacing: -0.5px;
+    }
+    
+    .artist-info {
+      display: flex;
+      align-items: center;
+      //gap: 1px;
+      opacity: 0.8;
+      
+      .artist-icon {
+        font-size: 1rem;
+        color: #FF4B2B;
+      }
+      
+      .artist-name {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 3px;
+      }
+    }
+  }
+
+  // Video Meta Content
+  .video-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    // YouTube Stats - Subtle and minimal
+    .youtube-stats {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+      
+      &:hover {
+        opacity: 1;
+      }
+      
+      .youtube-badge {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+        
+        .youtube-icon {
+          color: #FF0000;
+          font-size: 1rem;
+          width: 1rem;
+          height: 1rem;
+        }
+      }
+      
+      .youtube-metrics {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+        
+        .youtube-metric {
+          display: flex;
+          align-items: center;
+        }
+      }
+    }
+    
+    // App Engagement - Prominent and interactive
+    .app-engagement {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      
+      .reaction-buttons {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        padding: 2px;
+        
+        .reaction-btn {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border: none;
+          background: transparent;
+          color: rgba(255, 255, 255, 0.8);
+          border-radius: 16px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          
+          mat-icon {
+            font-size: 1.1rem;
+          }
+          
+          .count {
+            font-weight: 500;
+            font-size: 0.9rem;
+          }
+          
+          &.like-btn:hover {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+          }
+          
+          &.dislike-btn:hover {
+            background: rgba(244, 67, 54, 0.1);
+            color: #F44336;
+          }
+          
+          &.active {
+            &.like-btn {
+              background: rgba(76, 175, 80, 0.2);
+              color: #4CAF50;
+            }
+            
+            &.dislike-btn {
+              background: rgba(244, 67, 54, 0.2);
+              color: #F44336;
+            }
+          }
+        }
+      }
+      
+      .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        .action-btn {
+          background: rgba(255, 255, 255, 0.08);
+          color: rgba(255, 255, 255, 0.9);
+          transition: all 0.2s ease;
+          width: 36px;
+          height: 36px;
+          
+          &:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+          }
+          
+          &.active {
+            color: #FF4B2B;
+            background: rgba(255, 75, 43, 0.2);
+          }
+          
+          mat-icon {
+            font-size: 1.2rem;
+          }
+        }
+        
+        .view-count {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-left: 8px;
+          padding: 6px 10px;
+          background: rgba(255, 75, 43, 0.1);
+          border-radius: 16px;
+          color: #FF4B2B;
+          font-weight: 500;
+          font-size: 0.9rem;
+          
+          mat-icon {
+            font-size: 1rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .video-meta-container {
+    .music-title {
+      .song-title {
+        font-size: 0.9rem;
+      }
+    }
+    .artist-info {
+      font-size: 0.8rem;
+      margin-bottom: 15px;
+    }
+    
+    .video-meta {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+      
+      .youtube-stats {
+        order: 2;
+        justify-content: center;
+      }
+      
+      .app-engagement {
+        order: 1;
+        justify-content: space-between;
+        
+        .reaction-buttons {
+          flex: 1;
+          justify-content: space-around;
+        }
+        
+        .action-buttons {
+          display: flex-wrap;
+          .view-count {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}

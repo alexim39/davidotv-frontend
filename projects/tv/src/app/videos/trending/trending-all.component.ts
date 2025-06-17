@@ -91,10 +91,10 @@ import { YoutubeService, YoutubeVideo } from "../../common/services/youtube.serv
         <mat-tab label="All Videos">
           <div class="tab-content">
             <!-- Loading state -->
-            <div *ngIf="loading" class="loading-container">
+            <!-- <div *ngIf="loading" class="loading-container">
               <mat-spinner diameter="50" strokeWidth="2" color="accent"></mat-spinner>
               <p class="loading-text">Loading trending videos...</p>
-            </div>
+            </div> -->
 
             <!-- Videos grid -->
             <div *ngIf="!loading && videos.length > 0" class="video-grid">
@@ -150,7 +150,7 @@ import { YoutubeService, YoutubeVideo } from "../../common/services/youtube.serv
 
        <div *ngIf="loading && !error" class="loading-more">
         <mat-spinner diameter="30" strokeWidth="2" color="accent"></mat-spinner>
-        <span>Loading more videos...</span>
+        <span>Loading videos...</span>
       </div>
 
     </div>

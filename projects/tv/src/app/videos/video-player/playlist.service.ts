@@ -11,7 +11,7 @@ export class PlaylistService {
    * Get video data from the backend API.
    * @returns An Observable that emits the API response or an error.
    */
-  getDavidoVideos(): Observable<any> {
+  getPlaylistVideos(): Observable<any> {
     return this.apiService.get<any>(`youtube/videos`, undefined, undefined, true);
   }
 

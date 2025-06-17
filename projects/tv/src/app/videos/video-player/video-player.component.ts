@@ -10,7 +10,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { PlaylistService } from './playlist.service';
-import { YoutubeService } from '../../common/services/youtube.service';
+import { YoutubeService, YoutubeVideo } from '../../common/services/youtube.service';
 import { timeAgo as timeAgoUtil } from '../../common/utils/time.util';
 
 // Declare YT for TypeScript to recognize the global YouTube API object
@@ -129,36 +129,92 @@ declare global {
           
 
           <div class="video-info-container" *ngIf="!isLoading">
-            <div class="video-meta">
-              <div class="video-stats">
-                <span class="views">{{ views | number }} views</span>
-                <span class="upload-date">Premiered {{ uploadDate | date }}</span>
-              </div>
-              <div class="video-actions">
-                <button mat-button (click)="likeVideo()" [class.active]="liked" aria-label="Like video">
-                  <mat-icon>{{ liked ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
-                  {{ likes | number }}
-                </button>
-                <button mat-button (click)="dislikeVideo()" [class.active]="disliked" aria-label="Dislike video">
-                  <mat-icon>{{ disliked ? 'thumb_down' : 'thumb_down_off_alt' }}</mat-icon>
-                  {{ dislikes | number }}
-                </button>
-                <button mat-button (click)="shareVideo()" aria-label="Share video">
-                  <mat-icon>share</mat-icon>
-                  Share
-                </button>
-                <button mat-button (click)="saveVideo()" [class.active]="saved" aria-label="Save video">
-                  <mat-icon>{{ saved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-                  Save
-                </button>
-                <button mat-button (click)="toggleRepeatMode()" [class.active]="repeatMode !== 'none'" aria-label="Repeat">
-                  <mat-icon>
-                    {{ repeatMode === 'one' ? 'repeat_one' : repeatMode === 'all' ? 'repeat' : 'repeat' }}
-                  </mat-icon>
-                  Repeat {{ repeatMode !== 'none' ? '(' + repeatMode + ')' : '' }}
-                </button>
-              </div>
-            </div>
+
+
+
+
+           
+          
+
+         
+          
+          <div class="video-meta-container">
+  <!-- Music Title Section -->
+  <div class="music-title">
+    <h2 class="song-title">{{ currentVideo.title }}</h2>
+    <div class="artist-info">
+      <!-- <mat-icon class="artist-icon">tv_options_edit_channels</mat-icon> -->
+      <span class="artist-name">- {{currentVideo.channel}}</span>
+    </div>
+  </div>
+
+  <!-- Video Meta Content -->
+  <div class="video-meta">
+    <!-- Left: Subtle YouTube Stats -->
+    <div class="youtube-stats">
+      <div class="youtube-badge">
+        <mat-icon class="youtube-icon">smart_display</mat-icon>
+        <span class="youtube-label">YouTube</span>
+      </div>
+      <div class="youtube-metrics">
+        <span class="youtube-metric" matTooltip="Views">
+          {{ currentVideo.views  }} views
+        </span>
+        •
+        <span class="youtube-metric" matTooltip="Likes">
+          {{ currentVideo.likes  }} likes
+        </span>
+        •
+        <span class="youtube-metric" matTooltip="Dislikes">
+          {{ currentVideo.dislikes  }} dislikes
+        </span>
+        •
+        <span class="youtube-metric" matTooltip="Published">
+          {{ timeAgo(currentVideo.publishedAt) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Right: Prominent App Actions -->
+    <div class="app-engagement">
+      <div class="reaction-buttons">
+        <button class="reaction-btn like-btn" (click)="likeVideo()" [class.active]="liked">
+          <mat-icon>{{ liked ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
+          <span class="count">{{ appLikes | number }}</span>
+        </button>
+        
+        <button class="reaction-btn dislike-btn" (click)="dislikeVideo()" [class.active]="disliked">
+          <mat-icon>{{ disliked ? 'thumb_down' : 'thumb_down_off_alt' }}</mat-icon>
+          <span class="count">{{ appDislikes | number }}</span>
+        </button>
+      </div>
+      
+      <div class="action-buttons">
+        <button mat-mini-fab class="action-btn" (click)="shareVideo()" matTooltip="Share">
+          <mat-icon>share</mat-icon>
+        </button>
+        
+        <button mat-mini-fab class="action-btn" (click)="saveVideo()" [class.active]="saved" matTooltip="Save">
+          <mat-icon>{{ saved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+        </button>
+        
+        <button mat-mini-fab class="action-btn" (click)="toggleRepeatMode()" [class.active]="repeatMode !== 'none'" matTooltip="Repeat">
+          <mat-icon>{{ repeatMode === 'one' ? 'repeat_one' : 'repeat' }}</mat-icon>
+        </button>
+        
+        <div class="view-count" matTooltip="App Views">
+          <mat-icon>visibility</mat-icon>
+          <span>{{ appViews | number }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
 
             <div class="video-description">
               <h2>{{ videoTitle }}</h2>
@@ -283,8 +339,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   controlsTimeout: any;
 
   // Video stats
-  views = 12547893;
-  uploadDate = new Date('2023-05-15');
+  //views = 12547893;
+  //uploadDate = new Date('2023-05-15');
   likes = 542310;
   liked = false;
   dislikes = 3245;
@@ -353,6 +409,10 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   private playerStateInterval: any;
   private updateInterval: any = null;
+  currentVideo!: YoutubeVideo;
+  appViews = 123456; 
+  appLikes = 123456; 
+  appDislikes = 123456; 
 
 
   constructor(
@@ -361,25 +421,34 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar,
     private router: Router,
     private ngZone: NgZone, // Inject NgZone
-    private youtubeService: PlaylistService
+    private playlistService: PlaylistService,
+    private youtubeService: YoutubeService
   ) {}
 
   ngOnInit() {
-    const videoId = this.route.snapshot.paramMap.get('id');
+   const videoId = this.route.snapshot.paramMap.get('id');
     if (videoId) {
       this.currentVideoId = videoId;
       this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
       this.loadVideo(videoId);
+
+      // Get current video details
+      this.youtubeService.getVideoById(videoId).subscribe({
+        next: (response: any) => {
+          console.log('single video response ',response)
+          this.currentVideo = response.data;
+        }
+      }); 
     }
 
       
-    this.youtubeService.getDavidoVideos().subscribe({
+    this.playlistService.getPlaylistVideos().subscribe({
       next: (response) => {
-        console.log('video response ',response)
+        console.log('playlist video response ',response)
         this.davidoVideos = response.data;
         this.recommendedVideos = response.data;;
       }
-    });
+    }); 
 
 
     // Assign onYouTubeIframeAPIReady to a global function and ensure it runs in Angular's zone
@@ -419,42 +488,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  /* onYouTubeIframeAPIReady() {
-    // Only create a new player if it doesn't exist or if it's been destroyed
-    // Checking `getPlayerState` is a way to see if it's a valid player object
-    if (!this.player || typeof this.player.getPlayerState !== 'function') {
-      // Destroy existing player if it somehow persisted but is not functional
-      if (this.player && typeof this.player.destroy === 'function') {
-        this.player.destroy();
-      }
-
-      this.player = new window.YT.Player(this.videoFrame.nativeElement, {
-        videoId: this.currentVideoId,
-        playerVars: {
-          enablejsapi: 1,
-          rel: 0,
-          modestbranding: 1,
-          controls: 0, // Custom controls handled by app
-          disablekb: 1,
-          fs: 1,
-          iv_load_policy: 3,
-          origin: window.location.origin,
-          autoplay: this.autoplay ? 1 : 0
-        },
-        events: {
-          'onReady': this.onPlayerReady.bind(this),
-          'onStateChange': this.onPlayerStateChange.bind(this)
-        }
-      });
-    } else {
-      // If player already exists and is functional, just load the new video
-      this.player.loadVideoById(this.currentVideoId);
-      if (this.autoplay) {
-        this.player.playVideo();
-      }
-    }
-  } */
-
     onYouTubeIframeAPIReady() {
       // If the ViewChild is not yet available, retry after a short delay
       if (!this.videoFrame || !this.videoFrame.nativeElement) {
@@ -493,42 +526,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         }
       }
     }
-
- /* onPlayerReady(event: any) {
-    this.ngZone.run(() => {
-      this.playerReady = true;
-      this.isLoading = false;
-
-      this.duration = this.player.getDuration();
-      this.startUpdateLoop();
-
-      if (this.pendingAutoPlay) {
-        this.playVideo();
-        this.pendingAutoPlay = false;
-      }
-      
-      // Get initial duration
-      this.player.getDuration().then((duration: number) => {
-        this.duration = duration;
-      }).catch(() => {
-        // If we can't get duration immediately, it will be polled later
-        this.duration = 0;
-      });
-
-      // Get initial current time
-      this.player.getCurrentTime().then((time: number) => {
-        this.currentTime = time;
-      }).catch(() => {
-        this.currentTime = 0;
-      });
-
-      this.startPlayerStatePolling();
-      
-      if (this.autoplay) {
-        this.playVideo();
-      }
-    });
-  } */
 
     onPlayerReady(event: any) {
       this.ngZone.run(() => {
@@ -581,39 +578,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       this.resetControlsTimer();
     });
   }
-
-  /* startPlayerStatePolling() {
-    // Clear any existing interval to prevent multiple polls running
-    if (this.playerStateInterval) {
-      clearInterval(this.playerStateInterval);
-    }
-    
-    // Set up a new interval to poll current time and duration
-    this.playerStateInterval = setInterval(() => {
-      if (this.playerReady && this.player) {
-        try {
-          // Get current time
-          this.player.getCurrentTime().then((time: number) => {
-            this.ngZone.run(() => {
-              this.currentTime = time;
-            });
-          }).catch(() => {});
-
-          // Refresh duration periodically (in case it wasn't available initially)
-          if (this.duration <= 0 || isNaN(this.duration)) {
-            this.player.getDuration().then((duration: number) => {
-              this.ngZone.run(() => {
-                this.duration = duration;
-              });
-            }).catch(() => {});
-          }
-        } catch (error) {
-          console.error('Error polling player state:', error);
-        }
-      }
-    }, 1000); // Poll every second
-  }
- */
 
   startPlayerStatePolling() {
     // Clear any existing interval to prevent multiple polls running
@@ -690,8 +654,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     const video = this.davidoVideos.find((v: any) => v.id === videoId);
     if (video) {
       this.videoTitle = video.title;
-      this.uploadDate = new Date();
-      this.uploadDate.setFullYear(this.uploadDate.getFullYear() - Math.floor(Math.random() * 5));
+      //this.uploadDate = new Date();
+      //this.uploadDate.setFullYear(this.uploadDate.getFullYear() - Math.floor(Math.random() * 5));
     }
   }
 
@@ -828,6 +792,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   @HostListener('mousemove')
   @HostListener('keydown')
+  @HostListener('touchstart')
   onUserActivity() {
     this.resetControlsTimer();
   }
