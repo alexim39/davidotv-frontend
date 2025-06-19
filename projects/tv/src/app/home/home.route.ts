@@ -36,6 +36,9 @@ export const HomeRoutes: Routes = [
             {   path: 'official', 
                 loadChildren: () => import('../official/official.route').then(r => r.OfficialRoutes) 
             },      
+            {   path: 'events', 
+                loadChildren: () => import('../event/event.route').then(r => r.EventRoutes) 
+            },      
         ]
     }
 ];

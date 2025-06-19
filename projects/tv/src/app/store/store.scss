@@ -1,0 +1,47 @@
+// Breakpoints
+$breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+);
+
+// Product Grid
+.product-grid {
+  display: grid;
+  gap: 1.5rem;
+  
+  @media (min-width: map-get($breakpoints, sm)) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: map-get($breakpoints, md)) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @media (min-width: map-get($breakpoints, lg)) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+// Product Detail Page
+.product-detail-container {
+  @media (min-width: map-get($breakpoints, md)) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+// Checkout Steps
+.checkout-steps {
+  display: flex;
+  flex-direction: column;
+  
+  @media (min-width: map-get($breakpoints, md)) {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}

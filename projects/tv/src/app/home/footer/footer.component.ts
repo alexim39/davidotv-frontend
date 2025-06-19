@@ -52,7 +52,6 @@ import { UserInterface, UserService } from '../../common/services/user.service';
           <nav>
             <ul>
               <li><a mat-button routerLink="/about">About Us</a></li>
-              <li><a mat-button routerLink="/news">Latest News</a></li>
               <li><a mat-button routerLink="/events">Events</a></li>
               <li><a mat-button routerLink="/gallery">Gallery</a></li>
               <li><a mat-button routerLink="/contact">Contact</a></li>

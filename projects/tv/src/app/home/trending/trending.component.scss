@@ -47,7 +47,7 @@
         transition: all 0.2s ease;
 
         &:hover {
-          color: #E60000;
+          color: #8f0045;
           transform: translateX(4px);
         }
 
@@ -95,7 +95,7 @@
         }
 
         .video-title {
-          color: #FF4D4D;
+          color: #8f0045;
         }
       }
 
@@ -216,7 +216,7 @@
 
     .nav-button {
       background: white;
-      color: #FF4D4D;
+      color: #8f0045;
       width: 40px;
       height: 40px;
       border-radius: 50%;
@@ -229,7 +229,7 @@
       flex-shrink: 0;
 
       &:hover:not([disabled]) {
-        background: #FF4D4D;
+        background: #8f0045;
         color: white;
         transform: scale(1.1);
       }
@@ -264,7 +264,7 @@
         transition: all 0.3s ease;
 
         &.active {
-          background: #FF4D4D;
+          background: #8f0045;
           width: 24px;
           border-radius: 4px;
         }

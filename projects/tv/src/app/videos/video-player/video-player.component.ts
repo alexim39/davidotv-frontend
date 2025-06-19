@@ -302,11 +302,12 @@ declare global {
           <div class="recommendation-list">
             <div class="recommendation-item" *ngFor="let video of recommendedVideos" (click)="navigateToVideo(video.youtubeVideoId)">
               <div class="thumbnail-container">
-              <img [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" alt="{{ video.title }}" class="thumbnail">                <span class="duration">{{ video.duration }}</span>
+              <img [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" alt="{{ video.title }}" class="thumbnail">                
+              <!-- <span class="duration">{{ video.duration }}</span> -->
               </div>
               <div class="video-details">
                 <h4>{{ video.title }}</h4>
-                <p class="creator">Davido</p>
+                <p class="creator">{{ video.channel }}</p>
                 <p class="views">{{ video.views }} views • {{ timeAgo(video.publishedAt) }} </p>
               </div>
             </div>

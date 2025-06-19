@@ -100,7 +100,7 @@ import { YoutubeService } from "../common/services/youtube.service";
           <mat-card *ngFor="let video of filteredVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
             <div class="thumbnail-container">
               <img mat-card-image [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" [alt]="video.title" loading="lazy">
-              <div class="video-duration">3:45</div>
+              <!-- <div class="video-duration">{{video.duration}}</div> -->
             </div>
             <mat-card-content>
               <div class="video-info">

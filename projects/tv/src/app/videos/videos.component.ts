@@ -101,11 +101,10 @@ import { throttleTime } from 'rxjs/operators';
           <mat-card *ngFor="let video of filteredVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
             <div class="thumbnail-container">
               <img mat-card-image [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" [alt]="video.title" loading="lazy">
-              <div class="video-duration">3:45</div>
+              <!-- <div class="video-duration">3:45</div> -->
             </div>
             <mat-card-content>
               <div class="video-info">
-                <!-- <img src="./img/ytch.jpeg" alt="Channel" class="channel-icon" loading="lazy"> -->
                 <img src="./img/ytch.jpeg" alt="Channel" class="channel-icon" loading="lazy">
                 <div class="video-meta">
                   <h3>{{ video.title }}</h3>

@@ -141,6 +141,7 @@ template: `
   <a mat-button routerLink="/videos" (click)="toggleMobileMenu()">Videos</a>
   <a mat-button routerLink="/official/videos" (click)="toggleMobileMenu()">Official</a>
   <a mat-button routerLink="/fan-art" (click)="toggleMobileMenu()">Fan Groups</a>
+  <a mat-button routerLink="/events" (click)="toggleMobileMenu()">Events</a>
   <a mat-button routerLink="/store" (click)="toggleMobileMenu()">Store</a>
   <a mat-button (click)="uploadContent(); toggleMobileMenu()">Upload</a>
 
