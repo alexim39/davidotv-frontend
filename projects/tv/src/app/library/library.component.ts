@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +14,8 @@ import { TruncatePipe } from '../common/pipes/truncate.pipe';
 import { MatDividerModule } from '@angular/material/divider';
 import { Subscription } from 'rxjs';
 import { UserInterface, UserService } from '../common/services/user.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'async-library',
@@ -53,8 +55,8 @@ import { UserInterface, UserService } from '../common/services/user.service';
         <mat-tab-group dynamicHeight>
           <mat-tab label="Saved Videos">
             <div class="tab-content">
-              <ng-container *ngIf="!isLoading || !user; else loadingTpl">
-                <div class="video-grid" *ngIf="savedVideos.length > 0; else emptyStateTpl">
+              <ng-container *ngIf="!isLoading  else loadingTpl">
+                <div class="video-grid" *ngIf="savedVideos.length > 0 && isAuthenticated; else emptyStateTpl">
                   <mat-card class="video-card" *ngFor="let video of savedVideos" [routerLink]="['/watch', video.videoId]">
                     <div class="thumbnail-container">
                       <img [src]="'https://i.ytimg.com/vi/' + video.videoId + '/mqdefault.jpg'" 
@@ -121,9 +123,11 @@ import { UserInterface, UserService } from '../common/services/user.service';
 export class LibraryComponent implements OnInit, OnDestroy {
   savedVideos: any[] = [];
   isLoading = true;
+  isAuthenticated = false;
 
   subscriptions: Subscription[] = [];
-  user!: UserInterface;
+  user: UserInterface | null = null; ;
+  private snackBar = inject(MatSnackBar);
 
   constructor(
     private videoService: VideoService,
@@ -131,21 +135,44 @@ export class LibraryComponent implements OnInit, OnDestroy {
     private cdRef: ChangeDetectorRef
   ) {}
 
- ngOnInit(): void {
+ /* ngOnInit(): void {
     this.subscriptions.push(
       this.userService.getCurrentUser$.subscribe({
         next: (user) => {
           if (user) {
             this.user = user;
             this.loadSavedVideos();
+            this.isAuthenticated = true;
           }
-        }
+        },
+        error: () => this.isAuthenticated = false
       })
     );
   }
+ */
 
-  loadSavedVideos(): void {
-     if (this.user) {
+  ngOnInit(): void {
+    this.subscriptions.push(
+        this.userService.getCurrentUser$.subscribe({
+            next: (user) => {
+                this.user = user;
+                this.isAuthenticated = !!user;
+                if (this.isAuthenticated) {
+                    this.loadSavedVideos();
+                } else {
+                    this.isLoading = false;
+                }
+            },
+            error: () => {
+                this.isAuthenticated = false;
+                this.isLoading = false;
+            }
+        })
+    );
+}
+
+  /* loadSavedVideos(): void {
+    if (this.isAuthenticated) {
       this.isLoading = true;
       this.cdRef.detectChanges(); 
 
@@ -156,24 +183,65 @@ export class LibraryComponent implements OnInit, OnDestroy {
           this.isLoading = false;
           this.cdRef.detectChanges(); 
         },
-        error: (err) => {
-          console.error('Error loading saved videos:', err);
+        error: (error: HttpErrorResponse) => {
+          //console.error('Error loading saved videos:', err);
+          let errorMessage = 'Server error occurred, please try again.'; // default error message.
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message; // Use backend's error message if available.
+          }  
+          this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
           this.isLoading = false;
           this.cdRef.detectChanges(); 
         }
       });
-     } 
+    } 
+    this.isAuthenticated = false
+  } */
 
+    loadSavedVideos(): void {
+    // Only proceed if authenticated and user exists
+    if (this.user && this.isAuthenticated) {
+        this.isLoading = true;
+        this.cdRef.detectChanges(); 
+        this.videoService.getSavedVideos(this.user._id).subscribe({
+            next: (response) => {
+                this.savedVideos = response.data;
+                this.isLoading = false;
+              this.cdRef.detectChanges();  
+            },
+            error: (error: HttpErrorResponse) => {
+                const errorMessage = error.error?.message || 'Server error occurred, please try again.';
+                this.snackBar.open(errorMessage, 'Ok', {duration: 3000});
+                this.isLoading = false;
+                this.cdRef.detectChanges(); 
+            }
+        });
+    } else {
+        this.isAuthenticated = false;
+    }
+}
+
+  removeFromLibrary(youtubeVideoId: string): void {
+    if (this.user && this.isAuthenticated) {
+       this.videoService.removeVideoFromLibrary(this.user._id, youtubeVideoId).subscribe({
+        next: (response) => {
+          this.savedVideos = this.savedVideos.filter(v => v.videoId !== youtubeVideoId);
+          this.snackBar.open(response.message, 'Ok',{duration: 3000});
+          this.cdRef.detectChanges(); 
+        },
+        error: (error: HttpErrorResponse) => {
+          let errorMessage = 'Server error occurred, please try again.'; // default error message.
+            if (error.error && error.error.message) {
+              errorMessage = error.error.message; // Use backend's error message if available.
+            }  
+            this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
+            this.cdRef.detectChanges(); 
+        }
+      });
+    } else {
+        this.isAuthenticated = false;
+    }
    
-  }
-
-  removeFromLibrary(videoId: string): void {
-    this.videoService.removeVideoFromLibrary(this.user._id, videoId).subscribe({
-      next: () => {
-        this.savedVideos = this.savedVideos.filter(v => v.youtubeVideoId !== videoId);
-      },
-      error: (err) => console.error('Error removing video:', err)
-    });
   }
 
   timeAgo(date: string | Date): string {
