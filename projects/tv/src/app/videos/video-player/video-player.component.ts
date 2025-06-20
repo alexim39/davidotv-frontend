@@ -10,8 +10,12 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { PlaylistService } from './playlist.service';
-import { YoutubeService, YoutubeVideo } from '../../common/services/youtube.service';
+import { YoutubeService, YoutubeVideoInterface } from '../../common/services/youtube.service';
 import { timeAgo as timeAgoUtil } from '../../common/utils/time.util';
+import { Subscription, timer } from 'rxjs';
+import { UserInterface, UserService } from '../../common/services/user.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { VideoService } from '../../common/services/videos.service';
 
 // Declare YT for TypeScript to recognize the global YouTube API object
 declare global {
@@ -139,77 +143,77 @@ declare global {
          
           
           <div class="video-meta-container">
-  <!-- Music Title Section -->
-  <div class="music-title">
-    <h2 class="song-title">{{ currentVideo.title }}</h2>
-    <div class="artist-info">
-      <!-- <mat-icon class="artist-icon">tv_options_edit_channels</mat-icon> -->
-      <span class="artist-name">- {{currentVideo.channel}}</span>
-    </div>
-  </div>
+            <!-- Music Title Section -->
+            <div class="music-title">
+              <h2 class="song-title">{{ currentVideo.title }}</h2>
+              <div class="artist-info">
+                <!-- <mat-icon class="artist-icon">tv_options_edit_channels</mat-icon> -->
+                <span class="artist-name">- {{currentVideo.channel}}</span>
+              </div>
+            </div>
 
-  <!-- Video Meta Content -->
-  <div class="video-meta">
-    <!-- Left: Subtle YouTube Stats -->
-    <div class="youtube-stats">
-      <div class="youtube-badge">
-        <mat-icon class="youtube-icon">smart_display</mat-icon>
-        <span class="youtube-label">YouTube</span>
-      </div>
-      <div class="youtube-metrics">
-        <span class="youtube-metric" matTooltip="Views">
-          {{ currentVideo.views  }} views
-        </span>
-        •
-        <span class="youtube-metric" matTooltip="Likes">
-          {{ currentVideo.likes  }} likes
-        </span>
-        •
-        <span class="youtube-metric" matTooltip="Dislikes">
-          {{ currentVideo.dislikes  }} dislikes
-        </span>
-        •
-        <span class="youtube-metric" matTooltip="Published">
-          {{ timeAgo(currentVideo.publishedAt) }}
-        </span>
-      </div>
-    </div>
+            <!-- Video Meta Content -->
+            <div class="video-meta">
+              <!-- Left: Subtle YouTube Stats -->
+              <div class="youtube-stats">
+                <div class="youtube-badge">
+                  <mat-icon class="youtube-icon">smart_display</mat-icon>
+                  <span class="youtube-label">YouTube</span>
+                </div>
+                <div class="youtube-metrics">
+                  <span class="youtube-metric" matTooltip="Views">
+                    {{ currentVideo.views  }} views
+                  </span>
+                  •
+                  <span class="youtube-metric" matTooltip="Likes">
+                    {{ currentVideo.likes  }} likes
+                  </span>
+                  •
+                  <span class="youtube-metric" matTooltip="Dislikes">
+                    {{ currentVideo.dislikes  }} dislikes
+                  </span>
+                  •
+                  <span class="youtube-metric" matTooltip="Published">
+                    {{ timeAgo(currentVideo.publishedAt) }}
+                  </span>
+                </div>
+              </div>
 
-    <!-- Right: Prominent App Actions -->
-    <div class="app-engagement">
-      <div class="reaction-buttons">
-        <button class="reaction-btn like-btn" (click)="likeVideo()" [class.active]="liked">
-          <mat-icon>{{ liked ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
-          <span class="count">{{ appLikes | number }}</span>
-        </button>
-        
-        <button class="reaction-btn dislike-btn" (click)="dislikeVideo()" [class.active]="disliked">
-          <mat-icon>{{ disliked ? 'thumb_down' : 'thumb_down_off_alt' }}</mat-icon>
-          <span class="count">{{ appDislikes | number }}</span>
-        </button>
-      </div>
-      
-      <div class="action-buttons">
-        <button mat-mini-fab class="action-btn" (click)="shareVideo()" matTooltip="Share">
-          <mat-icon>share</mat-icon>
-        </button>
-        
-        <button mat-mini-fab class="action-btn" (click)="saveVideo()" [class.active]="saved" matTooltip="Save">
-          <mat-icon>{{ saved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-        </button>
-        
-        <button mat-mini-fab class="action-btn" (click)="toggleRepeatMode()" [class.active]="repeatMode !== 'none'" matTooltip="Repeat">
-          <mat-icon>{{ repeatMode === 'one' ? 'repeat_one' : 'repeat' }}</mat-icon>
-        </button>
-        
-        <div class="view-count" matTooltip="App Views">
-          <mat-icon>visibility</mat-icon>
-          <span>{{ appViews | number }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+              <!-- Right: Prominent App Actions -->
+              <div class="app-engagement">
+                <div class="reaction-buttons">
+                  <button class="reaction-btn like-btn" (click)="likeVideo()" [class.active]="liked">
+                    <mat-icon>{{ liked ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
+                    <span class="count">{{ appLikes | number }}</span>
+                  </button>
+                  
+                  <button class="reaction-btn dislike-btn" (click)="dislikeVideo()" [class.active]="disliked">
+                    <mat-icon>{{ disliked ? 'thumb_down' : 'thumb_down_off_alt' }}</mat-icon>
+                    <span class="count">{{ appDislikes | number }}</span>
+                  </button>
+                </div>
+                
+                <div class="action-buttons">
+                  <button mat-mini-fab class="action-btn" (click)="shareVideo()" matTooltip="Share">
+                    <mat-icon>share</mat-icon>
+                  </button>
+                  
+                  <button mat-mini-fab class="action-btn" (click)="saveVideo()" [class.active]="saved" matTooltip="Save">
+                    <mat-icon>{{ saved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+                  </button>
+                  
+                  <button mat-mini-fab class="action-btn" (click)="toggleRepeatMode()" [class.active]="repeatMode !== 'none'" matTooltip="Repeat">
+                    <mat-icon>{{ repeatMode === 'one' ? 'repeat_one' : 'repeat' }}</mat-icon>
+                  </button>
+                  
+                  <div class="view-count" matTooltip="App Views">
+                    <mat-icon>visibility</mat-icon>
+                    <span>{{ appViews | number }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
 
 
@@ -410,11 +414,17 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   private playerStateInterval: any;
   private updateInterval: any = null;
-  currentVideo!: YoutubeVideo;
+  currentVideo!: YoutubeVideoInterface;
   appViews = 123456; 
   appLikes = 123456; 
   appDislikes = 123456; 
 
+  subscriptions: Subscription[] = [];
+  user: UserInterface | null = null;
+
+  // Add these properties to your component
+  private watchHistoryInterval = 10; // Update every 10 seconds
+  private watchHistorySubscription: Subscription | null = null;
 
   constructor(
     private route: ActivatedRoute, 
@@ -423,7 +433,9 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     private router: Router,
     private ngZone: NgZone, // Inject NgZone
     private playlistService: PlaylistService,
-    private youtubeService: YoutubeService
+    private youtubeService: YoutubeService,
+    private userService: UserService,
+    private videoService: VideoService
   ) {}
 
   ngOnInit() {
@@ -433,13 +445,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
       this.loadVideo(videoId);
 
-      // Get current video details
-      this.youtubeService.getVideoById(videoId).subscribe({
-        next: (response: any) => {
-          console.log('single video response ',response)
-          this.currentVideo = response.data;
-        }
-      }); 
+      this.getCurrentVideoData(videoId)
     }
 
       
@@ -456,6 +462,25 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     window.onYouTubeIframeAPIReady = () => this.ngZone.run(() => this.onYouTubeIframeAPIReady());
     this.loadYouTubeAPI();
 
+     this.subscriptions.push(
+      this.userService.getCurrentUser$.subscribe({
+        next: (user) => {
+          this.user = user;
+          console.log('current user ',this.user)
+        }
+      })
+    )
+
+  }
+
+  private getCurrentVideoData(videoId: string) {
+     // Get current video details
+      this.youtubeService.getVideoById(videoId).subscribe({
+        next: (response: any) => {
+          console.log('single video response ',response)
+          this.currentVideo = response.data;
+        }
+      });
   }
 
 
@@ -473,6 +498,11 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     if (window.onYouTubeIframeAPIReady === this.onYouTubeIframeAPIReady) {
       (window as any).onYouTubeIframeAPIReady = undefined; 
     }
+
+    // destroy the subscription for user
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+
+    this.stopWatchHistoryTracking();
   }
 
   loadYouTubeAPI() {
@@ -556,7 +586,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       });
     }
 
-  onPlayerStateChange(event: any) {
+  /* onPlayerStateChange(event: any) {
     // Ensure all state updates happen within Angular's zone
     this.ngZone.run(() => {
       const state = event.data; // YouTube player states: -1, 0, 1, 2, 3, 5
@@ -578,7 +608,34 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       
       this.resetControlsTimer();
     });
-  }
+  } */
+
+    onPlayerStateChange(event: any) {
+  this.ngZone.run(() => {
+    const state = event.data;
+    
+    if (state === window.YT.PlayerState.PLAYING) {
+      this.isPlaying = true;
+      this.showOverlay = false;
+      
+      // Start tracking watch progress
+      this.startWatchHistoryTracking();
+      
+      if (this.duration === 0 || isNaN(this.duration)) {
+        this.getDuration();
+      }
+    } else if (state === window.YT.PlayerState.PAUSED || state === window.YT.PlayerState.ENDED) {
+      this.isPlaying = false;
+      this.stopWatchHistoryTracking();
+      
+      if (state === window.YT.PlayerState.ENDED) {
+        this.handleVideoEnded();
+      }
+    }
+    
+    this.resetControlsTimer();
+  });
+}
 
   startPlayerStatePolling() {
     // Clear any existing interval to prevent multiple polls running
@@ -648,6 +705,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     
     // Update current video index based on the new video ID
     this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
+    // load video data
+    this.getCurrentVideoData(videoId)
   } 
 
 
@@ -901,10 +960,59 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  saveVideo() {
+ /*  saveVideo() {
     this.saved = !this.saved;
     this.snackBar.open(this.saved ? 'Video saved!' : 'Video removed from saved.', '', { duration: 2000 });
+  } */
+
+  saveVideo() {
+  if (!this.user) {
+    this.snackBar.open('Please login to save videos', '', { duration: 2000 });
+    return;
   }
+
+  this.saved = !this.saved;
+  
+  if (this.saved) {
+    const videoData = {
+      youtubeVideoId: this.currentVideoId,
+      title: this.currentVideo.title,
+      channel: this.currentVideo.channel,
+      thumbnail: `https://i.ytimg.com/vi/${this.currentVideoId}/mqdefault.jpg`,
+      duration: this.currentVideo.duration,
+      publishedAt: this.currentVideo.publishedAt
+    };
+
+    this.videoService.saveVideoToLibrary(this.user._id, videoData).subscribe({
+      next: (response: any) => {
+        this.snackBar.open(response.message, '', { duration: 2000 });
+      },
+      error: (error: HttpErrorResponse) => {
+        this.saved = false;
+        //this.snackBar.open('Failed to save video', '', { duration: 2000 });
+        //console.error('Error saving video:', error);
+
+          let errorMessage = 'Server error occurred, please try again.'; // default error message.
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message; // Use backend's error message if available.
+          }  
+          this.snackBar.open(errorMessage, 'Ok',{duration: 2000});
+
+      }
+    });
+  } else {
+    this.videoService.removeVideoFromLibrary(this.user._id, this.currentVideoId).subscribe({
+      next: () => {
+        this.snackBar.open('Video removed from library', '', { duration: 2000 });
+      },
+      error: (error: HttpErrorResponse) => {
+        this.saved = true;
+        this.snackBar.open('Failed to remove video', '', { duration: 2000 });
+        //console.error('Error removing video:', error);
+      }
+    });
+  }
+}
 
   shareVideo() {
     if (navigator.share) {
@@ -945,5 +1053,46 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   timeAgo(date: string | Date): string {
     return timeAgoUtil(date);
+  }
+
+  // Add these new methods
+  private startWatchHistoryTracking() {
+    if (!this.user) return;
+    
+    // Clear any existing interval
+    this.stopWatchHistoryTracking();
+    
+    // Initial update
+    this.updateWatchHistory();
+    
+    // Set up periodic updates
+    this.watchHistorySubscription = timer(this.watchHistoryInterval * 1000, this.watchHistoryInterval * 1000)
+      .subscribe(() => this.updateWatchHistory());
+  }
+
+  private stopWatchHistoryTracking() {
+    if (this.watchHistorySubscription) {
+      this.watchHistorySubscription.unsubscribe();
+      this.watchHistorySubscription = null;
+    }
+  }
+
+  private updateWatchHistory() {
+    if (!this.user || !this.playerReady || !this.isPlaying) return;
+    
+    const progress = (this.currentTime / this.duration) * 100;
+    
+    const videoData = {
+      youtubeVideoId: this.currentVideoId,
+      title: this.currentVideo.title,
+      channel: this.currentVideo.channel,
+      thumbnail: `https://i.ytimg.com/vi/${this.currentVideoId}/mqdefault.jpg`,
+      duration: this.currentVideo.duration,
+      publishedAt: this.currentVideo.publishedAt
+    };
+    
+    this.videoService.updateWatchHistory(this.currentVideoId, videoData).subscribe({
+      error: (err) => console.error('Error updating watch history:', err)
+    });
   }
 }

@@ -4,7 +4,7 @@ import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { ApiService } from './api.service';
 
-export interface YoutubeVideo {
+export interface YoutubeVideoInterface {
   _id?: string;
   youtubeVideoId: string;
   title: string;
@@ -36,9 +36,9 @@ export interface YoutubeVideo {
 export class YoutubeService {
 
   // Cache for better performance
-  private trendingCache = new BehaviorSubject<YoutubeVideo[]>([]);
-  private musicCache = new BehaviorSubject<YoutubeVideo[]>([]);
-  private videosCache = new BehaviorSubject<YoutubeVideo[]>([]);
+  private trendingCache = new BehaviorSubject<YoutubeVideoInterface[]>([]);
+  private musicCache = new BehaviorSubject<YoutubeVideoInterface[]>([]);
+  private videosCache = new BehaviorSubject<YoutubeVideoInterface[]>([]);
 
    constructor(private apiService: ApiService) {}
 
@@ -48,7 +48,7 @@ export class YoutubeService {
  * @param page Page number for pagination
  * @param forceRefresh Bypass cache and force refresh
  */
-getTrendingVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<YoutubeVideo[]> {
+getTrendingVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<YoutubeVideoInterface[]> {
   // Always get current cache value safely
   const currentCache = this.trendingCache.value || [];
 
@@ -64,7 +64,7 @@ getTrendingVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = 
     .set('page', page.toString())
     .set('sort', '-engagementScore,-publishedAt');
 
-  return this.apiService.get<YoutubeVideo[]>(`youtube/videos`, params).pipe(
+  return this.apiService.get<YoutubeVideoInterface[]>(`youtube/videos`, params).pipe(
     tap(videos => {
       // Ensure videos is an array
       const newVideos = Array.isArray(videos) ? videos : [];
@@ -88,7 +88,7 @@ getTrendingVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = 
  * @param page Page number for pagination
  * @param forceRefresh Bypass cache and force refresh
  */
-getMusicVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<YoutubeVideo[]> {
+getMusicVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<YoutubeVideoInterface[]> {
   // Always get current cache value safely
   const currentCache = this.musicCache.value || [];
 
@@ -105,7 +105,7 @@ getMusicVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = fal
     .set('page', page.toString())
     .set('sort', '-publishedAt');
 
-  return this.apiService.get<YoutubeVideo[]>(`youtube/videos`, params).pipe(
+  return this.apiService.get<YoutubeVideoInterface[]>(`youtube/videos`, params).pipe(
     tap(videos => {
       // Ensure videos is an array
       const newVideos = Array.isArray(videos) ? videos : [];
@@ -127,7 +127,7 @@ getMusicVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = fal
    * @param limit Number of videos to return
    * @param forceRefresh Bypass cache and force refresh
    */
-  getAllVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<YoutubeVideo[]> {
+  getAllVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<YoutubeVideoInterface[]> {
     // Always get current cache value safely
     const currentCache = this.videosCache.value || [];
 
@@ -143,7 +143,7 @@ getMusicVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = fal
       .set('page', page.toString())
       .set('sort', '-publishedAt');
 
-    return this.apiService.get<YoutubeVideo[]>(`youtube/videos`, params).pipe(
+    return this.apiService.get<YoutubeVideoInterface[]>(`youtube/videos`, params).pipe(
       tap(videos => {
         // Ensure videos is an array
         const newVideos = Array.isArray(videos) ? videos : [];
@@ -165,12 +165,12 @@ getMusicVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = fal
    * @param query Search query
    * @param limit Number of results to return
    */
-  searchVideos(query: string, limit: number = 12): Observable<YoutubeVideo[]> {
+  searchVideos(query: string, limit: number = 12): Observable<YoutubeVideoInterface[]> {
     const params = new HttpParams()
       .set('search', query)
       .set('limit', limit.toString());
 
-    return this.apiService.get<YoutubeVideo[]>(`youtube/videos/search`, params ).pipe(
+    return this.apiService.get<YoutubeVideoInterface[]>(`youtube/videos/search`, params ).pipe(
       catchError(this.handleError)
     );
   }
@@ -179,8 +179,8 @@ getMusicVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = fal
    * Get video by ID
    * @param videoId YouTube video ID
    */
-  getVideoById(videoId: string): Observable<YoutubeVideo> {
-    return this.apiService.get<YoutubeVideo>(`youtube/videos/${videoId}`).pipe(
+  getVideoById(videoId: string): Observable<YoutubeVideoInterface> {
+    return this.apiService.get<YoutubeVideoInterface>(`youtube/videos/${videoId}`).pipe(
       catchError(this.handleError)
     );
   }

@@ -16,7 +16,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
 import { timeAgo as timeAgoUtil } from '../../common/utils/time.util';
 import { ChangeDetectorRef } from '@angular/core';
-import { YoutubeService, YoutubeVideo } from "../../common/services/youtube.service";
+import { YoutubeService, YoutubeVideoInterface } from "../../common/services/youtube.service";
 
 @Component({
   selector: 'async-trending-all',

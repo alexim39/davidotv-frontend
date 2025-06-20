@@ -39,6 +39,14 @@ export const HomeRoutes: Routes = [
             {   path: 'events', 
                 loadChildren: () => import('../event/event.route').then(r => r.EventRoutes) 
             },      
+            {
+                path: 'library',
+                loadComponent: () => import('../library/library.component').then(m => m.LibraryComponent),
+            },      
+            {
+                path: 'history',
+                loadComponent: () => import('../history/history.component').then(m => m.HistoryComponent),
+            }      
         ]
     }
 ];
