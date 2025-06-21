@@ -14,7 +14,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
-import { timeAgo as timeAgoUtil, formatDuration as videoDuration  } from '../common/utils/time.util';
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat   } from '../common/utils/time.util';
 import { YoutubeService } from "../common/services/youtube.service";
 import { throttleTime } from 'rxjs/operators';
 
@@ -112,7 +112,7 @@ import { throttleTime } from 'rxjs/operators';
                   <div class="video-stats">
                     <span class="stat-item">
                       <mat-icon class="stat-icon">visibility</mat-icon>
-                      {{ video.views }}
+                      {{ formatViewCount(video.views) }}
                     </span>
                     <span class="stat-item">
                       {{ timeAgo(video.publishedAt) }}
@@ -331,5 +331,9 @@ onContainerScroll(event: Event): void {
 
   formatDuration(duration: string): string {
     return videoDuration(duration)
+  }
+
+  formatViewCount(views: number | 0): string {
+    return viewFormat(views);
   }
 }

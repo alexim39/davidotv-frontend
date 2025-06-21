@@ -46,6 +46,10 @@ export const HomeRoutes: Routes = [
             {
                 path: 'history',
                 loadComponent: () => import('../history/history.component').then(m => m.HistoryComponent),
+            },     
+            {
+                path: 'search',
+                loadComponent: () => import('../home/search/search-results.component').then(m => m.SearchResultsComponent),
             }      
         ]
     }

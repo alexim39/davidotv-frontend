@@ -111,7 +111,7 @@ import { HttpErrorResponse } from '@angular/common/http';
           <mat-icon class="empty-icon">bookmark_border</mat-icon>
           <h3>No saved videos yet</h3>
           <p>Tap the bookmark icon on any video to save it here</p>
-          <button mat-raised-button color="primary" [routerLink]="['/']" class="browse-btn">
+          <button mat-raised-button color="primary" [routerLink]="['/videos']" class="browse-btn">
             Browse videos
           </button>
         </div>

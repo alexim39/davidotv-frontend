@@ -8,7 +8,7 @@ import { MatChipsModule } from "@angular/material/chips";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { timeAgo as timeAgoUtil } from '../../common/utils/time.util';
+import { timeAgo as timeAgoUtil, formatViewCount as viewFormat } from '../../common/utils/time.util';
 import { HomeService } from "../home.service";
 import { Subscription } from 'rxjs';
 import { YoutubeService } from "../../common/services/youtube.service";
@@ -116,7 +116,7 @@ import { YoutubeService } from "../../common/services/youtube.service";
                         <h3 class="video-title" [matTooltip]="video.title">{{video.title}}</h3>
                         <p class="channel-name">{{video.channel}}</p>
                         <div class="video-stats">
-                          <span class="views">Views {{video.views}}</span>
+                          <span class="views">Views {{formatViewCount(video.views)}}</span>
                           <span class="separator">•</span>
                           <span class="date"> {{ timeAgo(video.publishedAt) }} </span>
                         </div>
@@ -293,6 +293,10 @@ export class TrendingComponent implements OnInit, OnDestroy {
 
   timeAgo(date: string | Date): string {
     return timeAgoUtil(date);
+  }
+
+  formatViewCount(views: number | 0): string {
+    return viewFormat(views);
   }
 
   formatDuration(seconds: number): string {

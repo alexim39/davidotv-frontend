@@ -11,7 +11,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { PlaylistService } from './playlist.service';
 import { YoutubeService, YoutubeVideoInterface } from '../../common/services/youtube.service';
-import { timeAgo as timeAgoUtil, formatDuration as videoDuration } from '../../common/utils/time.util';
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat } from '../../common/utils/time.util';
 import { Subscription, timer } from 'rxjs';
 import { UserInterface, UserService } from '../../common/services/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -134,13 +134,6 @@ declare global {
 
           <div class="video-info-container" *ngIf="!isLoading">
 
-
-
-
-           
-          
-
-         
           
           <div class="video-meta-container">
             <!-- Music Title Section -->
@@ -162,7 +155,7 @@ declare global {
                 </div>
                 <div class="youtube-metrics">
                   <span class="youtube-metric" matTooltip="Views">
-                    {{ currentVideo.views  }} views
+                    {{ formatViewCount(currentVideo.views)  }} views
                   </span>
                   •
                   <span class="youtube-metric" matTooltip="Likes">
@@ -208,7 +201,7 @@ declare global {
                   
                   <div class="view-count" matTooltip="App Views">
                     <mat-icon>visibility</mat-icon>
-                    <span>{{ appViews | number }}</span>
+                    <span>{{ formatViewCount(appViews) }}</span>
                   </div>
                 </div>
               </div>
@@ -312,7 +305,7 @@ declare global {
               <div class="video-details">
                 <h4>{{ video.title }}</h4>
                 <p class="creator">{{ video.channel }}</p>
-                <p class="views">{{ video.views }} views • {{ timeAgo(video.publishedAt) }} </p>
+                <p class="views">{{ formatViewCount(video.views) }} views • {{ timeAgo(video.publishedAt) }} </p>
               </div>
             </div>
           </div>
@@ -1053,6 +1046,10 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   formatDuration(duration: string): string {
       return videoDuration(duration)
+  }
+
+  formatViewCount(views: number | 0): string {
+    return viewFormat(views);
   }
 
   // Add these new methods

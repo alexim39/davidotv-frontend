@@ -51,7 +51,7 @@ template: `
       <div class="search-bar">
         <input 
           type="text" 
-          placeholder="Search videos, music..." 
+          placeholder="Search DavidoTV videos..." 
           [(ngModel)]="searchQuery"
           (keyup.enter)="onSearch()"
         >
@@ -550,8 +550,17 @@ export class NavbarComponent implements OnDestroy, OnInit {
 
   onSearch() {
     if (this.searchQuery.trim()) {
-      // Implement your search functionality
-      console.log('Searching for:', this.searchQuery);
+      this.router.navigate(['/search'], { 
+        queryParams: { q: this.searchQuery.trim() } 
+      });
+      
+      // Reset search query if you want the field to clear after search
+      // this.searchQuery = '';
+      
+      // Close mobile menu if open
+      if (this.mobileMenuOpen) {
+        this.toggleMobileMenu();
+      }
     }
   }
 

@@ -14,7 +14,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
-import { timeAgo as timeAgoUtil, formatDuration as videoDuration  } from '../common/utils/time.util';
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat } from '../common/utils/time.util';
 import { YoutubeService } from "../common/services/youtube.service";
 
 @Component({
@@ -92,7 +92,7 @@ import { YoutubeService } from "../common/services/youtube.service";
         <mat-tab label="All Videos">
           <div class="tab-content">
             <!-- Videos grid -->
-            <div *ngIf="!loading && videos.length > 0" class="video-grid">
+            <div *ngIf="videos.length > 0" class="video-grid">
               <mat-card *ngFor="let video of filteredVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
                 <div class="thumbnail-container">
                   <img mat-card-image [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" [alt]="video.title" loading="lazy">
@@ -107,7 +107,7 @@ import { YoutubeService } from "../common/services/youtube.service";
                       <div class="video-stats">
                         <span class="stat-item">
                           <mat-icon class="stat-icon">visibility</mat-icon>
-                          {{ video.views }}
+                          {{ formatViewCount(video.views) }}
                         </span>
                         <span class="stat-item">
                           {{ timeAgo(video.publishedAt) }}
@@ -119,8 +119,14 @@ import { YoutubeService } from "../common/services/youtube.service";
               </mat-card>
             </div>
 
+            <!-- Initial loading -->
+          <div *ngIf="initialLoading && !error" class="loading-container">
+            <mat-spinner diameter="50" strokeWidth="3"></mat-spinner>
+            <p class="loading-text">Loading videos...</p>
+          </div>
+
             <!-- No results -->
-            <div *ngIf="!loading && filteredVideos.length === 0 && !error" class="no-results">
+            <div *ngIf="!initialLoading && filteredVideos.length === 0 && !error" class="no-results">
               <mat-icon class="no-results-icon">search_off</mat-icon>
               <h3>No videos found</h3>
               <p>Try adjusting your search or filter criteria</p>
@@ -139,40 +145,31 @@ import { YoutubeService } from "../common/services/youtube.service";
         <mat-tab label="Music Videos">
           <div class="tab-content">
             <!-- Content for Music Videos tab -->
-            <div *ngIf="!loading && musicVideos.length > 0" class="video-grid">
-              <mat-card *ngFor="let video of musicVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
-                <!-- Same video card structure -->
-              </mat-card>
-            </div>
           </div>
         </mat-tab>
         <mat-tab label="Live">
           <div class="tab-content">
             <!-- Content for Live tab -->
-            <div *ngIf="!loading && liveVideos.length > 0" class="video-grid">
-              <mat-card *ngFor="let video of liveVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
-                <!-- Same video card structure -->
-              </mat-card>
-            </div>
           </div>
         </mat-tab>
       </mat-tab-group>
 
-      <div *ngIf="loading && !error" class="loading-more">
-        <mat-spinner diameter="30" strokeWidth="2" color="accent"></mat-spinner>
-        <span>Loading videos...</span>
-      </div>
+     <!-- Loading more (at bottom) -->
+    <div *ngIf="loadingMore && !error" class="loading-more">
+      <mat-spinner diameter="30" strokeWidth="2" color="accent"></mat-spinner>
+      <span>Loading more videos...</span>
+    </div>
     </div>
   `,
   styleUrls: ['./official.component.scss']
 })
 export class OfficialComponent implements OnInit, OnDestroy {
-  videos: any[] = [];
+ videos: any[] = [];
   filteredVideos: any[] = [];
   musicVideos: any[] = [];
   liveVideos: any[] = [];
-  loading = false;
-  loadingMore = false;
+  initialLoading = false; // for first load
+  loadingMore = false;    // for infinite scroll
   error: string | null = null;
   allLoaded = false;
   activeTab = 'all';
@@ -197,7 +194,7 @@ export class OfficialComponent implements OnInit, OnDestroy {
     this.loadVideos();
   }
 
-  loadVideos() {
+  /* loadVideos() {
     if (this.loading || this.allLoaded) return;
     
     this.loading = true;
@@ -226,6 +223,50 @@ export class OfficialComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.error = 'Failed to load videos. Please try again later.';
         this.loading = false;
+        this.cdr.detectChanges();
+        console.error('Error loading videos:', err);
+      }
+    });
+  } */
+
+    loadVideos() {
+    // If it's the initial load
+    if (this.videos.length === 0) {
+      this.initialLoading = true;
+    } else {
+      // If it's loading more
+      if (this.loadingMore || this.allLoaded) return;
+      this.loadingMore = true;
+    }
+    
+    this.error = null;
+
+    this.videosSubscription = this.youtubeService.getMusicVideos(this.pageSize, this.page, true).subscribe({
+      next: (response: any) => {
+        const newVideos = response.data || [];
+        
+        if (newVideos.length < this.pageSize) {
+          this.allLoaded = true;
+        }
+
+        const newUnique = newVideos.filter(
+          (v: any) => !this.videos.some(existing => existing.youtubeVideoId === v.youtubeVideoId)
+        );
+
+        this.videos = [...this.videos, ...newUnique];
+        this.filteredVideos = [...this.videos];
+        this.musicVideos = this.videos.filter(video => video.title.toLowerCase().includes('music'));
+        this.liveVideos = this.videos.filter(video => video.title.toLowerCase().includes('live'));
+        this.page++;
+        
+        this.initialLoading = false;
+        this.loadingMore = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.error = 'Failed to load videos. Please try again later.';
+        this.initialLoading = false;
+        this.loadingMore = false;
         this.cdr.detectChanges();
         console.error('Error loading videos:', err);
       }
@@ -325,5 +366,9 @@ export class OfficialComponent implements OnInit, OnDestroy {
 
   formatDuration(duration: string): string {
     return videoDuration(duration)
+  }
+
+   formatViewCount(views: number | 0): string {
+    return viewFormat(views);
   }
 }

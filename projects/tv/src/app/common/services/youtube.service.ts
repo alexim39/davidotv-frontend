@@ -163,14 +163,16 @@ getMusicVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = fal
   /**
    * Search for Davido-related videos
    * @param query Search query
+   * @param page Page number (1-based)
    * @param limit Number of results to return
    */
-  searchVideos(query: string, limit: number = 12): Observable<YoutubeVideoInterface[]> {
+  searchVideos(query: string, page: number = 1, limit: number = 12): Observable<{ data: YoutubeVideoInterface[], meta: { total: number } }> {
     const params = new HttpParams()
       .set('search', query)
+      .set('page', page.toString())
       .set('limit', limit.toString());
 
-    return this.apiService.get<YoutubeVideoInterface[]>(`youtube/videos/search`, params ).pipe(
+    return this.apiService.get<{ data: YoutubeVideoInterface[], meta: { total: number } }>(`youtube/videos/search`, params).pipe(
       catchError(this.handleError)
     );
   }
@@ -185,70 +187,6 @@ getMusicVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = fal
     );
   }
 
-  /**
-   * Format duration from ISO 8601 to human readable format
-   * @param duration ISO 8601 duration string
-   */
-  formatDuration(duration: string): string {
-    if (!duration) return '0:00';
-    
-    const matches = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-    if (!matches) return '0:00';
-    
-    const hours = matches[1] ? parseInt(matches[1]) : 0;
-    const minutes = matches[2] ? parseInt(matches[2]) : 0;
-    const seconds = matches[3] ? parseInt(matches[3]) : 0;
-    
-    let timeStr = '';
-    if (hours > 0) {
-      timeStr += hours + ':';
-      timeStr += minutes.toString().padStart(2, '0') + ':';
-    } else {
-      timeStr += minutes + ':';
-    }
-    timeStr += seconds.toString().padStart(2, '0');
-    
-    return timeStr;
-  }
-
-  /**
-   * Format view count to human readable format
-   * @param count Number of views
-   */
-  formatViewCount(count: number): string {
-    if (count >= 1000000) {
-      return (count / 1000000).toFixed(1) + 'M';
-    } else if (count >= 1000) {
-      return (count / 1000).toFixed(1) + 'K';
-    }
-    return count.toString();
-  }
-
-  /**
-   * Format published date to relative time
-   * @param date Published date
-   */
-  formatPublishedDate(date: Date): string {
-    const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
-    
-    const intervals = {
-      year: 31536000,
-      month: 2592000,
-      week: 604800,
-      day: 86400,
-      hour: 3600,
-      minute: 60
-    };
-    
-    for (const [unit, secondsInUnit] of Object.entries(intervals)) {
-      const interval = Math.floor(seconds / secondsInUnit);
-      if (interval >= 1) {
-        return interval === 1 ? `1 ${unit} ago` : `${interval} ${unit}s ago`;
-      }
-    }
-    
-    return 'Just now';
-  }
 
   private handleError(error: any) {
     console.error('An error occurred:', error);

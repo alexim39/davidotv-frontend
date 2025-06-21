@@ -25,6 +25,8 @@ export function timeAgo(dateStr: string | Date): string {
   return 'Just now';
 }
 
+
+
 /**
  * Returns a human-readable "duration" string for a given string.
  * Example: sample youtube time format
@@ -42,3 +44,18 @@ export function formatDuration(duration: string): string {
     ? `${hours}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`
     : `${minutes}:${seconds.padStart(2, '0')}`;
 }
+
+
+
+/**
+ * Format view count to human readable format
+ * @param count Number of views
+ */
+ export function formatViewCount(count: number): string {
+    if (count >= 1000000) {
+      return (count / 1000000).toFixed(1) + 'M';
+    } else if (count >= 1000) {
+      return (count / 1000).toFixed(1) + 'K';
+    }
+    return count.toString();
+ }
