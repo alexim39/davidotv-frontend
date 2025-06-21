@@ -1,18 +1,23 @@
 import { Component } from '@angular/core';
 import { EventCardComponent } from './event-card.component';
 import { Event } from './event.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-events-list',
   standalone: true,
-  imports: [EventCardComponent],
+  imports: [EventCardComponent, CommonModule],
   template: `
     <div class="events-grid">
       <app-event-card 
         *ngFor="let event of events" 
-        [event]="event"
         (click)="viewEvent(event.id)">
       </app-event-card>
+     <!--  <app-event-card 
+        *ngFor="let event of events" 
+        [event]="event"
+        (click)="viewEvent(event.id)">
+      </app-event-card> -->
     </div>
   `,
   styles: [`

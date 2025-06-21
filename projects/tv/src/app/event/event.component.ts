@@ -21,6 +21,7 @@ import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { EventsListComponent } from './events-list.component';
 
 @Component({
   selector: 'app-event',
@@ -30,7 +31,6 @@ import { MatButtonModule } from '@angular/material/button';
     CommonModule,
     MatListModule,
     MatIconModule,
-    EventCardComponent,
     EventsMapComponent,
     MatProgressBarModule,
     MatButtonToggleModule,
@@ -41,6 +41,7 @@ import { MatButtonModule } from '@angular/material/button';
     FormsModule,
     RouterModule,
     MatButtonModule,
+    EventsListComponent
   ],
   template: `
     <div class="events-page">
@@ -103,15 +104,7 @@ import { MatButtonModule } from '@angular/material/button';
             <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
             
             <div class="events-grid">
-              <app-event-card 
-                *ngFor="let event of events" 
-                (click)="openEventDetail(event)">
-              </app-event-card>
-              <!-- <app-event-card 
-                *ngFor="let event of events" 
-                [event]="event"
-                (click)="openEventDetail(event)">
-              </app-event-card> -->
+              <app-events-list></app-events-list>
             </div>
           </div>
           

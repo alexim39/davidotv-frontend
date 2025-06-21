@@ -17,7 +17,9 @@ import { Event as AppEvent } from './event.model'; // rename to avoid conflict w
   template: `
     <section class="carousel-wrapper">
       <div class="carousel-header">
-        <h2><!-- Featured Events --></h2>
+        <h2>
+          Featured Events
+        </h2>
         <div class="controls">
           <button mat-icon-button (click)="previous()" [disabled]="current === 0" aria-label="Previous">
             <mat-icon>chevron_left</mat-icon>
@@ -80,13 +82,12 @@ import { Event as AppEvent } from './event.model'; // rename to avoid conflict w
     }
 
     .carousel-header h2 {
-      font-size: 1.8rem;
-      color: #444;
+      font-size: 1rem;
       margin: 0;
     }
 
     .controls button {
-      color: #333;
+      //color: #333;
     }
 
     .carousel-content {
@@ -118,7 +119,7 @@ import { Event as AppEvent } from './event.model'; // rename to avoid conflict w
       width: 100%;
       aspect-ratio: 16 / 9;
       object-fit: cover;
-      max-width: 30em;
+      max-width: 25em;
     }
 
     .card-content {

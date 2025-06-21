@@ -87,60 +87,78 @@ import { YoutubeService } from "../common/services/youtube.service";
         </mat-form-field>
       </div>
 
-      <!-- video content -->
-      <div class="video-content">
-        <!-- Loading state -->
-       <!--  <div *ngIf="loading" class="loading-container">
-          <mat-spinner diameter="50" strokeWidth="2" color="accent"></mat-spinner>
-          <p class="loading-text">Loading Davido videos...</p>
-        </div> -->
-
-        <!-- Videos grid -->
-        <div *ngIf="videos.length > 0" class="video-grid">
-          <mat-card *ngFor="let video of filteredVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
-            <div class="thumbnail-container">
-              <img mat-card-image [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" [alt]="video.title" loading="lazy">
-              <div class="video-duration">{{ formatDuration(video.duration) }}</div>
-            </div>
-            <mat-card-content>
-              <div class="video-info">
-                <img src="./img/ytch.jpeg" alt="Channel" class="channel-icon" loading="lazy">
-                <div class="video-meta">
-                  <h3>{{ video.title }}</h3>
-                  <p class="channel-name">Davido</p>
-                  <div class="video-stats">
-                    <span class="stat-item">
-                      <mat-icon class="stat-icon">visibility</mat-icon>
-                      {{ video.views }}
-                    </span>
-                    <span class="stat-item">
-                      {{ timeAgo(video.publishedAt) }}
-                    </span>
-                  </div>
+      <!-- Content tabs -->
+      <mat-tab-group class="content-tabs" (selectedTabChange)="onTabChange($event)">
+        <mat-tab label="All Videos">
+          <div class="tab-content">
+            <!-- Videos grid -->
+            <div *ngIf="!loading && videos.length > 0" class="video-grid">
+              <mat-card *ngFor="let video of filteredVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
+                <div class="thumbnail-container">
+                  <img mat-card-image [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" [alt]="video.title" loading="lazy">
+                  <div class="video-duration">{{ formatDuration(video.duration) }}</div>
                 </div>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        </div>
+                <mat-card-content>
+                  <div class="video-info">
+                    <img src="./img/ytch.jpeg" alt="Channel" class="channel-icon" loading="lazy">
+                    <div class="video-meta">
+                      <h3>{{ video.title }}</h3>
+                      <p class="channel-name">Davido</p>
+                      <div class="video-stats">
+                        <span class="stat-item">
+                          <mat-icon class="stat-icon">visibility</mat-icon>
+                          {{ video.views }}
+                        </span>
+                        <span class="stat-item">
+                          {{ timeAgo(video.publishedAt) }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
 
-        <!-- No results -->
-        <div *ngIf="!loading && filteredVideos.length === 0 && !error" class="no-results">
-          <mat-icon class="no-results-icon">search_off</mat-icon>
-          <h3>No videos found</h3>
-          <p>Try adjusting your search or filter criteria</p>
-          <button mat-flat-button color="primary" (click)="resetFilters()">Reset Filters</button>
-        </div>
+            <!-- No results -->
+            <div *ngIf="!loading && filteredVideos.length === 0 && !error" class="no-results">
+              <mat-icon class="no-results-icon">search_off</mat-icon>
+              <h3>No videos found</h3>
+              <p>Try adjusting your search or filter criteria</p>
+              <button mat-flat-button color="primary" (click)="resetFilters()">Reset Filters</button>
+            </div>
 
-        <!-- Error state -->
-        <div *ngIf="error" class="error-state">
-          <mat-icon class="error-icon">error_outline</mat-icon>
-          <h3>Error loading videos</h3>
-          <p>{{ error }}</p>
-          <button mat-raised-button color="primary" (click)="retryLoading()">Retry</button>
-        </div>
-      </div>
+            <!-- Error state -->
+            <div *ngIf="error" class="error-state">
+              <mat-icon class="error-icon">error_outline</mat-icon>
+              <h3>Error loading videos</h3>
+              <p>{{ error }}</p>
+              <button mat-raised-button color="primary" (click)="retryLoading()">Retry</button>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Music Videos">
+          <div class="tab-content">
+            <!-- Content for Music Videos tab -->
+            <div *ngIf="!loading && musicVideos.length > 0" class="video-grid">
+              <mat-card *ngFor="let video of musicVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
+                <!-- Same video card structure -->
+              </mat-card>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="Live">
+          <div class="tab-content">
+            <!-- Content for Live tab -->
+            <div *ngIf="!loading && liveVideos.length > 0" class="video-grid">
+              <mat-card *ngFor="let video of liveVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
+                <!-- Same video card structure -->
+              </mat-card>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
 
-       <div *ngIf="loading && !error" class="loading-more">
+      <div *ngIf="loading && !error" class="loading-more">
         <mat-spinner diameter="30" strokeWidth="2" color="accent"></mat-spinner>
         <span>Loading videos...</span>
       </div>
@@ -151,10 +169,13 @@ import { YoutubeService } from "../common/services/youtube.service";
 export class OfficialComponent implements OnInit, OnDestroy {
   videos: any[] = [];
   filteredVideos: any[] = [];
+  musicVideos: any[] = [];
+  liveVideos: any[] = [];
   loading = false;
   loadingMore = false;
   error: string | null = null;
   allLoaded = false;
+  activeTab = 'all';
   
   // Pagination
   private page = 0;
@@ -176,65 +197,69 @@ export class OfficialComponent implements OnInit, OnDestroy {
     this.loadVideos();
   }
 
+  loadVideos() {
+    if (this.loading || this.allLoaded) return;
+    
+    this.loading = true;
+    this.error = null;
 
- loadVideos() {
-  if (this.loading || this.allLoaded) return;
-  
-  this.loading = true;
-  this.error = null;
+    this.videosSubscription = this.youtubeService.getMusicVideos(this.pageSize, this.page, true).subscribe({
+      next: (response: any) => {
+        const newVideos = response.data || [];
+        
+        if (newVideos.length < this.pageSize) {
+          this.allLoaded = true;
+        }
 
-  this.videosSubscription = this.youtubeService.getMusicVideos(this.pageSize, this.page, true).subscribe({
-    next: (response: any) => {
-      const newVideos = response.data || [];
-      
-      // If we get fewer videos than requested, we've reached the end
-      if (newVideos.length < this.pageSize) {
-        this.allLoaded = true;
+        const newUnique = newVideos.filter(
+          (v: any) => !this.videos.some(existing => existing.youtubeVideoId === v.youtubeVideoId)
+        );
+
+        this.videos = [...this.videos, ...newUnique];
+        this.filteredVideos = [...this.videos];
+        this.musicVideos = this.videos.filter(video => video.title.toLowerCase().includes('music'));
+        this.liveVideos = this.videos.filter(video => video.title.toLowerCase().includes('live'));
+        this.page++;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.error = 'Failed to load videos. Please try again later.';
+        this.loading = false;
+        this.cdr.detectChanges();
+        console.error('Error loading videos:', err);
       }
+    });
+  }
 
-      // Avoid duplicates
-      const newUnique = newVideos.filter(
-        (v: any) => !this.videos.some(existing => existing.youtubeVideoId === v.youtubeVideoId)
-      );
-
-      this.videos = [...this.videos, ...newUnique];
+  onTabChange(event: any) {
+    this.activeTab = event.tab.textLabel.toLowerCase();
+    if (this.activeTab === 'all videos') {
       this.filteredVideos = [...this.videos];
-      this.page++;
-      this.loading = false;
-      this.cdr.detectChanges();
-    },
-    error: (err) => {
-      this.error = 'Failed to load videos. Please try again later.';
-      this.loading = false;
-      this.cdr.detectChanges();
-      console.error('Error loading videos:', err);
+    } else if (this.activeTab === 'music videos') {
+      this.filteredVideos = this.musicVideos;
+    } else if (this.activeTab === 'live') {
+      this.filteredVideos = this.liveVideos;
     }
-  });
-}
+  }
 
-  
-
-  // Sorting
+  // ... rest of the methods remain the same ...
   sortBy(property: 'title' | 'views' | 'publishedAt') {
     this.filteredVideos.sort((a, b) => {
       if (property === 'publishedAt') {
-        // Extract numeric value from "X years ago"
         const aYears = parseInt(a.publishedAt);
         const bYears = parseInt(b.publishedAt);
         return aYears - bYears;
       } else if (property === 'views') {
-        // Extract numeric value from views string (e.g., "245M views" -> 245)
         const aViews = parseFloat(a.views ?? '');
         const bViews = parseFloat(b.views ?? '');
         return bViews - aViews;
       } else {
-        // Sort by title
         return (a.title ?? '').localeCompare(b.title ?? '');
       }
     });
   }
 
-  // Filtering and searching
   applySearch() {
     if (!this.searchQuery) {
       this.filteredVideos = [...this.videos];
@@ -263,7 +288,6 @@ export class OfficialComponent implements OnInit, OnDestroy {
     this.filteredVideos = [...this.videos];
   }
 
-  // Navigation
   goBack() {
     this.router.navigate(['/']);
   }
@@ -286,10 +310,9 @@ export class OfficialComponent implements OnInit, OnDestroy {
     this.videosSubscription?.unsubscribe();
   }
 
-  // Handle scroll event (currently does nothing, but required for template binding)
   onContainerScroll(event: Event): void {
     const container = event.target as HTMLElement;
-    const threshold = 100; // px from bottom
+    const threshold = 100;
     
     if (container.scrollTop + container.clientHeight >= container.scrollHeight - threshold) {
       this.loadVideos();

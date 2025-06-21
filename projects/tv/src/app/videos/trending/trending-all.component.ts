@@ -86,16 +86,8 @@ import { YoutubeService, YoutubeVideoInterface } from "../../common/services/you
         </mat-form-field>
       </div>
 
-      <!-- Content tabs -->
-      <mat-tab-group class="content-tabs" (selectedTabChange)="onTabChange($event)">
-        <mat-tab label="All Videos">
-          <div class="tab-content">
-            <!-- Loading state -->
-            <!-- <div *ngIf="loading" class="loading-container">
-              <mat-spinner diameter="50" strokeWidth="2" color="accent"></mat-spinner>
-              <p class="loading-text">Loading trending videos...</p>
-            </div> -->
 
+      
             <!-- Videos grid -->
             <div *ngIf="!loading && videos.length > 0" class="video-grid">
               <mat-card *ngFor="let video of filteredVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
@@ -139,15 +131,20 @@ import { YoutubeService, YoutubeVideoInterface } from "../../common/services/you
               <p>{{ error }}</p>
               <button mat-raised-button color="primary" (click)="retryLoading()">Retry</button>
             </div>
-          </div>
+
+
+      
+
+      <!-- Content tabs -->
+     <!--  <mat-tab-group class="content-tabs" (selectedTabChange)="onTabChange($event)">
+        <mat-tab label="All Videos">
+          <div class="tab-content">
         </mat-tab>
         <mat-tab label="Music Videos">
-          <!-- Similar content structure for music videos -->
         </mat-tab>
         <mat-tab label="Live">
-          <!-- Similar content structure for live videos -->
         </mat-tab>
-      </mat-tab-group>
+      </mat-tab-group> -->
 
        <div *ngIf="loading && !error" class="loading-more">
         <mat-spinner diameter="30" strokeWidth="2" color="accent"></mat-spinner>
