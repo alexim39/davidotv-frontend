@@ -14,7 +14,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
-import { timeAgo as timeAgoUtil } from '../common/utils/time.util';
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration  } from '../common/utils/time.util';
 import { YoutubeService } from "../common/services/youtube.service";
 import { throttleTime } from 'rxjs/operators';
 
@@ -101,7 +101,7 @@ import { throttleTime } from 'rxjs/operators';
           <mat-card *ngFor="let video of filteredVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
             <div class="thumbnail-container">
               <img mat-card-image [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" [alt]="video.title" loading="lazy">
-              <!-- <div class="video-duration">3:45</div> -->
+              <div class="video-duration">{{ formatDuration(video.duration) }}</div>
             </div>
             <mat-card-content>
               <div class="video-info">
@@ -325,7 +325,11 @@ onContainerScroll(event: Event): void {
   }
 }
 
-   timeAgo(date: string | Date): string {
-      return timeAgoUtil(date);
-    }
+  timeAgo(date: string | Date): string {
+     return timeAgoUtil(date);
+  }
+
+  formatDuration(duration: string): string {
+    return videoDuration(duration)
+  }
 }

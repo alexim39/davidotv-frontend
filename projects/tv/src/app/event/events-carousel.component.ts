@@ -1,74 +1,52 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  HostListener
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Event } from './event.model';
+import { Event as AppEvent } from './event.model'; // rename to avoid conflict with DOM Event
 
 @Component({
   selector: 'app-events-carousel',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatIconModule,
-    MatButtonModule
-  ],
+  imports: [CommonModule, MatCardModule, MatIconModule, MatButtonModule],
   template: `
-    <div class="carousel-container">
+    <section class="carousel-wrapper">
       <div class="carousel-header">
-        <h2 class="carousel-title">Featured Events</h2>
-        <div class="carousel-controls">
-          <button mat-icon-button 
-                  (click)="previousSlide()" 
-                  [disabled]="currentSlide === 0"
-                  aria-label="Previous slide">
+        <h2><!-- Featured Events --></h2>
+        <div class="controls">
+          <button mat-icon-button (click)="previous()" [disabled]="current === 0" aria-label="Previous">
             <mat-icon>chevron_left</mat-icon>
           </button>
-          <button mat-icon-button 
-                  (click)="nextSlide()" 
-                  [disabled]="currentSlide === maxSlide"
-                  aria-label="Next slide">
+          <button mat-icon-button (click)="next()" [disabled]="current >= maxSlide" aria-label="Next">
             <mat-icon>chevron_right</mat-icon>
           </button>
         </div>
       </div>
 
-      <div class="carousel-track" [style.transform]="'translateX(' + (-currentSlide * 100 / slidesPerView) + '%)'">
-        <div class="carousel-slide" 
-             *ngFor="let event of displayedEvents"
-             [style.flex-basis]="100 / slidesPerView + '%'">
-          <mat-card class="featured-event-card" (click)="handleEventClick(event.id)">
-            <img mat-card-image 
-                 [src]="event.imageUrl" 
-                 [alt]="event.title + ' event banner'"
-                 width="400"
-                 height="400">
-            <div class="event-overlay">
-              <div class="event-info">
-                <h3>{{event.title}}</h3>
-                <div class="event-meta">
-                  <div class="date">
-                    <mat-icon aria-hidden="true">event</mat-icon>
-                    <span>{{event.date | date:'MMM d, y'}}</span>
-                  </div>
-                  <div class="location">
-                    <mat-icon aria-hidden="true">location_on</mat-icon>
-                    <span>{{event.location}}</span>
-                  </div>
-                </div>
-                <div class="event-actions">
-                  <button mat-flat-button 
-                          color="primary"
-                          (click)="handleTicketClick($event, event.id)">
-                    Get Tickets
-                  </button>
-                  <button mat-stroked-button 
-                          color="primary"
-                          (click)="handleReminderClick($event, event.id)">
-                    Remind Me
-                  </button>
-                </div>
+      <div class="carousel-content">
+        <div class="carousel-track" [style.transform]="transformStyle">
+          <mat-card
+            class="event-card"
+            *ngFor="let event of events"
+            (click)="handleEventClick(event.id)"
+          >
+            <img mat-card-image [src]="event.imageUrl" [alt]="event.title" />
+            <div class="card-content">
+              <h3>{{ event.title }}</h3>
+              <p class="meta">
+                <mat-icon>event</mat-icon> {{ event.date | date: 'mediumDate' }}
+                <span class="location">
+                  <mat-icon>location_on</mat-icon> {{ event.location }}
+                </span>
+              </p>
+              <div class="buttons">
+                <button mat-flat-button color="primary" (click)="handleTicketClick($event, event.id)">Get Tickets</button>
+                <button mat-stroked-button color="primary" (click)="handleReminderClick($event, event.id)">Remind Me</button>
               </div>
             </div>
           </mat-card>
@@ -76,21 +54,22 @@ import { Event } from './event.model';
       </div>
 
       <div class="carousel-indicators">
-        <button *ngFor="let indicator of indicators" 
-                mat-icon-button
-                (click)="goToSlide(indicator)"
-                [class.active]="currentSlide === indicator"
-                [attr.aria-label]="'Go to slide ' + (indicator + 1)">
-          <mat-icon>{{currentSlide === indicator ? 'radio_button_checked' : 'radio_button_unchecked'}}</mat-icon>
+        <button
+          *ngFor="let dot of indicators; let i = index"
+          mat-icon-button
+          [class.active]="i === current"
+          (click)="goTo(i)"
+        >
+          <mat-icon>{{ i === current ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
         </button>
       </div>
-    </div>
+    </section>
   `,
   styles: [`
-    .carousel-container {
-      position: relative;
-      overflow: hidden;
-      padding: 1rem;
+    .carousel-wrapper {
+      width: 100%;
+      padding: 2rem 1rem;
+      //background: #f9f9f9;
     }
 
     .carousel-header {
@@ -98,201 +77,126 @@ import { Event } from './event.model';
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1rem;
+    }
 
-      .carousel-title {
-        color: #3f51b5;
-        margin: 0;
-        font-size: 1.5rem;
-      }
+    .carousel-header h2 {
+      font-size: 1.8rem;
+      color: #444;
+      margin: 0;
+    }
+
+    .controls button {
+      color: #333;
+    }
+
+    .carousel-content {
+      overflow: hidden;
+      position: relative;
     }
 
     .carousel-track {
       display: flex;
-      transition: transform 0.5s ease;
-      width: 100%;
+      gap: 1rem;
+      transition: transform 0.5s ease-in-out;
     }
 
-    .carousel-slide {
-      flex: 0 0 100%;
-      padding: 0 0.5rem;
-      box-sizing: border-box;
-      min-width: 0;
-    }
-
-    .featured-event-card {
-      position: relative;
-      height: 400px;
-      border-radius: 8px;
+    .event-card {
+      min-width: 100%;
+      flex-shrink: 0;
+      border-radius: 12px;
       overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       cursor: pointer;
-      
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
-      
-      .event-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
-        padding: 2rem;
-        color: white;
-        
-        .event-info {
-          h3 {
-            margin: 0 0 1rem;
-            font-size: 1.5rem;
-            line-height: 1.2;
-          }
-          
-          .event-meta {
-            display: flex;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-            
-            .date,
-            .location {
-              display: flex;
-              align-items: center;
-              font-size: 0.9rem;
-              
-              mat-icon {
-                margin-right: 0.5rem;
-                font-size: 1.2rem;
-              }
-            }
-          }
-          
-          .event-actions {
-            display: flex;
-            gap: 1rem;
-            
-            button {
-              flex: 1;
-              font-weight: 500;
-            }
-          }
-        }
-      }
+      transition: transform 0.3s ease;
+    }
+
+    .event-card:hover {
+      transform: scale(1.02);
+    }
+
+    img[mat-card-image] {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      max-width: 30em;
+    }
+
+    .card-content {
+      padding: 1rem;
+    }
+
+    .card-content h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.2rem;
+      //color: #222;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .meta mat-icon {
+      vertical-align: middle;
+      font-size: 18px;
+    }
+
+    .location {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .buttons {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
     }
 
     .carousel-indicators {
       display: flex;
       justify-content: center;
+      gap: 0.5rem;
       margin-top: 1rem;
-      gap: 0.5rem;
-      
-      button {
-        color: rgba(0, 0, 0, 0.38);
-        
-        &.active {
-          color: #3f51b5;
-        }
-      }
     }
 
-    .carousel-controls {
-      display: flex;
-      gap: 0.5rem;
+    .carousel-indicators button.active mat-icon {
+      color: #8f0045;
     }
 
+    /* Responsive breakpoints */
     @media (min-width: 600px) {
-      .carousel-slide {
-        flex: 0 0 50%;
-      }
+      .event-card { min-width: 48%; }
     }
 
     @media (min-width: 960px) {
-      .carousel-slide {
-        flex: 0 0 33.33%;
-      }
+      .event-card { min-width: 31%; }
     }
 
     @media (min-width: 1280px) {
-      .carousel-slide {
-        flex: 0 0 25%;
-      }
+      .event-card { min-width: 23%; }
     }
   `]
 })
-export class EventsCarouselComponent implements OnInit, OnDestroy {
-  @Input() events: Event[] = this.getDefaultEvents();
-  currentSlide = 0;
+export class EventsCarouselComponent implements OnInit {
+  @Input() events: AppEvent[] = [];
+
+  current = 0;
   slidesPerView = 1;
-  private resizeObserver: ResizeObserver | undefined;
 
-  get maxSlide(): number {
-    return Math.max(0, Math.ceil(this.events.length / this.slidesPerView) - 1);
-  }
-
-  get indicators(): number[] {
-    return Array.from({ length: this.maxSlide + 1 }, (_, i) => i);
-  }
-
-  get displayedEvents(): Event[] {
-    // For infinite carousel effect, duplicate events
-    return [...this.events, ...this.events, ...this.events];
-  }
-
-  ngOnInit(): void {
+  ngOnInit() {
     this.updateSlidesPerView();
-    this.setupResizeObserver();
   }
 
-  ngOnDestroy(): void {
-    this.resizeObserver?.disconnect();
+  @HostListener('window:resize')
+  onResize() {
+    this.updateSlidesPerView();
   }
 
-  private getDefaultEvents(): Event[] {
-    return [
-      {
-        id: '1',
-        title: 'Davido Live in Lagos',
-        description: 'Annual homecoming concert',
-        date: new Date('2023-12-15'),
-        location: 'Eko Convention Center',
-        imageUrl: 'img/event-banner.png',
-        attendees: 12500,
-        price: 50
-      },
-      {
-        id: '2',
-        title: 'Meet & Greet',
-        description: 'Intimate session with Davido',
-        date: new Date('2023-11-20'),
-        location: 'Davidotv HQ, Ikeja',
-        imageUrl: 'img/event-banner.png',
-        attendees: 150,
-        price: 100
-      },
-      {
-        id: '3',
-        title: 'Album Listening Party',
-        description: 'First listen of new album',
-        date: new Date('2023-12-01'),
-        location: 'Online Event',
-        imageUrl: 'img/event-banner.png',
-        attendees: 3200,
-        price: 0
-      },
-      {
-        id: '4',
-        title: 'Charity Concert',
-        description: 'Fundraiser for education',
-        date: new Date('2024-01-10'),
-        location: 'Tafawa Balewa Square',
-        imageUrl: 'img/event-banner.png',
-        attendees: 8000,
-        price: 30
-      }
-    ];
-  }
-
-  private updateSlidesPerView(): void {
+  updateSlidesPerView(): void {
     const width = window.innerWidth;
     if (width >= 1280) this.slidesPerView = 4;
     else if (width >= 960) this.slidesPerView = 3;
@@ -300,37 +204,41 @@ export class EventsCarouselComponent implements OnInit, OnDestroy {
     else this.slidesPerView = 1;
   }
 
-  private setupResizeObserver(): void {
-    this.resizeObserver = new ResizeObserver(() => {
-      this.updateSlidesPerView();
-    });
-    this.resizeObserver.observe(document.body);
+  get maxSlide(): number {
+    return Math.max(0, this.events.length - this.slidesPerView);
   }
 
-  nextSlide(): void {
-    this.currentSlide = (this.currentSlide + 1) % (this.maxSlide + 1);
+  get indicators(): number[] {
+    return Array.from({ length: this.events.length - this.slidesPerView + 1 }, (_, i) => i);
   }
 
-  previousSlide(): void {
-    this.currentSlide = (this.currentSlide - 1 + this.maxSlide + 1) % (this.maxSlide + 1);
+  get transformStyle(): string {
+    return `translateX(-${this.current * (100 / this.slidesPerView)}%)`;
   }
 
-  goToSlide(index: number): void {
-    this.currentSlide = index;
+  previous(): void {
+    if (this.current > 0) this.current--;
+  }
+
+  next(): void {
+    if (this.current < this.maxSlide) this.current++;
+  }
+
+  goTo(index: number): void {
+    this.current = index;
   }
 
   handleEventClick(eventId: string): void {
     console.log('Event clicked:', eventId);
-    // this.router.navigate(['/events', eventId]);
   }
 
-  handleTicketClick(event: MouseEvent, eventId: string): void {
-    event.stopPropagation();
-    console.log('Get tickets for:', eventId);
+  handleTicketClick(e: MouseEvent, eventId: string): void {
+    e.stopPropagation();
+    console.log('Ticket click for:', eventId);
   }
 
-  handleReminderClick(event: MouseEvent, eventId: string): void {
-    event.stopPropagation();
-    console.log('Set reminder for:', eventId);
+  handleReminderClick(e: MouseEvent, eventId: string): void {
+    e.stopPropagation();
+    console.log('Reminder set for:', eventId);
   }
 }

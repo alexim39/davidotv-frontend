@@ -14,7 +14,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
-import { timeAgo as timeAgoUtil } from '../../common/utils/time.util';
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration } from '../../common/utils/time.util';
 import { ChangeDetectorRef } from '@angular/core';
 import { YoutubeService, YoutubeVideoInterface } from "../../common/services/youtube.service";
 
@@ -105,6 +105,7 @@ import { YoutubeService, YoutubeVideoInterface } from "../../common/services/you
                 <mat-card-content>
                   <div class="video-info">
                     <img src="./img/ytch.jpeg" alt="Channel" class="channel-icon" loading="lazy">
+                    <span class="video-duration"> {{ formatDuration(video.duration) }}</span>
                     <div class="video-meta">
                       <h3>{{ video.title }}</h3>
                       <p class="channel-name">{{ video.channel }}</p>
@@ -332,7 +333,11 @@ export class TrendingAllComponent implements OnInit, OnDestroy {
     }
   }
 
-   timeAgo(date: string | Date): string {
+  timeAgo(date: string | Date): string {
     return timeAgoUtil(date);
+  }
+
+  formatDuration(duration: string): string {
+      return videoDuration(duration)
   }
 }

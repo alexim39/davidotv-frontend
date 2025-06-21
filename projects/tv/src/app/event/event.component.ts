@@ -145,7 +145,7 @@ import { MatButtonModule } from '@angular/material/button';
           h1 {
             font-weight: 700;
             margin-bottom: 1rem;
-            color: #3f51b5;
+            color: #8f0045;
           }
           
           .search-container {
@@ -191,7 +191,7 @@ import { MatButtonModule } from '@angular/material/button';
         .section-title {
           text-align: center;
           margin-bottom: 2rem;
-          color: #3f51b5;
+          color: #8f0045;
         }
       }
       
@@ -329,7 +329,73 @@ export class EventComponent implements OnInit {
         description: 'Special featured event',
         date: new Date('2023-12-20T20:00:00'),
         location: 'National Stadium, Lagos',
-        imageUrl: 'https://via.placeholder.com/800x400?text=Featured+Event',
+        imageUrl: 'img/davido-banner.png',
+        attendees: 15000,
+        price: 75,
+        category: 'concert'
+      },
+      {
+        id: '1',
+        title: 'Featured Concert',
+        description: 'Special featured event',
+        date: new Date('2023-12-20T20:00:00'),
+        location: 'National Stadium, Lagos',
+        imageUrl: 'img/davido-banner.png',
+        attendees: 15000,
+        price: 75,
+        category: 'concert'
+      },
+      {
+        id: '1',
+        title: 'Featured Concert',
+        description: 'Special featured event',
+        date: new Date('2023-12-20T20:00:00'),
+        location: 'National Stadium, Lagos',
+        imageUrl: 'img/davido-banner.png',
+        attendees: 15000,
+        price: 75,
+        category: 'concert'
+      },
+      {
+        id: '1',
+        title: 'Featured Concert',
+        description: 'Special featured event',
+        date: new Date('2023-12-20T20:00:00'),
+        location: 'National Stadium, Lagos',
+        imageUrl: 'img/davido-banner.png',
+        attendees: 15000,
+        price: 75,
+        category: 'concert'
+      },
+      {
+        id: '1',
+        title: 'Featured Concert',
+        description: 'Special featured event',
+        date: new Date('2023-12-20T20:00:00'),
+        location: 'National Stadium, Lagos',
+        imageUrl: 'img/davido-banner.png',
+        attendees: 15000,
+        price: 75,
+        category: 'concert'
+      },
+      {
+        id: '1',
+        title: 'Featured Concert',
+        description: 'Special featured event',
+        date: new Date('2023-12-20T20:00:00'),
+        location: 'National Stadium, Lagos',
+        imageUrl: 'img/davido-banner.png',
+        attendees: 15000,
+        price: 75,
+        category: 'concert'
+      },
+      {
+        id: '1',
+        title: 'Featured Concert',
+        description: 'Special featured event',
+        date: new Date('2023-12-20T20:00:00'),
+        location: 'National Stadium, Lagos',
+        imageUrl: 'img/davido-banner.png',
         attendees: 15000,
         price: 75,
         category: 'concert'

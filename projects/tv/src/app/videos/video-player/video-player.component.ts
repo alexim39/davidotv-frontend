@@ -11,7 +11,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { PlaylistService } from './playlist.service';
 import { YoutubeService, YoutubeVideoInterface } from '../../common/services/youtube.service';
-import { timeAgo as timeAgoUtil } from '../../common/utils/time.util';
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration } from '../../common/utils/time.util';
 import { Subscription, timer } from 'rxjs';
 import { UserInterface, UserService } from '../../common/services/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -307,7 +307,7 @@ declare global {
             <div class="recommendation-item" *ngFor="let video of recommendedVideos" (click)="navigateToVideo(video.youtubeVideoId)">
               <div class="thumbnail-container">
               <img [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" alt="{{ video.title }}" class="thumbnail">                
-              <!-- <span class="duration">{{ video.duration }}</span> -->
+              <span class="duration"> {{ formatDuration(video.duration) }}</span>
               </div>
               <div class="video-details">
                 <h4>{{ video.title }}</h4>
@@ -344,11 +344,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   controlsTimeout: any;
 
   // Video stats
-  //views = 12547893;
-  //uploadDate = new Date('2023-05-15');
-  likes = 542310;
   liked = false;
-  dislikes = 3245;
   disliked = false;
   saved = false;
 
@@ -415,9 +411,9 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   private playerStateInterval: any;
   private updateInterval: any = null;
   currentVideo!: YoutubeVideoInterface;
-  appViews = 123456; 
-  appLikes = 123456; 
-  appDislikes = 123456; 
+  appViews = 0; 
+  appLikes = 0; 
+  appDislikes = 0; 
 
   subscriptions: Subscription[] = [];
   user: UserInterface | null = null;
@@ -935,28 +931,28 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   likeVideo() {
     if (!this.liked) {
       this.liked = true;
-      this.likes++;
+      this.appLikes++;
       if (this.disliked) {
         this.disliked = false;
-        this.dislikes--;
+        this.appDislikes--;
       }
     } else {
       this.liked = false;
-      this.likes--;
+      this.appLikes--;
     }
   }
 
   dislikeVideo() {
     if (!this.disliked) {
       this.disliked = true;
-      this.dislikes++;
+      this.appDislikes++;
       if (this.liked) {
         this.liked = false;
-        this.likes--;
+        this.appLikes--;
       }
     } else {
       this.disliked = false;
-      this.dislikes--;
+      this.appDislikes--;
     }
   }
 
@@ -1053,6 +1049,10 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   timeAgo(date: string | Date): string {
     return timeAgoUtil(date);
+  }
+
+  formatDuration(duration: string): string {
+      return videoDuration(duration)
   }
 
   // Add these new methods

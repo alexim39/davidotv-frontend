@@ -122,7 +122,7 @@ interface Event {
             color: white;
             
             &.badge-primary {
-              background-color: #3f51b5; /* Primary color */
+              background-color: #8f0045; /* Primary color */
             }
             
             &.badge-accent {

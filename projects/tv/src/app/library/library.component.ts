@@ -7,7 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
-import { timeAgo as timeAgoUtil } from '../common/utils/time.util';
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration } from '../common/utils/time.util';
 import { YoutubeVideoInterface } from '../common/services/youtube.service';
 import { VideoService } from '../common/services/videos.service';
 import { TruncatePipe } from '../common/pipes/truncate.pipe';
@@ -205,8 +205,9 @@ export class LibraryComponent implements OnInit, OnDestroy {
         this.cdRef.detectChanges(); 
         this.videoService.getSavedVideos(this.user._id).subscribe({
             next: (response) => {
-                this.savedVideos = response.data;
-                this.isLoading = false;
+              console.log('saved video ',response.data)
+              this.savedVideos = response.data;
+              this.isLoading = false;
               this.cdRef.detectChanges();  
             },
             error: (error: HttpErrorResponse) => {
@@ -249,17 +250,7 @@ export class LibraryComponent implements OnInit, OnDestroy {
   }
 
   formatDuration(duration: string): string {
-    // Convert ISO 8601 duration to readable format (e.g., PT4M32S -> 4:32)
-    const matches = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-    if (!matches) return '';
-
-    const hours = matches[1] ? matches[1].replace('H', '') : '';
-    const minutes = matches[2] ? matches[2].replace('M', '') : '0';
-    const seconds = matches[3] ? matches[3].replace('S', '') : '0';
-
-    return hours 
-      ? `${hours}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`
-      : `${minutes}:${seconds.padStart(2, '0')}`;
+    return videoDuration(duration)
   }
 
   ngOnDestroy(): void {

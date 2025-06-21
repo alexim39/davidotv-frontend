@@ -73,7 +73,7 @@ interface FilterSheetData {
           margin: 0;
           font-size: 1.25rem;
           font-weight: 500;
-          color: #3f51b5; /* Primary color */
+          color: #8f0045; /* Primary color */
         }
       }
       
@@ -93,7 +93,7 @@ interface FilterSheetData {
             
             .category-icon {
               margin-right: 16px;
-              color: #3f51b5;
+              color: #8f0045;
             }
             
             .category-label {
