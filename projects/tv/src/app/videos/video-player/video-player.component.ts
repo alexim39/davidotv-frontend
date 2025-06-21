@@ -16,18 +16,20 @@ import { Subscription, timer } from 'rxjs';
 import { UserInterface, UserService } from '../../common/services/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { VideoService } from '../../common/services/videos.service';
+import { VideoCommentsComponent } from './video-comments/video-comments.component';
+import { RecommendationsSidebarComponent } from './recommendations-sidebar/recommendations-sidebar.component';
 
-// Declare YT for TypeScript to recognize the global YouTube API object
 declare global {
   interface Window {
     onYouTubeIframeAPIReady: () => void;
-    YT: any; // YouTube API type
+    YT: any;
   }
 }
 
 @Component({
   selector: 'async-video-player',
   providers: [PlaylistService],
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -36,7 +38,9 @@ declare global {
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatSliderModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    VideoCommentsComponent,
+    RecommendationsSidebarComponent
   ],
   template: `
     <div class="app-container">
@@ -83,7 +87,6 @@ declare global {
             </div>
 
             <div class="video-controls" *ngIf="!isLoading" [class.hidden]="!showControls && isPlaying">
-              
               <div class="controls-container">
                 <div class="left-controls">
                   <button mat-icon-button (click)="togglePlayPause()" aria-label="Play/Pause">
@@ -107,7 +110,7 @@ declare global {
                 </div>
               </div>
 
-             <div class="progress-bar">
+              <div class="progress-bar">
                 <mat-slider 
                   min="0" 
                   [max]="duration" 
@@ -118,10 +121,7 @@ declare global {
                   <input matSliderThumb [value]="currentTime">
                 </mat-slider>
               </div>
-              
             </div>
-
-              
           </div>
 
           <ng-template #loadingTpl>
@@ -130,88 +130,75 @@ declare global {
               <p class="loading-text">Loading Davido's content...</p>
             </div>
           </ng-template>
-          
 
           <div class="video-info-container" *ngIf="!isLoading">
-
-          
-          <div class="video-meta-container">
-            <!-- Music Title Section -->
-            <div class="music-title">
-              <h2 class="song-title">{{ currentVideo.title }}</h2>
-              <div class="artist-info">
-                <!-- <mat-icon class="artist-icon">tv_options_edit_channels</mat-icon> -->
-                <span class="artist-name">- {{currentVideo.channel}}</span>
-              </div>
-            </div>
-
-            <!-- Video Meta Content -->
-            <div class="video-meta">
-              <!-- Left: Subtle YouTube Stats -->
-              <div class="youtube-stats">
-                <div class="youtube-badge">
-                  <mat-icon class="youtube-icon">smart_display</mat-icon>
-                  <span class="youtube-label">YouTube</span>
-                </div>
-                <div class="youtube-metrics">
-                  <span class="youtube-metric" matTooltip="Views">
-                    {{ formatViewCount(currentVideo.views)  }} views
-                  </span>
-                  •
-                  <span class="youtube-metric" matTooltip="Likes">
-                    {{ currentVideo.likes  }} likes
-                  </span>
-                  •
-                  <span class="youtube-metric" matTooltip="Dislikes">
-                    {{ currentVideo.dislikes  }} dislikes
-                  </span>
-                  •
-                  <span class="youtube-metric" matTooltip="Published">
-                    {{ timeAgo(currentVideo.publishedAt) }}
-                  </span>
+            <div class="video-meta-container">
+              <div class="music-title">
+                <h2 class="song-title">{{ currentVideo.title }}</h2>
+                <div class="artist-info">
+                  <span class="artist-name">- {{currentVideo.channel}}</span>
                 </div>
               </div>
 
-              <!-- Right: Prominent App Actions -->
-              <div class="app-engagement">
-                <div class="reaction-buttons">
-                  <button class="reaction-btn like-btn" (click)="likeVideo()" [class.active]="liked">
-                    <mat-icon>{{ liked ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
-                    <span class="count">{{ appLikes | number }}</span>
-                  </button>
-                  
-                  <button class="reaction-btn dislike-btn" (click)="dislikeVideo()" [class.active]="disliked">
-                    <mat-icon>{{ disliked ? 'thumb_down' : 'thumb_down_off_alt' }}</mat-icon>
-                    <span class="count">{{ appDislikes | number }}</span>
-                  </button>
+              <div class="video-meta">
+                <div class="youtube-stats">
+                  <div class="youtube-badge">
+                    <mat-icon class="youtube-icon">smart_display</mat-icon>
+                    <span class="youtube-label">YouTube</span>
+                  </div>
+                  <div class="youtube-metrics">
+                    <span class="youtube-metric" matTooltip="Views">
+                      {{ formatViewCount(currentVideo.views)  }} views
+                    </span>
+                    •
+                    <span class="youtube-metric" matTooltip="Likes">
+                      {{ currentVideo.likes  }} likes
+                    </span>
+                    •
+                    <span class="youtube-metric" matTooltip="Dislikes">
+                      {{ currentVideo.dislikes  }} dislikes
+                    </span>
+                    •
+                    <span class="youtube-metric" matTooltip="Published">
+                      {{ timeAgo(currentVideo.publishedAt) }}
+                    </span>
+                  </div>
                 </div>
-                
-                <div class="action-buttons">
-                  <button mat-mini-fab class="action-btn" (click)="shareVideo()" matTooltip="Share">
-                    <mat-icon>share</mat-icon>
-                  </button>
+
+                <div class="app-engagement">
+                  <div class="reaction-buttons">
+                    <button class="reaction-btn like-btn" (click)="likeVideo()" [class.active]="liked">
+                      <mat-icon>{{ liked ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
+                      <span class="count">{{ appLikes | number }}</span>
+                    </button>
+                    
+                    <button class="reaction-btn dislike-btn" (click)="dislikeVideo()" [class.active]="disliked">
+                      <mat-icon>{{ disliked ? 'thumb_down' : 'thumb_down_off_alt' }}</mat-icon>
+                      <span class="count">{{ appDislikes | number }}</span>
+                    </button>
+                  </div>
                   
-                  <button mat-mini-fab class="action-btn" (click)="saveVideo()" [class.active]="saved" matTooltip="Save">
-                    <mat-icon>{{ saved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-                  </button>
-                  
-                  <button mat-mini-fab class="action-btn" (click)="toggleRepeatMode()" [class.active]="repeatMode !== 'none'" matTooltip="Repeat">
-                    <mat-icon>{{ repeatMode === 'one' ? 'repeat_one' : 'repeat' }}</mat-icon>
-                  </button>
-                  
-                  <div class="view-count" matTooltip="App Views">
-                    <mat-icon>visibility</mat-icon>
-                    <span>{{ formatViewCount(appViews) }}</span>
+                  <div class="action-buttons">
+                    <button mat-mini-fab class="action-btn" (click)="shareVideo()" matTooltip="Share">
+                      <mat-icon>share</mat-icon>
+                    </button>
+                    
+                    <button mat-mini-fab class="action-btn" (click)="saveVideo()" [class.active]="saved" matTooltip="Save">
+                      <mat-icon>{{ saved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+                    </button>
+                    
+                    <button mat-mini-fab class="action-btn" (click)="toggleRepeatMode()" [class.active]="repeatMode !== 'none'" matTooltip="Repeat">
+                      <mat-icon>{{ repeatMode === 'one' ? 'repeat_one' : 'repeat' }}</mat-icon>
+                    </button>
+                    
+                    <div class="view-count" matTooltip="App Views">
+                      <mat-icon>visibility</mat-icon>
+                      <span>{{ formatViewCount(appViews) }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-
-
-
-
-
 
             <div class="video-description">
               <h2>{{ videoTitle }}</h2>
@@ -234,82 +221,22 @@ declare global {
             </div>
           </div>
 
-          <div class="comments-section" *ngIf="!isLoading">
-            <div class="comments-header">
-              <h3>{{ comments.length }} Comments</h3>
-              <div class="sort-comments">
-                <mat-icon>sort</mat-icon>
-                <span>Sort by</span>
-              </div>
-            </div>
-
-            <div class="add-comment">
-              <img [src]="currentUserAvatar" alt="Your profile" class="user-avatar">
-              <div class="comment-form">
-                <form (submit)="addComment($event)">
-                  <input 
-                    type="text" 
-                    [(ngModel)]="newComment" 
-                    name="comment" 
-                    placeholder="Add a public comment..."
-                    aria-label="Add a comment"
-                    required
-                  >
-                  <div class="comment-actions" *ngIf="newComment">
-                    <button mat-button type="button" (click)="cancelComment()">CANCEL</button>
-                    <button mat-raised-button color="primary" type="submit" [disabled]="!newComment.trim()">COMMENT</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-
-            <div class="comments-list">
-              <div class="comment" *ngFor="let comment of comments">
-                <img [src]="comment.avatar" alt="{{ comment.user }}" class="comment-avatar">
-                <div class="comment-content">
-                  <div class="comment-header">
-                    <h4>{{ comment.user }}</h4>
-                    <span class="comment-time">{{ comment.time }}</span>
-                  </div>
-                  <p class="comment-text">{{ comment.text }}</p>
-                  <div class="comment-actions">
-                    <button mat-icon-button>
-                      <mat-icon>thumb_up_off_alt</mat-icon>
-                    </button>
-                    <span class="likes-count">{{ comment.likes }}</span>
-                    <button mat-icon-button>
-                      <mat-icon>thumb_down_off_alt</mat-icon>
-                    </button>
-                    <button mat-button>REPLY</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <async-video-comments 
+            [comments]="comments"
+            [currentUserAvatar]="currentUserAvatar"
+            (commentAdded)="onCommentAdded($event)"
+          ></async-video-comments>
         </section>
 
-        <aside class="recommendations-sidebar" *ngIf="!isLoading">
-          <div class="sidebar-header">
-            <h3>Up Next</h3>
-            <div class="autoplay-toggle">
-              <span>Autoplay</span>
-              <mat-slide-toggle [(ngModel)]="autoplay"></mat-slide-toggle>
-            </div>
-          </div>
-          <div class="recommendation-list">
-            <div class="recommendation-item" *ngFor="let video of recommendedVideos" (click)="navigateToVideo(video.youtubeVideoId)">
-              <div class="thumbnail-container">
-              <img [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" alt="{{ video.title }}" class="thumbnail">                
-              <span class="duration"> {{ formatDuration(video.duration) }}</span>
-              </div>
-              <div class="video-details">
-                <h4>{{ video.title }}</h4>
-                <p class="creator">{{ video.channel }}</p>
-                <p class="views">{{ formatViewCount(video.views) }} views • {{ timeAgo(video.publishedAt) }} </p>
-              </div>
-            </div>
-          </div>
-        </aside>
+        <section class="recommendations-section">
+          <async-recommendations-sidebar 
+          [recommendedVideos]="recommendedVideos"
+          [isLoading]="isLoading"
+          [autoplay]="autoplay"
+          (navigateToVideo)="navigateToVideo($event)"
+          (autoplayChanged)="autoplay = $event"
+        ></async-recommendations-sidebar>
+        </section>
       </main>
     </div>
   `,
@@ -414,6 +341,16 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   // Add these properties to your component
   private watchHistoryInterval = 10; // Update every 10 seconds
   private watchHistorySubscription: Subscription | null = null;
+
+   onCommentAdded(commentText: string) {
+    this.comments.unshift({
+      user: 'You',
+      text: commentText,
+      likes: 0,
+      time: 'Just now',
+      avatar: this.currentUserAvatar
+    });
+  }
 
   constructor(
     private route: ActivatedRoute, 
@@ -575,29 +512,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       });
     }
 
-  /* onPlayerStateChange(event: any) {
-    // Ensure all state updates happen within Angular's zone
-    this.ngZone.run(() => {
-      const state = event.data; // YouTube player states: -1, 0, 1, 2, 3, 5
-      
-      if (state === window.YT.PlayerState.PLAYING) {
-        this.isPlaying = true;
-        this.showOverlay = false;
-        // If duration wasn't correctly fetched onReady, try again when video starts playing
-        if (this.duration === 0 || isNaN(this.duration)) {
-          this.getDuration(); 
-        }
-      } else if (state === window.YT.PlayerState.PAUSED || state === window.YT.PlayerState.ENDED) {
-        this.isPlaying = false;
-      }
-      
-      if (state === window.YT.PlayerState.ENDED) { // Video ended
-        this.handleVideoEnded();
-      }
-      
-      this.resetControlsTimer();
-    });
-  } */
 
     onPlayerStateChange(event: any) {
   this.ngZone.run(() => {

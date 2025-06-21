@@ -12,7 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { timeAgo as timeAgoUtil } from '../../common/utils/time.util';
+import { timeAgo as timeAgoUtil, formatViewCount as viewFormat, formatDuration as videoDuration } from '../../common/utils/time.util';
 import { Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
 import { YoutubeService, YoutubeVideoInterface } from "../../common/services/youtube.service";
 import { TruncatePipe } from "../../common/pipes/truncate.pipe";
@@ -155,7 +155,7 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
                     <h3 class="video-title" [matTooltip]="video.title">{{video.title}}</h3>
                     <p class="channel-name">{{video.channel}}</p>
                     <div class="video-stats">
-                      <span class="views">{{ video.views | number }} views</span>
+                      <span class="views">{{ formatViewCount(video.views) }} views</span>
                       <span class="separator">•</span>
                       <span class="date">{{ timeAgo(video.publishedAt) }}</span>
                     </div>
@@ -261,7 +261,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
     this.youtubeService.searchVideos(this.currentSearchTerm, this.currentPage + 1, this.pageSize)
         .subscribe({
         next: (response) => {
-            console.log('search result ',response)
+            //console.log('search result ',response)
             this.videos = response.data.map((video: YoutubeVideoInterface) => ({
             ...video,
             channelIcon: ''//video.channelIcon || './img/ytch.jpeg'
@@ -296,19 +296,12 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
     return timeAgoUtil(date);
   }
 
-  formatDuration(duration: string): string {
-    // Convert ISO 8601 duration to readable format (PT1M33S -> 1:33)
-    const matches = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-    if (!matches) return '';
-
-    const hours = matches[1] ? parseInt(matches[1]) : 0;
-    const minutes = matches[2] ? parseInt(matches[2]) : 0;
-    const seconds = matches[3] ? parseInt(matches[3]) : 0;
-
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    } else {
-      return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    }
+  formatViewCount(views: number | 0): string {
+    return viewFormat(views);
   }
+
+  formatDuration(duration: string): string {
+      return videoDuration(duration)
+  }
+
 }

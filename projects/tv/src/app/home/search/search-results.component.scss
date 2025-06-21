@@ -1,7 +1,7 @@
 :host {
   display: block;
   width: 100%;
-  padding-top: 80px; // Account for fixed navbar
+  padding-top: 30px; // Account for fixed navbar
   min-height: calc(100vh - 80px);
   //background-color: #f9f9f9;
   border: 1px solid rgba(81, 0, 26, 0.8);
@@ -20,6 +20,10 @@
     .search-bar-container {
       max-width: 800px;
       margin: 0 auto 24px;
+       // Hide on large screens
+        @media (min-width: 1024px) {
+          display: none;
+        }
     }
 
     .search-input {
@@ -49,6 +53,8 @@
       color: #606060;
       text-align: center;
     }
+
+    
   }
 
   .loading-container {
@@ -276,7 +282,7 @@
 /* Responsive styles */
 @media (max-width: 768px) {
   :host {
-    padding-top: 64px;
+    padding-top: 24px;
   }
 
   .search-results-section {
