@@ -18,6 +18,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { VideoService } from '../../common/services/videos.service';
 import { VideoCommentsComponent } from './video-comments/video-comments.component';
 import { RecommendationsSidebarComponent } from './recommendations-sidebar/recommendations-sidebar.component';
+import { VideoDiscriptionComponent } from './video-description.component';
 
 declare global {
   interface Window {
@@ -40,7 +41,8 @@ declare global {
     MatSliderModule,
     MatSlideToggleModule,
     VideoCommentsComponent,
-    RecommendationsSidebarComponent
+    RecommendationsSidebarComponent,
+    VideoDiscriptionComponent
   ],
   template: `
     <div class="app-container">
@@ -75,7 +77,6 @@ declare global {
                 frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
-                title="{{ videoTitle }}"
                 (load)="onVideoLoad()"
                 aria-label="Davido video player"
                 tabindex="0"
@@ -200,32 +201,16 @@ declare global {
               </div>
             </div>
 
-            <div class="video-description">
-              <h2>{{ videoTitle }}</h2>
-              <div class="creator-info">
-                <img [src]="creatorAvatar" alt="Davido" class="creator-avatar">
-                <div class="creator-details">
-                  <h3>Davido</h3>
-                  <p>12.5M subscribers</p>
-                </div>
-                <button mat-raised-button color="warn" class="subscribe-btn">
-                  SUBSCRIBE
-                </button>
-              </div>
-              <div class="description-text" [class.expanded]="descriptionExpanded">
-                <p>{{ videoDescription }}</p>
-                <button mat-button (click)="descriptionExpanded = !descriptionExpanded" class="show-more-btn">
-                  Show {{ descriptionExpanded ? 'less' : 'more' }}
-                </button>
-              </div>
-            </div>
+            <app-video-discription/>
+
           </div>
 
           <async-video-comments 
             [comments]="comments"
             [currentUserAvatar]="currentUserAvatar"
             (commentAdded)="onCommentAdded($event)"
-          ></async-video-comments>
+          />
+          
         </section>
 
         <section class="recommendations-section">
@@ -235,8 +220,9 @@ declare global {
           [autoplay]="autoplay"
           (navigateToVideo)="navigateToVideo($event)"
           (autoplayChanged)="autoplay = $event"
-        ></async-recommendations-sidebar>
+        />
         </section>
+
       </main>
     </div>
   `,
@@ -244,22 +230,8 @@ declare global {
 })
 export class VideoPlayerComponent implements OnInit, OnDestroy {
   safeUrl: SafeResourceUrl | null = null;
-  videoTitle = 'Davido - New Hit Single (Official Video)';
-  videoDescription = `Official music video for Davido's latest hit single. 
-  
-  Directed by Director X
-  Produced by Speroach Beatz
-  Lyrics by Davido
-  
-  Follow Davido:
-  Instagram: @davido
-  Twitter: @davido
-  Facebook: /davidoofficial
-  
-  #Davido #NewSingle #Afrobeats`;
   isLoading = true;
   showOverlay = true;
-  descriptionExpanded = false;
   showControls = true;
   controlsTimeout: any;
 
@@ -283,17 +255,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   // Playlist management
   davidoVideos: any[] = [];
 
-  // Playlist management
-  /* davidoVideos = [
-    { youtubeVideoId: 'NnWe5Lhi0G8', title: 'Davido - Fall', duration: '4:25', thumbnail: 'https://i.ytimg.com/vi/NnWe5Lhi0G8/mqdefault.jpg', views: '245M views', publishedAt: '5 years ago' },
-    { youtubeVideoId: 'helEv0kGHd4', title: 'Davido - IF', duration: '3:32', thumbnail: 'https://i.ytimg.com/vi/helEv0kGHd4/mqdefault.jpg', views: '187M views', publishedAt: '4 years ago' },
-    { youtubeVideoId: 'l6QMJniQWxQ', title: 'Davido - Assurance', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/l6QMJniQWxQ/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: '8ORvJcpe2Oc', title: 'Davido - Assurance', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/8ORvJcpe2Oc/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: 'oiHh2-6jmnU', title: 'Davido - Assurance', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/oiHh2-6jmnU/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: '3Iyuym-Gci0', title: 'Davido - Fall', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/3Iyuym-Gci0/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: 'QGrxqOcZpZU', title: 'Davido - Fall', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/QGrxqOcZpZU/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: 'dAD73UeU6Dw', title: 'Davido - Fall', duration: '4:12', thumbnail: 'https://i.ytimg.com/vi/dAD73UeU6Dw/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-  ]; */
   currentVideoIndex = 0;
 
   // Repeat mode
@@ -324,7 +285,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   // User data
   currentUserAvatar = 'https://randomuser.me/api/portraits/men/1.jpg';
-  creatorAvatar = 'https://randomuser.me/api/portraits/men/0.jpg';
 
   @ViewChild('videoFrame') videoFrame!: ElementRef<HTMLIFrameElement>;
 
@@ -514,31 +474,31 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
 
     onPlayerStateChange(event: any) {
-  this.ngZone.run(() => {
-    const state = event.data;
-    
-    if (state === window.YT.PlayerState.PLAYING) {
-      this.isPlaying = true;
-      this.showOverlay = false;
-      
-      // Start tracking watch progress
-      this.startWatchHistoryTracking();
-      
-      if (this.duration === 0 || isNaN(this.duration)) {
-        this.getDuration();
-      }
-    } else if (state === window.YT.PlayerState.PAUSED || state === window.YT.PlayerState.ENDED) {
-      this.isPlaying = false;
-      this.stopWatchHistoryTracking();
-      
-      if (state === window.YT.PlayerState.ENDED) {
-        this.handleVideoEnded();
-      }
+      this.ngZone.run(() => {
+        const state = event.data;
+        
+        if (state === window.YT.PlayerState.PLAYING) {
+          this.isPlaying = true;
+          this.showOverlay = false;
+          
+          // Start tracking watch progress
+          this.startWatchHistoryTracking();
+          
+          if (this.duration === 0 || isNaN(this.duration)) {
+            this.getDuration();
+          }
+        } else if (state === window.YT.PlayerState.PAUSED || state === window.YT.PlayerState.ENDED) {
+          this.isPlaying = false;
+          this.stopWatchHistoryTracking();
+          
+          if (state === window.YT.PlayerState.ENDED) {
+            this.handleVideoEnded();
+          }
+        }
+        
+        this.resetControlsTimer();
+      });
     }
-    
-    this.resetControlsTimer();
-  });
-}
 
   startPlayerStatePolling() {
     // Clear any existing interval to prevent multiple polls running
@@ -587,7 +547,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.currentTime = 0; // Reset current time to 0 for the new video
     this.playerReady = false; // Reset player ready state for the new load
 
-    this.updateVideoInfo(videoId);
+   // this.updateVideoInfo(videoId);
     
     // If the player object already exists and is functional, load the new video via API
     // This handles navigating between videos without full component re-initialization
@@ -613,14 +573,12 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   } 
 
 
-  updateVideoInfo(videoId: string) {
+ /*  updateVideoInfo(videoId: string) {
     const video = this.davidoVideos.find((v: any) => v.id === videoId);
     if (video) {
-      this.videoTitle = video.title;
-      //this.uploadDate = new Date();
-      //this.uploadDate.setFullYear(this.uploadDate.getFullYear() - Math.floor(Math.random() * 5));
+      //this.videoTitle = video.title;
     }
-  }
+  } */
 
   onVideoLoad() {
     // This event signifies the iframe itself has loaded. The YouTube player inside still needs to be ready.
@@ -920,7 +878,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   shareVideo() {
     if (navigator.share) {
       navigator.share({
-        title: this.videoTitle,
+        //title: this.videoTitle,
         url: window.location.href
       }).catch(() => {});
     } else {

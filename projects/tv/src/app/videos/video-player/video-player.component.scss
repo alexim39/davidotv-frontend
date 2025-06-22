@@ -296,63 +296,7 @@ button.mat-icon-button.active {
   color: #ff4b2b;
 }
 
-/* Video Description */
-.video-description {
-  padding: 16px 0;
-  border-bottom: 1px solid #3f3f3f;
-}
 
-.video-description h2 {
-  font-size: 1.25rem;
-  font-weight: 500;
-  margin: 0 0 16px 0;
-}
-
-.creator-info {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.creator-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.creator-details {
-  flex: 1;
-}
-
-.creator-details h3 {
-  font-size: 1rem;
-  font-weight: 500;
-  margin: 0 0 4px 0;
-}
-
-.creator-details p {
-  font-size: 0.8rem;
-  margin: 0;
-}
-
-.description-text {
-  margin-left: 64px;
-  position: relative;
-}
-
-.description-text p {
-  margin: 0 0 8px 0;
-  line-height: 1.5;
-  white-space: pre-line;
-}
-
-.show-more-btn {
-  font-weight: 500;
-  padding: 0;
-  min-width: auto;
-}
 
 /* Responsive Design */
 @media (max-width: 1200px) {
