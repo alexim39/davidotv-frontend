@@ -88,7 +88,7 @@ getTrendingVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = 
  * @param page Page number for pagination
  * @param forceRefresh Bypass cache and force refresh
  */
-getMusicVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<YoutubeVideoInterface[]> {
+getOfficialVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<YoutubeVideoInterface[]> {
   // Always get current cache value safely
   const currentCache = this.musicCache.value || [];
 

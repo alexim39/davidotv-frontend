@@ -241,7 +241,7 @@ export class OfficialComponent implements OnInit, OnDestroy {
     
     this.error = null;
 
-    this.videosSubscription = this.youtubeService.getMusicVideos(this.pageSize, this.page, true).subscribe({
+    this.videosSubscription = this.youtubeService.getOfficialVideos(this.pageSize, this.page, true).subscribe({
       next: (response: any) => {
         const newVideos = response.data || [];
         

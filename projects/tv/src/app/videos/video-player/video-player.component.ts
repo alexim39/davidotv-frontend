@@ -213,15 +213,19 @@ declare global {
           
         </section>
 
-        <section class="recommendations-section">
-          <async-recommendations-sidebar 
+       <section class="recommendations-section">
+        <async-recommendations-sidebar 
+          *ngIf="recommendedVideos.length > 0 || isLoadingMore"
           [recommendedVideos]="recommendedVideos"
-          [isLoading]="isLoading"
+          [isLoading]="isLoadingMore"
+          [hasMoreVideos]="hasMoreVideos"
           [autoplay]="autoplay"
           (navigateToVideo)="navigateToVideo($event)"
-          (autoplayChanged)="autoplay = $event"
-        />
-        </section>
+          (autoplayChanged)="autoplayChanged($event)"
+          (loadMore)="loadSideBarVideos()"
+        ></async-recommendations-sidebar>
+      </section>
+       
 
       </main>
     </div>
@@ -279,10 +283,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   ];
   newComment = '';
 
-  // Recommended videos
-  recommendedVideos = this.davidoVideos;
-  autoplay = false;
-
   // User data
   currentUserAvatar = 'https://randomuser.me/api/portraits/men/1.jpg';
 
@@ -312,6 +312,14 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     });
   }
 
+  // properties for loading sidebar videos
+  recommendedVideos: any[] = [];
+  currentPage = 1;
+  pageSize = 10;
+  hasMoreVideos = true;
+  isLoadingMore = false;
+  autoplay = false;
+
   constructor(
     private route: ActivatedRoute, 
     private sanitizer: DomSanitizer,
@@ -335,13 +343,16 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
 
       
-    this.playlistService.getPlaylistVideos().subscribe({
+   /*  this.playlistService.getPlaylistVideos().subscribe({
       next: (response) => {
         console.log('playlist video response ',response)
         this.davidoVideos = response.data;
         this.recommendedVideos = response.data;;
       }
-    }); 
+    });  */
+
+    // load sidebar playlist
+    this.loadSideBarVideos();
 
 
     // Assign onYouTubeIframeAPIReady to a global function and ensure it runs in Angular's zone
@@ -359,14 +370,75 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   }
 
-  private getCurrentVideoData(videoId: string) {
-     // Get current video details
-      this.youtubeService.getVideoById(videoId).subscribe({
-        next: (response: any) => {
-          console.log('single video response ',response)
-          this.currentVideo = response.data;
+  /* loadSideBarVideos(reset = false) {
+    if (reset) {
+      this.currentPage = 1;
+      this.hasMoreVideos = true;
+      this.recommendedVideos = [];
+    }
+
+    if (this.isLoadingMore || !this.hasMoreVideos) return;
+
+    this.isLoadingMore = true;
+
+    this.playlistService.getPlaylistVideos(
+      this.currentPage,
+      this.pageSize
+      // Add optional menuType, sort, order if needed
+    ).subscribe({
+      next: (response) => {
+        console.log('Playlist video response:', response);
+        
+        if (reset) {
+          this.recommendedVideos = response.data;
+        } else {
+          this.recommendedVideos = [...this.recommendedVideos, ...response.data];
+        }
+
+        this.hasMoreVideos = response.meta.hasNextPage;
+        this.currentPage++;
+        this.isLoadingMore = false;
+      },
+      error: (err) => {
+        console.error('Error loading videos:', err);
+        this.isLoadingMore = false;
+      }
+    });
+  } */
+
+   loadSideBarVideos() {
+    if (this.isLoadingMore || !this.hasMoreVideos) return;
+
+    this.isLoadingMore = true;
+
+    this.playlistService.getPlaylistVideos(this.currentPage, this.pageSize)
+      .subscribe({
+        next: (response) => {
+          this.recommendedVideos = [...this.recommendedVideos, ...response.data];
+          this.hasMoreVideos = response.pagination.hasNextPage;
+          this.currentPage++;
+          this.isLoadingMore = false;
+        },
+        error: (err) => {
+          console.error('Error:', err);
+          this.isLoadingMore = false;
         }
       });
+  }
+
+  // Infinite scroll handler
+  onScroll() {
+    this.loadSideBarVideos();
+  }
+
+  private getCurrentVideoData(videoId: string) {
+    // Get current video details
+    this.youtubeService.getVideoById(videoId).subscribe({
+      next: (response: any) => {
+        console.log('single video response ',response)
+        this.currentVideo = response.data;
+      }
+    });
   }
 
 
@@ -405,100 +477,100 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-    onYouTubeIframeAPIReady() {
-      // If the ViewChild is not yet available, retry after a short delay
-      if (!this.videoFrame || !this.videoFrame.nativeElement) {
-        setTimeout(() => this.onYouTubeIframeAPIReady(), 100);
-        return;
+  onYouTubeIframeAPIReady() {
+    // If the ViewChild is not yet available, retry after a short delay
+    if (!this.videoFrame || !this.videoFrame.nativeElement) {
+      setTimeout(() => this.onYouTubeIframeAPIReady(), 100);
+      return;
+    }
+
+    // ...existing code...
+    if (!this.player || typeof this.player.getPlayerState !== 'function') {
+      if (this.player && typeof this.player.destroy === 'function') {
+        this.player.destroy();
       }
 
-      // ...existing code...
-      if (!this.player || typeof this.player.getPlayerState !== 'function') {
-        if (this.player && typeof this.player.destroy === 'function') {
-          this.player.destroy();
+      this.player = new window.YT.Player(this.videoFrame.nativeElement, {
+        videoId: this.currentVideoId,
+        playerVars: {
+          enablejsapi: 1,
+          rel: 0,
+          modestbranding: 1,
+          controls: 0,
+          disablekb: 1,
+          fs: 1,
+          iv_load_policy: 3,
+          origin: window.location.origin,
+          autoplay: this.autoplay ? 1 : 0
+        },
+        events: {
+          'onReady': this.onPlayerReady.bind(this),
+          'onStateChange': this.onPlayerStateChange.bind(this)
         }
-
-        this.player = new window.YT.Player(this.videoFrame.nativeElement, {
-          videoId: this.currentVideoId,
-          playerVars: {
-            enablejsapi: 1,
-            rel: 0,
-            modestbranding: 1,
-            controls: 0,
-            disablekb: 1,
-            fs: 1,
-            iv_load_policy: 3,
-            origin: window.location.origin,
-            autoplay: this.autoplay ? 1 : 0
-          },
-          events: {
-            'onReady': this.onPlayerReady.bind(this),
-            'onStateChange': this.onPlayerStateChange.bind(this)
-          }
-        });
-      } else {
-        this.player.loadVideoById(this.currentVideoId);
-        if (this.autoplay) {
-          this.player.playVideo();
-        }
+      });
+    } else {
+      this.player.loadVideoById(this.currentVideoId);
+      if (this.autoplay) {
+        this.player.playVideo();
       }
     }
+  }
 
-    onPlayerReady(event: any) {
-      this.ngZone.run(() => {
-        this.playerReady = true;
-        this.isLoading = false;
+  onPlayerReady(event: any) {
+    this.ngZone.run(() => {
+      this.playerReady = true;
+      this.isLoading = false;
 
-        // Synchronous call
-        const duration = this.player.getDuration();
-        this.duration = isNaN(duration) ? 0 : duration;
+      // Synchronous call
+      const duration = this.player.getDuration();
+      this.duration = isNaN(duration) ? 0 : duration;
 
-        this.startUpdateLoop();
+      this.startUpdateLoop();
 
-        if (this.pendingAutoPlay) {
-          this.playVideo();
-          this.pendingAutoPlay = false;
-        }
+      if (this.pendingAutoPlay) {
+        this.playVideo();
+        this.pendingAutoPlay = false;
+      }
 
-        // Synchronous call
-        const time = this.player.getCurrentTime();
-        this.currentTime = isNaN(time) ? 0 : time;
+      // Synchronous call
+      const time = this.player.getCurrentTime();
+      this.currentTime = isNaN(time) ? 0 : time;
 
-        this.startPlayerStatePolling();
+      this.startPlayerStatePolling();
 
-        if (this.autoplay) {
-          this.playVideo();
-        }
-      });
-    }
+      if (this.autoplay) {
+        this.playVideo();
+      }
+    });
+  }
 
 
-    onPlayerStateChange(event: any) {
-      this.ngZone.run(() => {
-        const state = event.data;
+  onPlayerStateChange(event: any) {
+    this.ngZone.run(() => {
+      const state = event.data;
+      
+      if (state === window.YT.PlayerState.PLAYING) {
+        this.isPlaying = true;
+        this.showOverlay = false;
         
-        if (state === window.YT.PlayerState.PLAYING) {
-          this.isPlaying = true;
-          this.showOverlay = false;
-          
-          // Start tracking watch progress
-          this.startWatchHistoryTracking();
-          
-          if (this.duration === 0 || isNaN(this.duration)) {
-            this.getDuration();
-          }
-        } else if (state === window.YT.PlayerState.PAUSED || state === window.YT.PlayerState.ENDED) {
-          this.isPlaying = false;
-          this.stopWatchHistoryTracking();
-          
-          if (state === window.YT.PlayerState.ENDED) {
-            this.handleVideoEnded();
-          }
-        }
+        // Start tracking watch progress
+        this.startWatchHistoryTracking();
         
-        this.resetControlsTimer();
-      });
-    }
+        if (this.duration === 0 || isNaN(this.duration)) {
+          this.getDuration();
+        }
+      } else if (state === window.YT.PlayerState.PAUSED || state === window.YT.PlayerState.ENDED) {
+        this.isPlaying = false;
+        this.stopWatchHistoryTracking();
+        
+        if (state === window.YT.PlayerState.ENDED) {
+          this.handleVideoEnded();
+        }
+      }
+      
+      this.resetControlsTimer();
+    });
+  }
 
   startPlayerStatePolling() {
     // Clear any existing interval to prevent multiple polls running
@@ -922,6 +994,12 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   formatViewCount(views: number | 0): string {
     return viewFormat(views);
+  }
+
+  autoplayChanged(newValue: boolean) {
+    this.autoplay = newValue;
+    // Optional: Add any additional autoplay change logic here
+    console.log('Autoplay changed to:', newValue);
   }
 
   // Add these new methods
