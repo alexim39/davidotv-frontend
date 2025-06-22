@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatSliderModule } from '@angular/material/slider';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { PlaylistService } from './playlist.service';
 import { YoutubeService, YoutubeVideoInterface } from '../../common/services/youtube.service';
@@ -18,7 +18,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { VideoService } from '../../common/services/videos.service';
 import { VideoCommentsComponent } from './video-comments/video-comments.component';
 import { RecommendationsSidebarComponent } from './recommendations-sidebar/recommendations-sidebar.component';
-import { VideoDiscriptionComponent } from './video-description.component';
 
 declare global {
   interface Window {
@@ -38,11 +37,10 @@ declare global {
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatSliderModule,
+    MatProgressBarModule,
     MatSlideToggleModule,
     VideoCommentsComponent,
     RecommendationsSidebarComponent,
-    VideoDiscriptionComponent
   ],
   template: `
     <div class="app-container">
@@ -77,7 +75,6 @@ declare global {
                 frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
-                (load)="onVideoLoad()"
                 aria-label="Davido video player"
                 tabindex="0"
               ></iframe>
@@ -88,39 +85,37 @@ declare global {
             </div>
 
             <div class="video-controls" *ngIf="!isLoading" [class.hidden]="!showControls && isPlaying">
+             
+
               <div class="controls-container">
                 <div class="left-controls">
+                  <button mat-icon-button (click)="skipBackward()" aria-label="Skip backward 10 seconds">
+                    <mat-icon>replay_10</mat-icon>
+                  </button>
                   <button mat-icon-button (click)="togglePlayPause()" aria-label="Play/Pause">
                     <mat-icon>{{ isPlaying ? 'pause' : 'play_arrow' }}</mat-icon>
                   </button>
-                  <button mat-icon-button (click)="playPreviousVideo()" aria-label="Previous video">
-                    <mat-icon>skip_previous</mat-icon>
+                  <button mat-icon-button (click)="skipForward()" aria-label="Skip forward 10 seconds">
+                    <mat-icon>forward_10</mat-icon>
                   </button>
-                  <button mat-icon-button (click)="playNextVideo()" aria-label="Next video">
-                    <mat-icon>skip_next</mat-icon>
-                  </button>
-                  <span class="time-display">{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</span>
-                </div>
-                <div class="right-controls">
                   <button mat-icon-button (click)="toggleMute()" aria-label="Toggle mute">
                     <mat-icon>{{ isMuted ? 'volume_off' : 'volume_up' }}</mat-icon>
                   </button>
+                </div>
+                <div class="right-controls">
                   <button mat-icon-button (click)="toggleFullscreen()" aria-label="Toggle fullscreen">
                     <mat-icon>{{ isFullscreen ? 'fullscreen_exit' : 'fullscreen' }}</mat-icon>
                   </button>
                 </div>
               </div>
 
-              <div class="progress-bar">
-                <mat-slider 
-                  min="0" 
-                  [max]="duration" 
-                  (input)="seekVideo($event)"
-                  step="1"
+               <div class="progress-container">
+                <mat-progress-bar 
+                  mode="determinate" 
+                  [value]="(currentTime / duration) * 100"
                   aria-label="Video progress"
-                >
-                  <input matSliderThumb [value]="currentTime">
-                </mat-slider>
+                ></mat-progress-bar>
+                <div class="time-display">{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</div>
               </div>
             </div>
           </div>
@@ -153,11 +148,11 @@ declare global {
                     </span>
                     •
                     <span class="youtube-metric" matTooltip="Likes">
-                      {{ currentVideo.likes  }} likes
+                      {{ formatViewCount(currentVideo.likes)  }} likes
                     </span>
                     •
                     <span class="youtube-metric" matTooltip="Dislikes">
-                      {{ currentVideo.dislikes  }} dislikes
+                      {{ formatViewCount(currentVideo.dislikes)  }} dislikes
                     </span>
                     •
                     <span class="youtube-metric" matTooltip="Published">
@@ -201,32 +196,26 @@ declare global {
               </div>
             </div>
 
-            <app-video-discription/>
-
+            <async-video-comments 
+              [comments]="comments"
+              [currentUserAvatar]="currentUserAvatar"
+              (commentAdded)="onCommentAdded($event)"
+            />
           </div>
-
-          <async-video-comments 
-            [comments]="comments"
-            [currentUserAvatar]="currentUserAvatar"
-            (commentAdded)="onCommentAdded($event)"
-          />
-          
         </section>
 
-       <section class="recommendations-section">
-        <async-recommendations-sidebar 
-          *ngIf="recommendedVideos.length > 0 || isLoadingMore"
-          [recommendedVideos]="recommendedVideos"
-          [isLoading]="isLoadingMore"
-          [hasMoreVideos]="hasMoreVideos"
-          [autoplay]="autoplay"
-          (navigateToVideo)="navigateToVideo($event)"
-          (autoplayChanged)="autoplayChanged($event)"
-          (loadMore)="loadSideBarVideos()"
-        ></async-recommendations-sidebar>
-      </section>
-       
-
+        <section class="recommendations-section">
+          <async-recommendations-sidebar 
+            *ngIf="recommendedVideos.length > 0 || isLoadingMore"
+            [recommendedVideos]="recommendedVideos"
+            [isLoading]="isLoadingMore"
+            [hasMoreVideos]="hasMoreVideos"
+            [autoplay]="autoplay"
+            (navigateToVideo)="navigateToVideo($event)"
+            (autoplayChanged)="autoplayChanged($event)"
+            (loadMore)="loadSideBarVideos()"
+          />
+        </section>
       </main>
     </div>
   `,
@@ -247,7 +236,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   // Player state
   currentVideoId: string = '';
   isPlaying = false;
-  player: any; // Type as 'any' for YouTube player object
+  player: any;
   playerReady = false;
   isMuted = false;
   isFullscreen = false;
@@ -258,7 +247,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   // Playlist management
   davidoVideos: any[] = [];
-
   currentVideoIndex = 0;
 
   // Repeat mode
@@ -281,7 +269,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       avatar: 'https://randomuser.me/api/portraits/women/44.jpg'
     }
   ];
-  newComment = '';
 
   // User data
   currentUserAvatar = 'https://randomuser.me/api/portraits/men/1.jpg';
@@ -298,21 +285,11 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   subscriptions: Subscription[] = [];
   user: UserInterface | null = null;
 
-  // Add these properties to your component
-  private watchHistoryInterval = 10; // Update every 10 seconds
+  // Watch history tracking
+  private watchHistoryInterval = 10;
   private watchHistorySubscription: Subscription | null = null;
 
-   onCommentAdded(commentText: string) {
-    this.comments.unshift({
-      user: 'You',
-      text: commentText,
-      likes: 0,
-      time: 'Just now',
-      avatar: this.currentUserAvatar
-    });
-  }
-
-  // properties for loading sidebar videos
+  // Sidebar videos
   recommendedVideos: any[] = [];
   currentPage = 1;
   pageSize = 10;
@@ -325,7 +302,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private snackBar: MatSnackBar,
     private router: Router,
-    private ngZone: NgZone, // Inject NgZone
+    private ngZone: NgZone,
     private playlistService: PlaylistService,
     private youtubeService: YoutubeService,
     private userService: UserService,
@@ -333,84 +310,49 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-   const videoId = this.route.snapshot.paramMap.get('id');
+    const videoId = this.route.snapshot.paramMap.get('id');
     if (videoId) {
       this.currentVideoId = videoId;
       this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
       this.loadVideo(videoId);
-
-      this.getCurrentVideoData(videoId)
+      this.getCurrentVideoData(videoId);
     }
 
-      
-   /*  this.playlistService.getPlaylistVideos().subscribe({
-      next: (response) => {
-        console.log('playlist video response ',response)
-        this.davidoVideos = response.data;
-        this.recommendedVideos = response.data;;
-      }
-    });  */
-
-    // load sidebar playlist
     this.loadSideBarVideos();
-
-
-    // Assign onYouTubeIframeAPIReady to a global function and ensure it runs in Angular's zone
     window.onYouTubeIframeAPIReady = () => this.ngZone.run(() => this.onYouTubeIframeAPIReady());
     this.loadYouTubeAPI();
 
-     this.subscriptions.push(
+    this.subscriptions.push(
       this.userService.getCurrentUser$.subscribe({
         next: (user) => {
           this.user = user;
-          console.log('current user ',this.user)
         }
       })
-    )
-
+    );
   }
 
-  /* loadSideBarVideos(reset = false) {
-    if (reset) {
-      this.currentPage = 1;
-      this.hasMoreVideos = true;
-      this.recommendedVideos = [];
+  skipForward(seconds: number = 10) {
+    if (this.playerReady) {
+      const newTime = Math.min(this.currentTime + seconds, this.duration);
+      this.currentTime = newTime;
+      this.player.seekTo(newTime, true);
+      this.resetControlsTimer();
     }
+  }
 
+  skipBackward(seconds: number = 10) {
+    if (this.playerReady) {
+      const newTime = Math.max(this.currentTime - seconds, 0);
+      this.currentTime = newTime;
+      this.player.seekTo(newTime, true);
+      this.resetControlsTimer();
+    }
+  }
+
+  loadSideBarVideos() {
     if (this.isLoadingMore || !this.hasMoreVideos) return;
 
     this.isLoadingMore = true;
-
-    this.playlistService.getPlaylistVideos(
-      this.currentPage,
-      this.pageSize
-      // Add optional menuType, sort, order if needed
-    ).subscribe({
-      next: (response) => {
-        console.log('Playlist video response:', response);
-        
-        if (reset) {
-          this.recommendedVideos = response.data;
-        } else {
-          this.recommendedVideos = [...this.recommendedVideos, ...response.data];
-        }
-
-        this.hasMoreVideos = response.meta.hasNextPage;
-        this.currentPage++;
-        this.isLoadingMore = false;
-      },
-      error: (err) => {
-        console.error('Error loading videos:', err);
-        this.isLoadingMore = false;
-      }
-    });
-  } */
-
-   loadSideBarVideos() {
-    if (this.isLoadingMore || !this.hasMoreVideos) return;
-
-    this.isLoadingMore = true;
-
     this.playlistService.getPlaylistVideos(this.currentPage, this.pageSize)
       .subscribe({
         next: (response) => {
@@ -426,65 +368,46 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Infinite scroll handler
-  onScroll() {
-    this.loadSideBarVideos();
-  }
-
   private getCurrentVideoData(videoId: string) {
-    // Get current video details
     this.youtubeService.getVideoById(videoId).subscribe({
       next: (response: any) => {
-        console.log('single video response ',response)
         this.currentVideo = response.data;
       }
     });
   }
 
-
   ngOnDestroy() {
-    // Clear the interval to prevent memory leaks
     if (this.playerStateInterval) {
       clearInterval(this.playerStateInterval);
     }
-    // Destroy the YouTube player instance
     if (this.player && typeof this.player.destroy === 'function') {
       this.player.destroy();
     }
     clearTimeout(this.controlsTimeout);
-    // Remove the global onYouTubeIframeAPIReady reference to prevent issues on component re-creation
     if (window.onYouTubeIframeAPIReady === this.onYouTubeIframeAPIReady) {
       (window as any).onYouTubeIframeAPIReady = undefined; 
     }
-
-    // destroy the subscription for user
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
-
     this.stopWatchHistoryTracking();
   }
 
   loadYouTubeAPI() {
-    // Check if the YouTube API script is already loaded
     if (!(window as any).YT || typeof (window as any).YT.Player === 'undefined') {
       const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api'; // Official YouTube Iframe API script URL
+      tag.src = 'https://www.youtube.com/iframe_api';
       const firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
     } else {
-      // If API is already loaded (e.g., navigating back to component, or hot module reload)
-      // Call the ready function directly within Angular's zone
       this.ngZone.run(() => this.onYouTubeIframeAPIReady());
     }
   }
 
   onYouTubeIframeAPIReady() {
-    // If the ViewChild is not yet available, retry after a short delay
     if (!this.videoFrame || !this.videoFrame.nativeElement) {
       setTimeout(() => this.onYouTubeIframeAPIReady(), 100);
       return;
     }
 
-    // ...existing code...
     if (!this.player || typeof this.player.getPlayerState !== 'function') {
       if (this.player && typeof this.player.destroy === 'function') {
         this.player.destroy();
@@ -520,11 +443,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.ngZone.run(() => {
       this.playerReady = true;
       this.isLoading = false;
-
-      // Synchronous call
       const duration = this.player.getDuration();
       this.duration = isNaN(duration) ? 0 : duration;
-
       this.startUpdateLoop();
 
       if (this.pendingAutoPlay) {
@@ -532,10 +452,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         this.pendingAutoPlay = false;
       }
 
-      // Synchronous call
       const time = this.player.getCurrentTime();
       this.currentTime = isNaN(time) ? 0 : time;
-
       this.startPlayerStatePolling();
 
       if (this.autoplay) {
@@ -544,7 +462,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     });
   }
 
-
   onPlayerStateChange(event: any) {
     this.ngZone.run(() => {
       const state = event.data;
@@ -552,8 +469,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       if (state === window.YT.PlayerState.PLAYING) {
         this.isPlaying = true;
         this.showOverlay = false;
-        
-        // Start tracking watch progress
         this.startWatchHistoryTracking();
         
         if (this.duration === 0 || isNaN(this.duration)) {
@@ -573,16 +488,13 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   }
 
   startPlayerStatePolling() {
-    // Clear any existing interval to prevent multiple polls running
     if (this.playerStateInterval) {
       clearInterval(this.playerStateInterval);
     }
     
-    // Set up a new interval to poll current time and duration
     this.playerStateInterval = setInterval(() => {
       if (this.playerReady && this.player) {
         try {
-          // Get current time (synchronous)
           const time = this.player.getCurrentTime();
           if (!isNaN(time)) {
             this.ngZone.run(() => {
@@ -590,7 +502,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
             });
           }
 
-          // Refresh duration periodically (in case it wasn't available initially)
           if (this.duration <= 0 || isNaN(this.duration)) {
             const duration = this.player.getDuration();
             if (!isNaN(duration) && duration > 0) {
@@ -603,59 +514,30 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
           console.error('Error polling player state:', error);
         }
       }
-    }, 1000); // Poll every second
+    }, 1000);
   }
 
- loadVideo(videoId: string, autoPlay: boolean = false) {
+  loadVideo(videoId: string, autoPlay: boolean = false) {
     this.currentVideoId = videoId;
-    // Correct YouTube iframe URL format
     const url = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=0&disablekb=1&fs=1&iv_load_policy=3&origin=${window.location.origin}`;
     this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
     
     this.showOverlay = true;
     this.isPlaying = false;
-    this.isLoading = true; // Indicate loading state for the new video
-    this.duration = 0; // Reset duration
-    this.currentTime = 0; // Reset current time to 0 for the new video
-    this.playerReady = false; // Reset player ready state for the new load
+    this.isLoading = true;
+    this.duration = 0;
+    this.currentTime = 0;
+    this.playerReady = false;
 
-   // this.updateVideoInfo(videoId);
-    
-    // If the player object already exists and is functional, load the new video via API
-    // This handles navigating between videos without full component re-initialization
     if (this.player && typeof this.player.loadVideoById === 'function') {
       this.player.loadVideoById(videoId);
     }
 
+    this.playerReady = false;
+    this.pendingAutoPlay = autoPlay;
     
- this.playerReady = false;
- this.pendingAutoPlay = autoPlay; // new flag
-    // If the player is ready, we can play immediately
-    if (this.playerReady && autoPlay) {
-      this.playVideo();
-    } else {
-      // Otherwise, wait for onPlayerReady to handle autoplay
-      this.pendingAutoPlay = autoPlay;
-    }
-    
-    // Update current video index based on the new video ID
     this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
-    // load video data
-    this.getCurrentVideoData(videoId)
-  } 
-
-
- /*  updateVideoInfo(videoId: string) {
-    const video = this.davidoVideos.find((v: any) => v.id === videoId);
-    if (video) {
-      //this.videoTitle = video.title;
-    }
-  } */
-
-  onVideoLoad() {
-    // This event signifies the iframe itself has loaded. The YouTube player inside still needs to be ready.
-    // The actual video loading state and player readiness is managed by onPlayerReady from YouTube API.
-    // No specific action needed here that isn't covered by onPlayerReady.
+    this.getCurrentVideoData(videoId);
   }
 
   private startUpdateLoop() {
@@ -673,13 +555,12 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   }
 
   private stopUpdateLoop() {
-  if (this.updateInterval) {
-    clearInterval(this.updateInterval);
-    this.updateInterval = null;
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+      this.updateInterval = null;
+    }
   }
-}
 
-  // Player control methods
   playVideo() {
     if (this.playerReady) {
       this.ngZone.run(() => {
@@ -710,25 +591,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
- seekVideo(event: any) {
-    // Handle both MatSlider events and direct number inputs
-    const time = typeof event === 'number' ? event : event.value;
-    
-    this.ngZone.run(() => {
-      this.currentTime = time; // Update current time immediately for smooth slider movement
-      
-      if (this.playerReady) {
-        this.player.seekTo(time, true); // Seek with immediate playback
-        if (!this.isPlaying) {
-          this.player.playVideo(); // Start playing after seek if it was paused
-          this.isPlaying = true;
-        }
-      }
-    });
-    
-    this.resetControlsTimer();
-  }
-
   toggleMute() {
     this.isMuted = !this.isMuted;
     
@@ -757,26 +619,24 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.resetControlsTimer();
   }
 
- getDuration() {
+  getDuration() {
     if (this.playerReady && this.player) {
       this.player.getDuration().then((duration: number) => {
         this.ngZone.run(() => {
           if (!isNaN(duration) && duration > 0) {
             this.duration = duration;
           } else {
-            // If we get an invalid duration, try again later
             setTimeout(() => this.getDuration(), 1000);
           }
         });
       }).catch((error: any) => {
         console.error('Error getting duration:', error);
-        // Retry after a delay
         setTimeout(() => this.getDuration(), 1000);
       });
     }
   }
 
- formatTime(seconds: number): string {
+  formatTime(seconds: number): string {
     if (isNaN(seconds) || seconds < 0) seconds = 0;
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
@@ -803,11 +663,12 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   handleVideoEnded() {
     switch (this.repeatMode) {
       case 'one':
-        this.seekVideo({ value: 0 }); // Seek to the beginning of the current video
-        this.playVideo(); // Play the current video again
+        this.currentTime = 0;
+        this.player.seekTo(0, true);
+        this.playVideo();
         break;
       case 'all':
-        this.playNextVideo(true); // Play the next video, and loop to the first if at end
+        this.playNextVideo(true);
         break;
       default:
         this.isPlaying = false;
@@ -821,9 +682,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       let nextIndex = this.currentVideoIndex + 1;
       if (nextIndex >= this.davidoVideos.length) {
         if (loop) {
-          nextIndex = 0; // Loop back to the first video
+          nextIndex = 0;
         } else {
-          // If not looping, stop playback and reset state
           this.isPlaying = false;
           this.showOverlay = true;
           this.showControls = true;
@@ -834,7 +694,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       this.currentVideoIndex = nextIndex;
       this.router.navigate(['/watch', nextVideo.youtubeVideoId]);
       this.loadVideo(nextVideo.youtubeVideoId, true);
-      this.playVideo(); // Automatically play the next video
+      this.playVideo();
     }
   }
 
@@ -842,13 +702,13 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     if (this.davidoVideos.length > 0) {
       let prevIndex = this.currentVideoIndex - 1;
       if (prevIndex < 0) {
-        prevIndex = this.davidoVideos.length - 1; // Loop to the last video
+        prevIndex = this.davidoVideos.length - 1;
       }
       const prevVideo = this.davidoVideos[prevIndex];
       this.currentVideoIndex = prevIndex;
       this.router.navigate(['/watch', prevVideo.youtubeVideoId]);
       this.loadVideo(prevVideo.youtubeVideoId, true);
-      this.playVideo(); // Automatically play the previous video
+      this.playVideo();
     }
   }
 
@@ -893,64 +753,53 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
- /*  saveVideo() {
-    this.saved = !this.saved;
-    this.snackBar.open(this.saved ? 'Video saved!' : 'Video removed from saved.', '', { duration: 2000 });
-  } */
-
   saveVideo() {
-  if (!this.user) {
-    this.snackBar.open('Please login to save videos', '', { duration: 2000 });
-    return;
-  }
+    if (!this.user) {
+      this.snackBar.open('Please login to save videos', '', { duration: 2000 });
+      return;
+    }
 
-  this.saved = !this.saved;
-  
-  if (this.saved) {
-    const videoData = {
-      youtubeVideoId: this.currentVideoId,
-      title: this.currentVideo.title,
-      channel: this.currentVideo.channel,
-      thumbnail: `https://i.ytimg.com/vi/${this.currentVideoId}/mqdefault.jpg`,
-      duration: this.currentVideo.duration,
-      publishedAt: this.currentVideo.publishedAt
-    };
+    this.saved = !this.saved;
+    
+    if (this.saved) {
+      const videoData = {
+        youtubeVideoId: this.currentVideoId,
+        title: this.currentVideo.title,
+        channel: this.currentVideo.channel,
+        thumbnail: `https://i.ytimg.com/vi/${this.currentVideoId}/mqdefault.jpg`,
+        duration: this.currentVideo.duration,
+        publishedAt: this.currentVideo.publishedAt
+      };
 
-    this.videoService.saveVideoToLibrary(this.user._id, videoData).subscribe({
-      next: (response: any) => {
-        this.snackBar.open(response.message, '', { duration: 2000 });
-      },
-      error: (error: HttpErrorResponse) => {
-        this.saved = false;
-        //this.snackBar.open('Failed to save video', '', { duration: 2000 });
-        //console.error('Error saving video:', error);
-
-          let errorMessage = 'Server error occurred, please try again.'; // default error message.
+      this.videoService.saveVideoToLibrary(this.user._id, videoData).subscribe({
+        next: (response: any) => {
+          this.snackBar.open(response.message, '', { duration: 2000 });
+        },
+        error: (error: HttpErrorResponse) => {
+          this.saved = false;
+          let errorMessage = 'Server error occurred, please try again.';
           if (error.error && error.error.message) {
-            errorMessage = error.error.message; // Use backend's error message if available.
+            errorMessage = error.error.message;
           }  
           this.snackBar.open(errorMessage, 'Ok',{duration: 2000});
-
-      }
-    });
-  } else {
-    this.videoService.removeVideoFromLibrary(this.user._id, this.currentVideoId).subscribe({
-      next: () => {
-        this.snackBar.open('Video removed from library', '', { duration: 2000 });
-      },
-      error: (error: HttpErrorResponse) => {
-        this.saved = true;
-        this.snackBar.open('Failed to remove video', '', { duration: 2000 });
-        //console.error('Error removing video:', error);
-      }
-    });
+        }
+      });
+    } else {
+      this.videoService.removeVideoFromLibrary(this.user._id, this.currentVideoId).subscribe({
+        next: () => {
+          this.snackBar.open('Video removed from library', '', { duration: 2000 });
+        },
+        error: (error: HttpErrorResponse) => {
+          this.saved = true;
+          this.snackBar.open('Failed to remove video', '', { duration: 2000 });
+        }
+      });
+    }
   }
-}
 
   shareVideo() {
     if (navigator.share) {
       navigator.share({
-        //title: this.videoTitle,
         url: window.location.href
       }).catch(() => {});
     } else {
@@ -959,22 +808,14 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  addComment(event: Event) {
-    event.preventDefault();
-    if (this.newComment.trim()) {
-      this.comments.unshift({
-        user: 'You',
-        text: this.newComment,
-        likes: 0,
-        time: 'Just now',
-        avatar: this.currentUserAvatar
-      });
-      this.newComment = '';
-    }
-  }
-
-  cancelComment() {
-    this.newComment = '';
+  onCommentAdded(commentText: string) {
+    this.comments.unshift({
+      user: 'You',
+      text: commentText,
+      likes: 0,
+      time: 'Just now',
+      avatar: this.currentUserAvatar
+    });
   }
 
   navigateToVideo(videoId: string) {
@@ -989,7 +830,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   }
 
   formatDuration(duration: string): string {
-      return videoDuration(duration)
+      return videoDuration(duration);
   }
 
   formatViewCount(views: number | 0): string {
@@ -998,21 +839,14 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   autoplayChanged(newValue: boolean) {
     this.autoplay = newValue;
-    // Optional: Add any additional autoplay change logic here
-    console.log('Autoplay changed to:', newValue);
   }
 
-  // Add these new methods
   private startWatchHistoryTracking() {
     if (!this.user) return;
     
-    // Clear any existing interval
     this.stopWatchHistoryTracking();
-    
-    // Initial update
     this.updateWatchHistory();
     
-    // Set up periodic updates
     this.watchHistorySubscription = timer(this.watchHistoryInterval * 1000, this.watchHistoryInterval * 1000)
       .subscribe(() => this.updateWatchHistory());
   }
@@ -1026,8 +860,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   private updateWatchHistory() {
     if (!this.user || !this.playerReady || !this.isPlaying) return;
-    
-    const progress = (this.currentTime / this.duration) * 100;
     
     const videoData = {
       youtubeVideoId: this.currentVideoId,

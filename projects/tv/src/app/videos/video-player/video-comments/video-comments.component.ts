@@ -1,8 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { UserInterface, UserService } from '../../../common/services/user.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'async-video-comments',
@@ -72,6 +75,22 @@ export class VideoCommentsComponent {
   @Output() commentAdded = new EventEmitter<string>();
   
   newComment = '';
+
+  private snackBar = inject(MatSnackBar);
+  private userService = inject(UserService);
+  user: UserInterface | null = null;
+  subscriptions: Subscription[] = [];
+
+   ngOnInit() {
+    this.subscriptions.push(
+      this.userService.getCurrentUser$.subscribe({
+        next: (user) => {
+          this.user = user;
+          console.log('comment current user ',this.user)
+        }
+      })
+    )
+  }
 
   addComment(event: Event) {
     event.preventDefault();

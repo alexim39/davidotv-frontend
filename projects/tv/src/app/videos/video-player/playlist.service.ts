@@ -32,7 +32,7 @@ export class PlaylistService {
     }
 
     return this.apiService.get<PlaylistResponse>(`youtube/videos/playlist`, params).pipe(
-      tap((response: PlaylistResponse) => console.log('API Response:', response)),
+      //tap((response: PlaylistResponse) => console.log('API Response:', response)),
       catchError((error: any) => {
         console.error('API Error:', error);
         return throwError(() => new Error('Failed to load videos'));

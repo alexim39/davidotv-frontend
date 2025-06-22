@@ -108,7 +108,7 @@ import { RouterModule } from '@angular/router';
     .page-container {
       //background-color: var(--background);
       min-height: 100vh;
-      margin-top: 4em;
+      //margin-top: 4em;
     }
 
     /* Sidenav container */
@@ -199,10 +199,8 @@ import { RouterModule } from '@angular/router';
 
     /* Content area */
     .content {
-      padding: 16px;
       min-height: calc(100vh - var(--desktop-navbar-height));
-      //background-color: var(--background);
-
+      margin-top: 4em;
       @media (max-width: var(--mobile-breakpoint)) {
         min-height: calc(100vh - var(--mobile-navbar-height));
       }
