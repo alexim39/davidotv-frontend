@@ -127,6 +127,7 @@ import { RouterModule } from '@angular/router';
   mat-nav-list {
     display: flex;
     flex-direction: column;
+    margin-top: 4em;
 
     a {
       height: 40px;

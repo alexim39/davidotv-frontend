@@ -27,6 +27,8 @@ export interface YoutubeVideoInterface {
   isOfficialContent: boolean;
   url: string;
   menuTypes: string[];
+  comments?: any;
+  appViews: number;
   
 }
 

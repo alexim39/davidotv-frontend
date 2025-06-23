@@ -18,6 +18,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { VideoService } from '../../common/services/videos.service';
 import { VideoCommentsComponent } from './video-comments/video-comments.component';
 import { RecommendationsSidebarComponent } from './recommendations-sidebar/recommendations-sidebar.component';
+import { VideoCommentService, Comment } from './video-comments/video-comments.service';
 
 declare global {
   interface Window {
@@ -28,7 +29,7 @@ declare global {
 
 @Component({
   selector: 'async-video-player',
-  providers: [PlaylistService],
+  providers: [PlaylistService, VideoCommentService],
   standalone: true,
   imports: [
     CommonModule,
@@ -189,7 +190,7 @@ declare global {
                     
                     <div class="view-count" matTooltip="App Views">
                       <mat-icon>visibility</mat-icon>
-                      <span>{{ formatViewCount(appViews) }}</span>
+                      <span>{{ formatViewCount(currentVideo.appViews) }}</span>
                     </div>
                   </div>
                 </div>
@@ -199,8 +200,12 @@ declare global {
             <async-video-comments 
               [comments]="comments"
               [currentUserAvatar]="currentUserAvatar"
+              [currentUserId]="user?._id || ''"
               (commentAdded)="onCommentAdded($event)"
+              (commentLiked)="onCommentLiked($event)"
+              (replyAdded)="onReplyAdded($event)"
             />
+
           </div>
         </section>
 
@@ -253,7 +258,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   repeatMode: 'none' | 'one' | 'all' = 'none';
   
   // Comments
-  comments = [
+  /* comments = [
     { 
       user: 'SuperFan', 
       text: 'Davido never disappoints! This song is fire 🔥🔥', 
@@ -268,7 +273,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       time: '1 week ago',
       avatar: 'https://randomuser.me/api/portraits/women/44.jpg'
     }
-  ];
+  ]; */
+  comments: Comment[] = [];
 
   // User data
   currentUserAvatar = 'https://randomuser.me/api/portraits/men/1.jpg';
@@ -278,7 +284,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   private playerStateInterval: any;
   private updateInterval: any = null;
   currentVideo!: YoutubeVideoInterface;
-  appViews = 0; 
   appLikes = 0; 
   appDislikes = 0; 
 
@@ -306,7 +311,9 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     private playlistService: PlaylistService,
     private youtubeService: YoutubeService,
     private userService: UserService,
-    private videoService: VideoService
+    private videoService: VideoService,
+    private videoCommentService: VideoCommentService,
+    
   ) {}
 
   ngOnInit() {
@@ -371,7 +378,9 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   private getCurrentVideoData(videoId: string) {
     this.youtubeService.getVideoById(videoId).subscribe({
       next: (response: any) => {
+        //console.log('current video ',response)
         this.currentVideo = response.data;
+         this.comments = this.currentVideo.comments;
       }
     });
   }
@@ -517,28 +526,31 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  loadVideo(videoId: string, autoPlay: boolean = false) {
-    this.currentVideoId = videoId;
-    const url = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=0&disablekb=1&fs=1&iv_load_policy=3&origin=${window.location.origin}`;
-    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-    
-    this.showOverlay = true;
-    this.isPlaying = false;
-    this.isLoading = true;
-    this.duration = 0;
-    this.currentTime = 0;
-    this.playerReady = false;
+    // Update the loadVideo method to load comments
+    loadVideo(videoId: string, autoPlay: boolean = false) {
+      this.currentVideoId = videoId;
+      const url = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=0&disablekb=1&fs=1&iv_load_policy=3&origin=${window.location.origin}`;
+      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      
+      this.showOverlay = true;
+      this.isPlaying = false;
+      this.isLoading = true;
+      this.duration = 0;
+      this.currentTime = 0;
+      this.playerReady = false;
 
-    if (this.player && typeof this.player.loadVideoById === 'function') {
-      this.player.loadVideoById(videoId);
+      if (this.player && typeof this.player.loadVideoById === 'function') {
+        this.player.loadVideoById(videoId);
+      }
+
+      this.playerReady = false;
+      this.pendingAutoPlay = autoPlay;
+      
+      this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
+      this.getCurrentVideoData(videoId);
+      
     }
 
-    this.playerReady = false;
-    this.pendingAutoPlay = autoPlay;
-    
-    this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
-    this.getCurrentVideoData(videoId);
-  }
 
   private startUpdateLoop() {
     this.stopUpdateLoop();
@@ -808,13 +820,64 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  onCommentAdded(commentText: string) {
-    this.comments.unshift({
-      user: 'You',
-      text: commentText,
-      likes: 0,
-      time: 'Just now',
-      avatar: this.currentUserAvatar
+  onCommentAdded(commentData: {text: string}) {
+    if (!this.user) return;
+
+    this.videoCommentService.addComment(
+      this.currentVideoId,
+      this.user._id,
+      commentData.text
+    ).subscribe({
+      next: (updatedVideo) => {
+        //this.comments = updatedVideo.comments;
+        this.snackBar.open('Comment posted', 'Close', { duration: 2000 });
+      },
+      error: (err) => {
+        this.snackBar.open('Failed to post comment', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+
+  onCommentLiked(commentId: string) {
+    if (!this.user) {
+      this.snackBar.open('Please login to like comments', 'Close', { duration: 2000 });
+      return;
+    }
+
+    this.videoCommentService.likeComment(
+      this.currentVideoId,
+      commentId,
+      this.user._id
+    ).subscribe({
+      next: (updatedVideo) => {
+        //this.comments = updatedVideo.comments;
+      },
+      error: (err) => {
+        this.snackBar.open('Failed to like comment', 'Close', { duration: 2000 });
+      }
+    });
+  }
+
+  // Add new method for replies
+  onReplyAdded(replyData: {parentId: string, text: string}) {
+    if (!this.user) return;
+
+    this.videoCommentService.addReply(
+      this.currentVideoId,
+      replyData.parentId,
+      this.user._id,
+      this.currentUserAvatar,
+      `${this.user.name} ${this.user.surname}`,
+      replyData.text
+    ).subscribe({
+      next: (updatedVideo) => {
+        //this.comments = updatedVideo.comments;
+        this.snackBar.open('Reply posted', 'Close', { duration: 2000 });
+      },
+      error: (err) => {
+        this.snackBar.open('Failed to post reply', 'Close', { duration: 3000 });
+      }
     });
   }
 
@@ -858,20 +921,28 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  private updateWatchHistory() {
-    if (!this.user || !this.playerReady || !this.isPlaying) return;
-    
-    const videoData = {
-      youtubeVideoId: this.currentVideoId,
-      title: this.currentVideo.title,
-      channel: this.currentVideo.channel,
-      thumbnail: `https://i.ytimg.com/vi/${this.currentVideoId}/mqdefault.jpg`,
-      duration: this.currentVideo.duration,
-      publishedAt: this.currentVideo.publishedAt
-    };
-    
-    this.videoService.updateWatchHistory(this.currentVideoId, videoData).subscribe({
-      error: (err) => console.error('Error updating watch history:', err)
-    });
-  }
+
+    private updateWatchHistory() {
+      if (!this.user || !this.playerReady || !this.isPlaying) return;
+      
+      const progress = (this.currentTime / this.duration) * 100;
+      
+      const videoData = {
+        userId: this.user._id, 
+        progress,
+        youtubeVideoId: this.currentVideoId,
+        title: this.currentVideo.title,
+        channel: this.currentVideo.channel,
+        thumbnail: `https://i.ytimg.com/vi/${this.currentVideoId}/mqdefault.jpg`,
+        duration: this.currentVideo.duration,
+        publishedAt: this.currentVideo.publishedAt,
+        views: this.currentVideo.views,
+        likes: this.currentVideo.likes,
+        dislikes: this.currentVideo.dislikes
+      };
+      
+      this.videoService.updateWatchHistory(videoData).subscribe({
+        error: (err) => console.error('Error updating watch history:', err)
+      });
+    }
 }

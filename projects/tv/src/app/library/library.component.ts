@@ -135,22 +135,6 @@ export class LibraryComponent implements OnInit, OnDestroy {
     private cdRef: ChangeDetectorRef
   ) {}
 
- /* ngOnInit(): void {
-    this.subscriptions.push(
-      this.userService.getCurrentUser$.subscribe({
-        next: (user) => {
-          if (user) {
-            this.user = user;
-            this.loadSavedVideos();
-            this.isAuthenticated = true;
-          }
-        },
-        error: () => this.isAuthenticated = false
-      })
-    );
-  }
- */
-
   ngOnInit(): void {
     this.subscriptions.push(
         this.userService.getCurrentUser$.subscribe({
@@ -171,41 +155,14 @@ export class LibraryComponent implements OnInit, OnDestroy {
     );
 }
 
-  /* loadSavedVideos(): void {
-    if (this.isAuthenticated) {
-      this.isLoading = true;
-      this.cdRef.detectChanges(); 
-
-      this.videoService.getSavedVideos(this.user._id).subscribe({
-        next: (response) => {
-          console.log('video ',response)
-          this.savedVideos = response.data;
-          this.isLoading = false;
-          this.cdRef.detectChanges(); 
-        },
-        error: (error: HttpErrorResponse) => {
-          //console.error('Error loading saved videos:', err);
-          let errorMessage = 'Server error occurred, please try again.'; // default error message.
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message; // Use backend's error message if available.
-          }  
-          this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
-          this.isLoading = false;
-          this.cdRef.detectChanges(); 
-        }
-      });
-    } 
-    this.isAuthenticated = false
-  } */
-
-    loadSavedVideos(): void {
+  loadSavedVideos(): void {
     // Only proceed if authenticated and user exists
     if (this.user && this.isAuthenticated) {
         this.isLoading = true;
         this.cdRef.detectChanges(); 
         this.videoService.getSavedVideos(this.user._id).subscribe({
             next: (response) => {
-              console.log('saved video ',response.data)
+              //console.log('saved video ',response.data)
               this.savedVideos = response.data;
               this.isLoading = false;
               this.cdRef.detectChanges();  
@@ -220,7 +177,7 @@ export class LibraryComponent implements OnInit, OnDestroy {
     } else {
         this.isAuthenticated = false;
     }
-}
+  }
 
   removeFromLibrary(youtubeVideoId: string): void {
     if (this.user && this.isAuthenticated) {

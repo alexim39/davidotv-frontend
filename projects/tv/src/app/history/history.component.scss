@@ -1,7 +1,4 @@
 /* Shared styles for both components */
-//@import 'src/styles/colors';
-//@import 'src/styles/breakpoints';
-
 .header-section {
   padding: 16px 24px;
   background-color: var(--background-color);
@@ -99,55 +96,50 @@
     color: var(--text-secondary);
   }
 
-  .browse-btn, .create-btn {
+  .browse-btn {
     padding: 8px 24px;
     border-radius: 20px;
   }
 }
-
 
 /* History specific styles */
 .history-container {
   background-color: var(--background-color);
   min-height: 100vh;
 
-  .history-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
     padding: 16px 0;
   }
 
-  .history-item {
-    display: flex;
-    gap: 16px;
-    padding: 8px;
-    border-radius: 8px;
+  .video-card {
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--card-background);
     position: relative;
 
     &:hover {
-      background-color: var(--hover-background);
-
-      .more-btn {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      
+      .card-actions {
         opacity: 1;
       }
     }
 
     .thumbnail-container {
       position: relative;
-      flex: 0 0 160px;
-      height: 90px;
-      border-radius: 4px;
+      padding-top: 56.25%; /* 16:9 aspect ratio */
       overflow: hidden;
 
-      @media (max-width: 600px) {
-        flex: 0 0 120px;
-        height: 68px;
-      }
-
       .thumbnail {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -157,35 +149,56 @@
         position: absolute;
         bottom: 0;
         left: 0;
-        right: 0;
-        height: 3px;
+        width: 100%;
+        height: 4px;
         background-color: rgba(255, 255, 255, 0.2);
-      }
 
-      .progress-bar {
-        height: 100%;
-        background-color: var(--primary-color);
+        .progress-bar {
+          height: 100%;
+          background-color: var(--primary-color);
+        }
       }
 
       .watched-time {
         position: absolute;
         bottom: 8px;
         right: 8px;
-        background-color: rgba(0, 0, 0, 0.7);
+        background-color: rgba(0, 0, 0, 0.8);
         color: white;
         padding: 2px 6px;
         border-radius: 4px;
-        font-size: 0.7rem;
+        font-size: 0.75rem;
+      }
+
+      .card-actions {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        z-index: 2;
+        opacity: 1 !important;
+        transition: opacity 0.2s ease;
+
+        button {
+          background-color: rgb(191, 29, 29) !important;
+          color: white !important;
+          transition: transform 0.2s ease;
+
+          &:hover {
+            transform: scale(1.1);
+            background-color: rgba(0, 0, 0, 0.9);
+          }
+        }
       }
     }
 
-    .video-info {
-      flex: 1;
-      min-width: 0;
+    mat-card-content {
+      padding: 16px;
+      position: relative;
+      z-index: 1;
 
       .video-title {
-        margin: 0 0 4px 0;
-        font-size: 0.95rem;
+        margin: 0 0 8px 0;
+        font-size: 1rem;
         font-weight: 500;
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -193,30 +206,17 @@
         overflow: hidden;
       }
 
-      .video-channel {
-        margin: 0 0 4px 0;
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-      }
-
-      .video-stats {
+      .video-meta {
         margin: 0;
         font-size: 0.8rem;
         color: var(--text-secondary);
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-      }
-    }
 
-    .more-btn {
-      align-self: center;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-      color: var(--text-secondary);
-
-      &:hover {
-        color: var(--text-primary);
+        span {
+          display: inline-block;
+        }
       }
     }
   }
@@ -240,7 +240,7 @@
     padding: 16px;
   }
 
-  .library-container {
+  .history-container {
     .video-grid {
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: 16px;
@@ -249,19 +249,9 @@
 }
 
 @media (max-width: 480px) {
-  .library-container {
+  .history-container {
     .video-grid {
       grid-template-columns: 1fr;
-    }
-  }
-
-  .history-container {
-    .history-item {
-      .video-info {
-        .video-title {
-          font-size: 0.9rem;
-        }
-      }
     }
   }
 }

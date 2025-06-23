@@ -21,38 +21,20 @@ export class VideoService {
     return this.apiService.delete<any>(`user/library/remove/${userId}/${youtubeVideoId}`, undefined, undefined, true);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  getWatchHistory(): Observable<any> {
-    return this.apiService.get<any>(``, undefined, undefined, true);
+  updateWatchHistory(videoData: any) {
+    return this.apiService.post<any>(`user/history/save`, videoData, undefined, true);
   }
 
-  clearHistory(): Observable<any> {
-    return this.apiService.get<any>(``, undefined, undefined, true);
+  getWatchHistory(userId: string): Observable<any> {
+    return this.apiService.get<any>(`user/history/video/${userId}`, undefined, undefined, true);
   }
 
- 
-
-  removeFromHistory(videoId: string): Observable<any> {
-    return this.apiService.get<any>(``, undefined, undefined, true);
+  removeFromHistory(watchedVideoId: string, userId: string): Observable<any> {
+    return this.apiService.delete<any>(`user/history/remove/${watchedVideoId}/${userId}`, undefined, undefined, true);
   }
 
-  
-   updateWatchHistory(userId: string, videoData: any) {
-    const formData = {userId, videoData}
-    return this.apiService.post<any>(`user/library/save`, formData, undefined, true);
+  clearHistory(userId: string): Observable<any> {
+    return this.apiService.delete<any>(`user/history/clear/${userId}`, undefined, undefined, true);
   }
-
 
 }

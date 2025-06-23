@@ -51,11 +51,24 @@ export function formatDuration(duration: string): string {
  * Format view count to human readable format
  * @param count Number of views
  */
- export function formatViewCount(count: number): string {
-    if (count >= 1000000) {
-      return (count / 1000000).toFixed(1) + 'M';
-    } else if (count >= 1000) {
-      return (count / 1000).toFixed(1) + 'K';
-    }
-    return count.toString();
- }
+export function formatViewCount(views: number | string | undefined | null): string {
+  if (views === undefined || views === null) {
+    return '0 views'; // or whatever default you prefer
+  }
+
+  // Convert to number if it's a string
+  const count = typeof views === 'string' ? parseInt(views, 10) : views;
+
+  if (isNaN(count)) {
+    return '0 views';
+  }
+
+  // Rest of your existing formatViewCount logic...
+  // For example:
+  if (count >= 1000000) {
+    return (count / 1000000).toFixed(1) + 'M views';
+  } else if (count >= 1000) {
+    return (count / 1000).toFixed(1) + 'K views';
+  }
+  return count.toString() + ' views';
+}
