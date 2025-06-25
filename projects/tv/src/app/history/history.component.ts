@@ -121,7 +121,7 @@ interface WatchedVideo {
       <mat-icon class="empty-icon">history</mat-icon>
       <h3>No watch history</h3>
       <p>Videos you watch will appear here</p>
-      <button mat-raised-button color="primary" [routerLink]="['/videos']" class="browse-btn">
+      <button mat-flat-button color="primary" [routerLink]="['/videos']" class="browse-btn">
         Browse videos
       </button>
     </div>
@@ -182,7 +182,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   } */
 
 
-    ngOnInit(): void {
+   /*  ngOnInit(): void {
   this.subscriptions.push(
     this.userService.getCurrentUser$.pipe(
       distinctUntilChanged(),
@@ -194,7 +194,27 @@ export class HistoryComponent implements OnInit, OnDestroy {
       switchMap(() => this.loadWatchHistory())
     ).subscribe()
   );
-}
+} */
+
+  ngOnInit(): void {
+    this.subscriptions.push(
+      this.userService.getCurrentUser$.pipe(
+        distinctUntilChanged(),
+        tap(user => {
+          this.user = user;
+          // If user is null, we should set loading to false
+          if (!user) {
+            this.isLoading = false;
+            this.watchedVideos = []; // Clear any existing videos
+          }
+          this.cdRef.markForCheck();
+        }),
+        // Only proceed if user exists
+        filter(user => !!user),
+        switchMap(() => this.loadWatchHistory())
+      ).subscribe()
+    );
+  }
 
 loadWatchHistory(): Observable<void> {
   this.isLoading = true;
