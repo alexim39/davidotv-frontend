@@ -29,6 +29,10 @@ export interface YoutubeVideoInterface {
   menuTypes: string[];
   comments?: any;
   appViews: number;
+  likedBy?: string;
+  dislikedBy?: string;
+  appLikes?: number;
+  appDislikes?: number;
   
 }
 

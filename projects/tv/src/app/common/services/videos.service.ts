@@ -37,4 +37,14 @@ export class VideoService {
     return this.apiService.delete<any>(`user/history/clear/${userId}`, undefined, undefined, true);
   }
 
+   // Like a video
+  likeVideo(videoId: string, userId: string) {
+    return this.apiService.post<any>(`youtube/videos/like`, { userId, videoId });
+  }
+
+  // Dislike a video
+  dislikeVideo(videoId: string, userId: string) {
+    return this.apiService.post<any>(`youtube/videos/dislike`, { userId, videoId });
+  }
+
 }

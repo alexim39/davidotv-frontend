@@ -90,7 +90,7 @@ import { HttpErrorResponse } from '@angular/common/http';
                 <mat-icon class="empty-icon">playlist_add</mat-icon>
                 <h3>Your playlists will appear here</h3>
                 <p>Create playlists to organize your favorite Davido content</p>
-                <button mat-raised-button color="primary" class="create-btn">
+                <button mat-flat-button color="primary" class="create-btn">
                   Create playlist
                 </button>
               </div>
@@ -111,7 +111,7 @@ import { HttpErrorResponse } from '@angular/common/http';
           <mat-icon class="empty-icon">bookmark_border</mat-icon>
           <h3>No saved videos yet</h3>
           <p>Tap the bookmark icon on any video to save it here</p>
-          <button mat-raised-button color="primary" [routerLink]="['/videos']" class="browse-btn">
+          <button mat-flat-button color="primary" [routerLink]="['/videos']" class="browse-btn">
             Browse videos
           </button>
         </div>

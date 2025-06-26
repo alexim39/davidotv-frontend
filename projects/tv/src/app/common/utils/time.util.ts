@@ -72,3 +72,55 @@ export function formatViewCount(views: number | string | undefined | null): stri
   }
   return count.toString() + ' views';
 }
+
+/**
+ * Format likes count to human readable format
+ * @param count Number of views
+ */
+export function formatLikeCount(views: number | string | undefined | null): string {
+  if (views === undefined || views === null) {
+    return '0 likes'; // or whatever default you prefer
+  }
+
+  // Convert to number if it's a string
+  const count = typeof views === 'string' ? parseInt(views, 10) : views;
+
+  if (isNaN(count)) {
+    return '0 likes';
+  }
+
+  // Rest of your existing formatViewCount logic...
+  // For example:
+  if (count >= 1000000) {
+    return (count / 1000000).toFixed(1) + 'M likes';
+  } else if (count >= 1000) {
+    return (count / 1000).toFixed(1) + 'K likes';
+  }
+  return count.toString() + ' likes';
+}
+
+/**
+ * Format dislikes count to human readable format
+ * @param count Number of views
+ */
+export function formatDislikesCount(views: number | string | undefined | null): string {
+  if (views === undefined || views === null) {
+    return '0 dislikes'; // or whatever default you prefer
+  }
+
+  // Convert to number if it's a string
+  const count = typeof views === 'string' ? parseInt(views, 10) : views;
+
+  if (isNaN(count)) {
+    return '0 dislikes';
+  }
+
+  // Rest of your existing formatViewCount logic...
+  // For example:
+  if (count >= 1000000) {
+    return (count / 1000000).toFixed(1) + 'M dislikes';
+  } else if (count >= 1000) {
+    return (count / 1000).toFixed(1) + 'K dislikes';
+  }
+  return count.toString() + ' dislikes';
+}

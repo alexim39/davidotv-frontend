@@ -11,7 +11,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { PlaylistService } from './playlist.service';
 import { YoutubeService, YoutubeVideoInterface } from '../../common/services/youtube.service';
-import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat } from '../../common/utils/time.util';
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat, formatLikeCount as likeFormat, formatDislikesCount as dislikesFormat } from '../../common/utils/time.util';
 import { Subscription, timer } from 'rxjs';
 import { UserInterface, UserService } from '../../common/services/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -145,15 +145,15 @@ declare global {
                   </div>
                   <div class="youtube-metrics">
                     <span class="youtube-metric" matTooltip="Views">
-                      {{ formatViewCount(currentVideo.views)  }} views
+                      {{ formatViewCount(currentVideo.views)  }} <!-- views -->
                     </span>
                     •
                     <span class="youtube-metric" matTooltip="Likes">
-                      {{ formatViewCount(currentVideo.likes)  }} likes
+                      {{ formatLikesCount(currentVideo.likes)  }} <!-- likes -->
                     </span>
                     •
                     <span class="youtube-metric" matTooltip="Dislikes">
-                      {{ formatViewCount(currentVideo.dislikes)  }} dislikes
+                      {{ formatDislikesCount(currentVideo.dislikes)  }} <!-- dislikes -->
                     </span>
                     •
                     <span class="youtube-metric" matTooltip="Published">
@@ -256,24 +256,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   // Repeat mode
   repeatMode: 'none' | 'one' | 'all' = 'none';
-  
-  // Comments
-  /* comments = [
-    { 
-      user: 'SuperFan', 
-      text: 'Davido never disappoints! This song is fire 🔥🔥', 
-      likes: 1245,
-      time: '2 days ago',
-      avatar: 'https://randomuser.me/api/portraits/men/32.jpg'
-    },
-    { 
-      user: 'MusicLover', 
-      text: 'The production on this track is insane. That beat drop at 1:23 gives me chills every time!', 
-      likes: 892,
-      time: '1 week ago',
-      avatar: 'https://randomuser.me/api/portraits/women/44.jpg'
-    }
-  ]; */
+
   comments: Comment[] = [];
 
   // User data
@@ -375,7 +358,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       });
   }
 
-  private getCurrentVideoData(videoId: string) {
+ /*  private getCurrentVideoData(videoId: string) {
     this.youtubeService.getVideoById(videoId).subscribe({
       next: (response: any) => {
         //console.log('current video ',response)
@@ -383,7 +366,17 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
          this.comments = this.currentVideo.comments;
       }
     });
-  }
+  } */
+
+    private getCurrentVideoData(videoId: string) {
+  this.youtubeService.getVideoById(videoId).subscribe({
+    next: (response: any) => {
+      this.currentVideo = response.data;
+      this.comments = this.currentVideo.comments;
+      this.initializeLikeDislikeStates(); // Add this line
+    }
+  });
+}
 
   ngOnDestroy() {
     if (this.playerStateInterval) {
@@ -737,33 +730,63 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
+
+
   likeVideo() {
-    if (!this.liked) {
-      this.liked = true;
-      this.appLikes++;
-      if (this.disliked) {
-        this.disliked = false;
-        this.appDislikes--;
-      }
-    } else {
-      this.liked = false;
-      this.appLikes--;
+    if (!this.user) {
+      this.snackBar.open('Please login to like videos', '', { duration: 2000 });
+      return;
     }
+
+    this.videoService.likeVideo(this.currentVideoId, this.user._id).subscribe({
+      next: (response) => {
+        this.ngZone.run(() => {
+          //this.liked = response.liked;
+          //this.disliked = false;
+          this.appLikes = response.appLikes;
+          this.appDislikes = response.appDislikes;
+          
+          if (response.liked) {
+            this.snackBar.open('Video liked', '', { duration: 1000 });
+          } else {
+            this.snackBar.open('Like removed', '', { duration: 1000 });
+          }
+        });
+      },
+      error: (error) => {
+        this.snackBar.open('Failed to like video', '', { duration: 2000 });
+      }
+    });
   }
 
+
   dislikeVideo() {
-    if (!this.disliked) {
-      this.disliked = true;
-      this.appDislikes++;
-      if (this.liked) {
-        this.liked = false;
-        this.appLikes--;
-      }
-    } else {
-      this.disliked = false;
-      this.appDislikes--;
+    if (!this.user) {
+      this.snackBar.open('Please login to dislike videos', '', { duration: 2000 });
+      return;
     }
+
+    this.videoService.dislikeVideo(this.currentVideoId, this.user._id).subscribe({
+      next: (response) => {
+        this.ngZone.run(() => {
+          //this.disliked = response.disliked;
+          //this.liked = false;
+          this.appLikes = response.appLikes;
+          this.appDislikes = response.appDislikes;
+          
+          if (response.disliked) {
+            this.snackBar.open('Video disliked', '', { duration: 1000 });
+          } else {
+            this.snackBar.open('Dislike removed', '', { duration: 1000 });
+          }
+        });
+      },
+      error: (error) => {
+        this.snackBar.open('Failed to dislike video', '', { duration: 2000 });
+      }
+    });
   }
+
 
   saveVideo() {
     if (!this.user) {
@@ -900,6 +923,14 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     return viewFormat(views);
   }
 
+  formatLikesCount(views: number | 0): string {
+    return likeFormat(views);
+  }
+
+  formatDislikesCount(views: number | 0): string {
+    return dislikesFormat(views);
+  }
+
   autoplayChanged(newValue: boolean) {
     this.autoplay = newValue;
   }
@@ -945,4 +976,17 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         error: (err) => console.error('Error updating watch history:', err)
       });
     }
+
+    // Initialize like/dislike states
+private initializeLikeDislikeStates() {
+  if (this.user && this.currentVideo) {
+    // Check if user has already liked/disliked this video
+    this.liked = this.currentVideo.likedBy?.includes(this.user._id) || false;
+    this.disliked = this.currentVideo.dislikedBy?.includes(this.user._id) || false;
+    
+    // Initialize counts
+    this.appLikes = this.currentVideo.appLikes || 0;
+    this.appDislikes = this.currentVideo.appDislikes || 0;
+  }
+}
 }
