@@ -16,27 +16,41 @@ export interface Thread {
 }
 
 export interface Comment {
-  id: string;
+  _id: string;
   content: string;
   author: User;
   createdAt: Date;
   likeCount: number;
-  replies: Comment[];
+   replies?: Reply[]; 
   isLiked?: boolean;
   replyCount?: number;
+  isReply?: boolean;
 }
 
 export interface User {
-  id: string;
+  _id: string;
   name: string;
   username: string;
   avatar: string;
-  isVerified: boolean;
+  isVerified?: boolean;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface Reply {
+  _id: string;  
+  content: string;
+  createdAt: Date;
+  author: User;
+  isDeleted?: boolean;
+  isLiked?: boolean;
+  likeCount?: number;
+  parentComment?: Comment;
+  thread?: Thread;
+  updatedAt?: Date;
+  replyCount?: number;
+}
+
+
+@Injectable()
 export class ForumService {
   constructor(private apiService: ApiService) {}
 
@@ -57,17 +71,24 @@ export class ForumService {
     return this.apiService.get<any>(`forum/thread/${id}`, undefined, undefined, true);
   }
 
-
-  // Comment Operations - Used to get all comments for a thread
-  getThreadComments(threadId: string): Observable<any> {
-    console.log('Fetching comments for thread:', threadId);
-    return this.apiService.get<any>(`forum/thread/comments/${threadId}`, undefined, undefined, true);
-  }
-
   // This method adds a new comment to a thread
-  addComment(threadId: string, content: string, authorId: string): Observable<any> {
-    return this.apiService.post<Comment>(`forum/thread/comment/new`, { content, threadId, authorId }, undefined, true);
+  addComment(threadId: string, content: string, authorId: string, parentCommentId?: string): Observable<any> {
+    return this.apiService.post<Comment>(`forum/thread/comment/new`, { content, threadId, authorId, parentCommentId }, undefined, true);
   }
+
+  // This method adds a comment reply in a thread
+  addCommentReply( content: string, authorId: string, commentId: string): Observable<any> {
+    return this.apiService.post<Comment>(`forum/thread/comment/reply`, { content, commentId, authorId }, undefined, true);
+  }
+
+  // Method to like/disklike a thread
+  toggleLikeThread(threadId: string, userId: string): Observable<any> {
+    console.log('Toggling like for thread:', threadId, 'by user:', userId);
+    return this.apiService.put<any>(`forum/thread/like`, {threadId, userId}, undefined, true);
+  }
+
+
+
 
 
 
@@ -79,17 +100,6 @@ export class ForumService {
     return this.apiService.get<Thread[]>(`forum/threads/tags/${tag}`, undefined, undefined, true);
   }
 
-  toggleLikeThread(threadId: string): Observable<Thread> {
-    return this.apiService.post<Thread>(`forum/threads/like`, {threadId}, undefined, true);
-  }
-
-  incrementViewCount(threadId: string): Observable<Thread> {
-    return this.apiService.post<Thread>(`forum/threads/view`, {threadId}, undefined, true);
-  }
-
-
-
- 
 
   addReply(commentId: string, content: string): Observable<Comment> {
     return this.apiService.post<Comment>(`forum/comments/${commentId}/replies`, { content }, undefined,  true);

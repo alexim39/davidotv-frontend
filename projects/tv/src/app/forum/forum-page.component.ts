@@ -17,6 +17,7 @@ import { ChangeDetectorRef } from '@angular/core';
 @Component({
   selector: 'app-forum-page',
   standalone: true,
+  providers: [ForumService],
   imports: [
     MatToolbarModule,
     MatIconModule,
@@ -71,11 +72,11 @@ import { ChangeDetectorRef } from '@angular/core';
           </div>
         </div>
 
-        <div *ngIf="currentView === 'detail'">
-          <!-- <app-thread-detail 
+        <!-- <div *ngIf="currentView === 'detail'">
+          <app-thread-detail 
             *ngIf="!isLoading && selectedThread" 
             >
-          </app-thread-detail> -->
+          </app-thread-detail>
 
           <div *ngIf="!isLoading && !selectedThread" class="thread-not-found">
             <mat-icon>error_outline</mat-icon>
@@ -84,7 +85,7 @@ import { ChangeDetectorRef } from '@angular/core';
               Back to discussions
             </button>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   `,

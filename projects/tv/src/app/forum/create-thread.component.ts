@@ -15,6 +15,7 @@ import { UserInterface, UserService } from '../common/services/user.service';
 
 @Component({
   selector: 'app-create-thread',
+  providers: [ForumService],
   standalone: true,
   imports: [
     ReactiveFormsModule, 

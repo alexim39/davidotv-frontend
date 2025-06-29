@@ -1,16 +1,32 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, inject, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { Comment } from './forum.service';
-import { timeAgo as timeAgoUtil, formatDuration as videoDuration } from '../common/utils/time.util';
+import { Comment, ForumService, Reply } from './forum.service';
+import { timeAgo as timeAgoUtil, } from '../common/utils/time.util';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { UserInterface, UserService } from '../common/services/user.service';
+import { Subscription, takeUntil } from 'rxjs';
+import { ReplyComponent } from './reply.component';
 
 @Component({
 selector: 'app-comment',
-imports: [MatIconModule, CommonModule, MatFormFieldModule, MatProgressBarModule, MatProgressSpinnerModule, ReactiveFormsModule],
+providers: [ForumService],
+imports: [
+  MatIconModule, 
+  CommonModule, 
+  MatInputModule, 
+  MatButtonModule, 
+  MatFormFieldModule, 
+  MatProgressBarModule, 
+  MatProgressSpinnerModule, 
+  ReactiveFormsModule,
+  ReplyComponent
+],
 template: `
 <div class="comment">
   <div class="comment-main">
@@ -22,7 +38,7 @@ template: `
         <span *ngIf="comment.author.isVerified" class="verified-badge" matTooltip="Verified User">
           <mat-icon>verified</mat-icon>
         </span>
-        <span class="comment-time">{{comment.author.name}}</span>
+        <span class="comment-time">{{comment.author.name | titlecase}}</span>
       </div>
       
       <div class="comment-text">{{comment.content}}</div>
@@ -53,7 +69,7 @@ template: `
           <button mat-button (click)="toggleReply()">Cancel</button>
           <button mat-raised-button color="primary" 
                   (click)="addReply()"
-                  [disabled]="replyControl.invalid || isSubmitting">
+                  [disabled]="replyControl.invalid || isSubmitting || !currentUser">
             <span *ngIf="!isSubmitting">Post Reply</span>
             <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
           </button>
@@ -62,21 +78,21 @@ template: `
     </div>
   </div>
   
-  <div class="comment-replies" *ngIf="showReplies && comment.replies.length > 0">
-    <app-comment *ngFor="let reply of comment.replies" 
-                [comment]="reply" 
-                [threadId]="threadId"
-                (likeComment)="likeComment.emit($event)">
-    </app-comment>
+  <!-- In comment.component.html -->
+  <div class="comment-replies" *ngIf="showReplies">
+    <app-reply 
+      *ngFor="let reply of replies"
+      [reply]="reply">
+    </app-reply>
   </div>
-</div>
+
 `,
 styles: [`
     
 .comment {
   margin-bottom: 20px;
   padding: 15px;
-  border-radius: 8px;
+  //border-radius: 8px;
   
   .comment-main {
     display: flex;
@@ -86,7 +102,7 @@ styles: [`
   .comment-avatar {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    //border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
   }
@@ -144,6 +160,10 @@ styles: [`
     
     .comment-reply-form {
       margin-top: 15px;
+
+      .full-width {
+        width: 100%;
+      }
       
       .reply-buttons {
         display: flex;
@@ -158,11 +178,10 @@ styles: [`
     margin-top: 20px;
     margin-left: 30px;
     padding-left: 15px;
-    border-left: 2px solid #eee;
+    //border-left: 2px solid #eee;
     
     .comment {
-      background-color: #fff;
-      border: 1px solid #eee;
+      //border: 1px solid #eee;
     }
   }
 }
@@ -186,25 +205,87 @@ styles: [`
   }
 }  
 
+
+.comment-replies {
+  margin-top: 16px;
+  margin-left: 44px; // Align with avatar
+  padding-left: 8px;
+  //border-left: 2px solid #eee;
+  
+  .reply {
+    &:first-child {
+      margin-top: 0;
+    }
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+
+.loading-replies {
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.no-replies {
+  padding: 12px;
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+}
+
 `]
 })
-export class CommentComponent implements OnInit {
+export class CommentComponent implements OnInit, OnDestroy {
   @Input() comment!: Comment;
   @Input() threadId!: string;
   @Input() isAuthor!: boolean;
   @Input() deleteComment!: string;
   @Output() likeComment = new EventEmitter<string>();
+
+  private userService = inject(UserService);
+  currentUser: UserInterface | null = null;
+  private forumService = inject(ForumService);
+  private cd = inject(ChangeDetectorRef);
+  subscriptions: Subscription[] = [];
   
   replyControl = new FormControl('', Validators.required);
   isReplying = false;
   isSubmitting = false;
-  showReplies = true;
+  showReplies = false;
+  destroy$: any;
+
+  replies: Reply[] = [];
+  isLoadingReplies = false;
 
   ngOnInit() {
+    //console.log('sent comments ',this.comment)
     if (!this.comment.replies) {
       this.comment.replies = [];
     }
+    this.replies = this.comment.replies; // Initialize replies from comment
+
+    this.loadCurrentUser();
   }
+
+   ngOnDestroy(): void {
+     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
+
+
+   private loadCurrentUser(): void {
+      this.subscriptions.push(
+      this.userService.getCurrentUser$.subscribe({
+        next: (user) => {
+          this.currentUser = user;
+          //console.log('current user ',this.user)
+        }
+      })
+    )
+    }
 
   toggleReply() {
     this.isReplying = !this.isReplying;
@@ -213,36 +294,56 @@ export class CommentComponent implements OnInit {
     }
   }
 
-  addReply() {
-    if (this.replyControl.invalid || this.isSubmitting) return;
-    this.isSubmitting = true;
-    
-    // In a real app, this would call a service to add the reply
-    const newReply: Comment = {
-      id: 'reply' + (this.comment.replies.length + 1),
-      content: this.replyControl.value ?? '',
-      author: {
-        id: 'user1',
-        name: 'Current User',
-        avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-        isVerified: true,
-        username: ''
-      },
-      createdAt: new Date(),
-      likeCount: 0,
-      replies: [],
-      isLiked: false
-    };
-    
-    this.comment.replies.unshift(newReply);
-    this.replyControl.reset();
-    this.isReplying = false;
-    this.isSubmitting = false;
-    this.showReplies = true;
-  }
+
+  // comment.component.ts
+ addReply() {
+  if (this.replyControl.invalid || this.isSubmitting || !this.currentUser) return;
+
+  this.isSubmitting = true;
+  this.cd.detectChanges();
+
+  this.forumService.addCommentReply(
+    this.replyControl.value ?? '',
+    this.currentUser._id,
+    this.comment._id
+  ).subscribe({
+    next: (response) => {
+      //console.log('New reply added:', response.data);
+      const sentReply: Reply = {
+        _id: response.data._id,
+        content: response.data.content,
+        createdAt: response.data.createdAt,
+        author: {
+          avatar: response.data.author.avatar,
+          _id: response.data.author._id,
+          name: response.data.author.name,
+          username: response.data.author.username,
+        },
+        isDeleted: response.data.isDeleted,
+        isLiked: response.data.isLiked,
+        likeCount: response.data.likeCount,
+        parentComment: response.data.parentComment,
+        thread: response.data.thread,
+        updatedAt: response.data.updatedAt
+      };
+      this.replies.unshift(sentReply);
+      this.comment.replyCount = (this.comment.replyCount || 0) + 1;
+      this.replyControl.reset();
+      this.isReplying = false;
+      this.isSubmitting = false;
+      this.showReplies = true;
+      this.cd.detectChanges();
+    },
+    error: (error) => {
+      console.error('Error adding reply:', error);
+      this.isSubmitting = false;
+      this.cd.detectChanges();
+    }
+  });
+}
 
   toggleLike() {
-    this.likeComment.emit(this.comment.id);
+    this.likeComment.emit(this.comment._id);
   }
 
   toggleReplies() {

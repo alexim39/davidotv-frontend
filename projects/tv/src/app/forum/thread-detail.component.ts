@@ -22,13 +22,14 @@ import { Subject, takeUntil, switchMap, tap, Subscription } from 'rxjs';
 
 import { ForumService, Thread, Comment, User } from './forum.service';
 import { CommentComponent } from './comment.component';
-import { timeAgo as timeAgoUtil, formatDuration as videoDuration } from '../common/utils/time.util';
+import { timeAgo as timeAgoUtil } from '../common/utils/time.util';
 import { SanitizeHtmlPipe } from '../common/pipes/sanitize-html.pipe';
 import { UserInterface, UserService } from '../common/services/user.service';
 
 @Component({
   selector: 'app-thread-detail',
   standalone: true,
+  providers: [ForumService],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -52,13 +53,13 @@ import { UserInterface, UserService } from '../common/services/user.service';
   </button>
 
   <!-- Loading State -->
-  <div *ngIf="loadingStates.thread" class="loading-state">
+  <div *ngIf="loadingStates" class="loading-state">
     <mat-spinner diameter="50"></mat-spinner>
     <p>Loading thread...</p>
   </div>
 
   <!-- Error State -->
-  <div *ngIf="error && !loadingStates.thread" class="error-state">
+  <div *ngIf="error && !loadingStates" class="error-state">
     <mat-icon color="warn">error_outline</mat-icon>
     <p>{{ error }}</p>
     <button mat-raised-button color="primary" (click)="loadThreadData()">
@@ -67,7 +68,7 @@ import { UserInterface, UserService } from '../common/services/user.service';
   </div>
 
   <!-- Thread Content -->
-  <ng-container *ngIf="thread && !loadingStates.thread">
+  <ng-container *ngIf="thread && !loadingStates">
     <mat-card class="thread-card">
       <mat-card-header>
         <img mat-card-avatar 
@@ -120,7 +121,7 @@ import { UserInterface, UserService } from '../common/services/user.service';
       <h3 id="comments-heading">Comments ({{ thread.commentCount }})</h3>
 
       <!-- Comment Form -->
-      <form [formGroup]="commentForm" class="comment-form">
+     <!--  <form [formGroup]="commentForm" class="comment-form">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Add your comment</mat-label>
           <textarea matInput 
@@ -138,21 +139,41 @@ import { UserInterface, UserService } from '../common/services/user.service';
           <span *ngIf="!isSubmitting">Post Comment</span>
           <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
         </button>
+      </form> -->
+
+      <form [formGroup]="commentForm" class="comment-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Add your comment</mat-label>
+          <textarea matInput 
+                  formControlName="content"
+                  rows="4"
+                  aria-label="Comment text area"
+                  [attr.maxlength]="2000"></textarea>
+          <mat-hint align="end">{{ remainingChars }} characters remaining</mat-hint>
+        </mat-form-field>
+        <button mat-raised-button 
+                color="primary"
+                (click)="addComment()"
+                [disabled]="commentForm.invalid || isSubmitting || !currentUser"
+                aria-label="Post comment">
+          <span *ngIf="!isSubmitting">Post Comment</span>
+          <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+        </button>
       </form>
 
       <!-- Comments Loading -->
-      <div *ngIf="loadingStates.comments" class="loading-comments">
+      <div *ngIf="loadingStates" class="loading-comments">
         <mat-spinner diameter="40"></mat-spinner>
       </div>
 
       <!-- Comments List -->
-      <div class="comments-list" *ngIf="!loadingStates.comments">
+      <div class="comments-list">
         <app-comment *ngFor="let comment of comments; trackBy: trackByCommentId"
-                    [comment]="comment"
-                    [threadId]="thread._id"
-                    [isAuthor]="isCommentAuthor(comment)"
-                    (likeComment)="toggleLikeComment($event)"
-                    (deleteComment)="handleDeleteComment($event)">
+          [comment]="comment"
+          [threadId]="thread._id"
+          [isAuthor]="isCommentAuthor(comment)"
+          (likeComment)="toggleLikeComment($event)"
+          (deleteComment)="handleDeleteComment($event)">
         </app-comment>
 
         <!-- Empty State -->
@@ -327,7 +348,17 @@ import { UserInterface, UserService } from '../common/services/user.service';
       }
     }
   }
+
+  /* styles.scss or component styles */
+.snackbar-center-bottom {
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  justify-content: center !important;
 }
+
+
+}
+
 
 @media (max-width: 600px) {
   .thread-detail-container {
@@ -369,10 +400,7 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
   thread: Thread | null = null;
   comments: Comment[] = [];
   currentUser: UserInterface | null = null;
-  loadingStates = {
-    thread: true,
-    comments: true
-  };
+  loadingStates = false;
   isSubmitting = false;
   error: string | null = null;
 
@@ -409,7 +437,7 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
   public loadThreadData(): void {
     this.route.params.pipe(
       tap(() => {
-        this.loadingStates.thread = true;
+        this.loadingStates = true;
         this.error = null;
         this.cd.markForCheck();
       }),
@@ -417,67 +445,54 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (response) => {
-        console.log('returned thread ',response.data)
+        //console.log('returned thread ',response.data)
         this.thread = response.data || null;
-        this.loadingStates.thread = false;
+        this.loadingStates = false;
         if (response.data) {
-          this.loadComments();
-          this.incrementViewCount();
+          //this.loadComments();
+          this.comments = response.data.comments || [];
+          //this.incrementViewCount();
+          this.cd.markForCheck();
         }
-        this.cd.markForCheck();
+        
       },
       error: (err) => {
         this.error = 'Failed to load thread';
-        this.loadingStates.thread = false;
+        this.loadingStates = false;
         this.cd.markForCheck();
       }
     });
-  }
-
-  private loadComments(): void {
-    if (!this.thread) return;
-
-    this.loadingStates.comments = true;
-    this.error = null;
-    this.cd.markForCheck();
-
-    this.forumService.getThreadComments(this.thread._id).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (response) => {
-        console.log('returned comments ',response.data)
-        this.comments = response.data || [];
-        this.loadingStates.comments = false;
-        this.cd.markForCheck();
-      },
-      error: (err) => {
-        this.error = 'Failed to load comments';
-        this.loadingStates.comments = false;
-        this.cd.markForCheck();
-      }
-    });
-  }
-
-  private incrementViewCount(): void {
-    if (!this.thread) return;
-    this.forumService.incrementViewCount(this.thread._id).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe();
   }
 
   toggleLikeThread(): void {
     if (!this.thread || !this.currentUser) return;
 
-    this.forumService.toggleLikeThread(this.thread._id).pipe(
+    // Optimistic UI update
+    const wasLiked = this.thread.isLiked;
+    this.thread.isLiked = !wasLiked;
+    this.thread.likeCount += this.thread.isLiked ? 1 : -1;
+    this.cd.markForCheck();
+
+    this.forumService.toggleLikeThread(this.thread._id, this.currentUser._id).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
-      next: (updatedThread) => {
-        if (updatedThread) {
-          this.thread = updatedThread;
+      next: (response) => {
+        if (response.success) {
+          this.thread = response.data;
+          // this.snackBar.open(response.message, 'Ok', {
+          //   duration: 3000,
+          //   horizontalPosition: 'center',
+          //   verticalPosition: 'bottom',
+          //   panelClass: 'snackbar-center-bottom'
+          // });
           this.cd.markForCheck();
         }
       },
       error: (err) => {
+        // Revert UI on error
+        this.thread!.isLiked = wasLiked;
+        this.thread!.likeCount += wasLiked ? 1 : -1;
+        this.cd.markForCheck();
         this.showError('Failed to update like');
       }
     });
@@ -536,7 +551,7 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
-        this.comments = this.comments.filter(c => c.id !== commentId);
+        this.comments = this.comments.filter(c => c._id !== commentId);
         if (this.thread) {
           this.thread.commentCount = Math.max(0, this.thread.commentCount - 1);
         }
@@ -549,7 +564,7 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
   }
 
   private updateCommentInList(updatedComment: Comment): void {
-    const index = this.comments.findIndex(c => c.id === updatedComment.id);
+    const index = this.comments.findIndex(c => c._id === updatedComment._id);
     if (index !== -1) {
       this.comments[index] = updatedComment;
     }
@@ -567,11 +582,11 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
   }
 
   trackByCommentId(index: number, comment: Comment): string {
-    return comment.id;
+    return comment._id;
   }
 
   isCommentAuthor(comment: Comment): boolean {
-    return this.currentUser?._id === comment.author.id;
+    return this.currentUser?._id === comment.author._id;
   }
 
   handleBack(): void {

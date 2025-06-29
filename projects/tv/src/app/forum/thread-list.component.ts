@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { TruncatePipe } from '../common/pipes/truncate.pipe';
-import { timeAgo as timeAgoUtil, formatDuration as videoDuration } from '../common/utils/time.util';
+import { timeAgo as timeAgoUtil } from '../common/utils/time.util';
 import { CommonModule } from '@angular/common';
 import { Thread } from './forum.service';
 import { MatButtonModule } from '@angular/material/button';
@@ -174,21 +174,16 @@ styles: [`
 }
 `]
 })
-export class ThreadListComponent implements OnInit {
+export class ThreadListComponent {
   @Input() threads: Thread[] = [];
 
   constructor(private router: Router) { }
 
-  ngOnInit(): void {
-    console.log('ThreadListComponent initialized with threads:', this.threads);
-  }
   openThread(threadId: string) {
-    if (!threadId) {
-      console.error('Cannot navigate: threadId is undefined!', threadId);
-      return;
-    }
+    if (!threadId) return;
     this.router.navigate(['/forum/thread', threadId]);
   }
+
 
   timeAgo(date: string | Date): string {
     return timeAgoUtil(date);
