@@ -891,7 +891,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       replyData.parentId,
       this.user._id,
       this.currentUserAvatar,
-      `${this.user.name} ${this.user.surname}`,
+      `${this.user.name} ${this.user.lastname}`,
       replyData.text
     ).subscribe({
       next: (updatedVideo) => {

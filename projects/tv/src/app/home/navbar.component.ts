@@ -66,9 +66,9 @@ template: `
       <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
       <a mat-button routerLink="/videos" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Videos</a>
       <a mat-button routerLink="/official/videos" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Official</a>
-      <a mat-button routerLink="/fan-art" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Fan Groups</a>
+      <a mat-button routerLink="/forum" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Forum</a>
+      <!-- <button mat-button routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="uploadContent()">Upload</button> -->
       <a mat-button routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Store</a>
-      <button mat-button routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="uploadContent()">Upload</button>
     </div>
 
     <!-- Desktop Actions -->
@@ -87,8 +87,9 @@ template: `
         </button>
         
         <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-avatar">
-          <img [src]="imageSource || './img/avatar.png'" alt="User profile" class="avatar-img">
+          <img [src]="imageSource || './img/avatar.png'" alt="User profile" class="avatar-img">  
         </button>
+        <span class="user-name" [matMenuTriggerFor]="userMenu">{{user?.name | titlecase }} {{user?.lastname | titlecase }}</span>
         
         <mat-menu #userMenu="matMenu" class="user-menu">
           <button mat-menu-item>
@@ -140,10 +141,10 @@ template: `
   <a mat-button routerLink="/" (click)="toggleMobileMenu()">Home</a>
   <a mat-button routerLink="/videos" (click)="toggleMobileMenu()">Videos</a>
   <a mat-button routerLink="/official/videos" (click)="toggleMobileMenu()">Official</a>
-  <a mat-button routerLink="/fan-art" (click)="toggleMobileMenu()">Fan Groups</a>
+  <a mat-button routerLink="/forum" (click)="toggleMobileMenu()">Forum</a>
   <a mat-button routerLink="/events" (click)="toggleMobileMenu()">Events</a>
-  <a mat-button routerLink="/store" (click)="toggleMobileMenu()">Store</a>
   <a mat-button (click)="uploadContent(); toggleMobileMenu()">Upload</a>
+  <a mat-button routerLink="/store" (click)="toggleMobileMenu()">Store</a>
 
   <!-- Theme Toggle Button -->
  <!--  <button mat-icon-button (click)="toggleTheme()" aria-label="Toggle theme">
@@ -155,7 +156,7 @@ template: `
       <div class="mobile-user-avatar">
         <img [src]="imageSource || './img/avatar.png'" alt="User profile" class="mobile-avatar-img">
       </div>
-      Profile
+      {{user?.name | titlecase }} {{user?.lastname | titlecase }}
     </a>
     <a mat-button routerLink="/notifications" (click)="toggleMobileMenu()">
       <mat-icon [matBadge]="notificationsCount" matBadgeColor="warn">notifications</mat-icon>
@@ -440,6 +441,26 @@ template: `
     visibility: visible;
   }
 }
+
+.user-name {
+  margin-left: 0px;
+  font-size: 15px;
+  font-weight: 600;
+  //color: #333;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 120px;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    max-width: 80px;
+  }
+}
 `]
 })
 export class NavbarComponent implements OnDestroy, OnInit {
@@ -465,12 +486,12 @@ export class NavbarComponent implements OnDestroy, OnInit {
     const authFlag = localStorage.getItem('isAuthenticated');
     if (authFlag === 'true') {
       
-     /*  this.userService.getCurrentUser$.subscribe({
+      this.userService.getCurrentUser$.subscribe({
         next: (user) => {
           this.user = user;
-          console.log('user ',this.user)
+          //console.log('user ',this.user)
         }
-      }) */
+      })
 
       this.subscriptions.push(
         this.userService.getUser().subscribe({

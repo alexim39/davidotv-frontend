@@ -50,7 +50,14 @@ export const HomeRoutes: Routes = [
             {
                 path: 'search',
                 loadComponent: () => import('../home/search/search-results.component').then(m => m.SearchResultsComponent),
-            }      
+            },    
+            {
+                path: 'upload',
+                loadComponent: () => import('../upload/upload.component').then(m => m.UploadComponent),
+            },
+            {   path: 'forum', 
+                loadChildren: () => import('../forum/forum.routes').then(r => r.ForumRoutes) 
+            },      
         ]
     }
 ];

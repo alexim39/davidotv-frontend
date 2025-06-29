@@ -18,19 +18,21 @@ import { MatButtonModule } from '@angular/material/button';
         <div class="message-container">
           <mat-icon class="info-icon">info</mat-icon>
           <p class="banner-text">
-            <span class="highlight-text">Limited Time Offer:</span> Get started with 
-            <a mat-button routerLink="plans" routerLinkActive="active" 
+            <span class="highlight-text">Legal Disclaimer:</span> 
+            This website is a <strong>non-commercial prototype</strong> created to showcase platform development capabilities. 
+            This is <strong>NOT an official Davido platform</strong> and has no connection to the artist or his management team.
+           <!--  <a mat-button routerLink="plans" routerLinkActive="active" 
                [routerLinkActiveOptions]="{ exact: true }" 
                (click)="scrollToTop()" class="cta-link">
               EliteSpace (₦50,000)
-            </a> 
-            and receive a free branded cap or 
+            </a>  -->
+            
             <a mat-button routerLink="plans" routerLinkActive="active" 
                [routerLinkActiveOptions]="{ exact: true }" 
                (click)="scrollToTop()" class="cta-link">
-              EmpireSpace (₦100,000)
+              Click here for more information
             </a> 
-            and get a free branded clothing. Offer valid while supplies last.
+            
           </p>
         </div>
         <button mat-icon-button class="close-button" (click)="dismissBanner()" aria-label="Close notification">
@@ -39,7 +41,6 @@ import { MatButtonModule } from '@angular/material/button';
       </div>
     </div>
   `,
-// ...existing code...
   styles: [`
     .notification-banner {
       background: linear-gradient(135deg, #8f0045 0%, #282828 100%);
@@ -127,7 +128,7 @@ import { MatButtonModule } from '@angular/material/button';
     .close-button {
       color: rgba(255, 255, 255, 0.7) !important;
       transition: all 0.2s ease;
-      margin-left: 16px;
+      margin-left: 1em;
     }
 
     .close-button:hover {
@@ -138,26 +139,28 @@ import { MatButtonModule } from '@angular/material/button';
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .notification-banner {
-        padding: 8px 0;
+        //padding: 8px 0;
       }
       .banner-content {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
-        padding: 0 10px;
+        //padding: 0 10px;
       }
       .message-container {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
+        
       }
       .banner-text {
         font-size: 13px;
+        padding: 0 2em;
       }
       .close-button {
         align-self: flex-end;
-        margin-top: -8px;
-        margin-right: -8px;
+        margin-top: -1em;
+        margin-right: 1em;
       }
     }
 

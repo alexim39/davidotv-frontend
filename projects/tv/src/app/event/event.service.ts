@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Event } from './event.model'
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class EventService {
   getEventsByCategory(category: string){
     // In a real app, this would be an HTTP request

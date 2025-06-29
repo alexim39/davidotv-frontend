@@ -6,7 +6,7 @@ export interface UserInterface {
   _id: string;
   status: boolean;
   name: string;
-  surname: string;
+  lastname: string;
   email: string;
   username: string;
   bio?: string;

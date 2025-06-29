@@ -1,14 +1,17 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { NavbarComponent } from './navbar.component';
 import { FooterComponent } from './footer/footer.component';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { UserInterface, UserService } from '../common/services/user.service';
+import { AuthComponent } from '../auth/auth.component';
+import { MatDialog } from '@angular/material/dialog';
 
 
 @Component({
@@ -67,13 +70,17 @@ import { RouterModule } from '@angular/router';
             </a>
             <mat-divider></mat-divider>
             <h3 matSubheader>FAN COMMUNITY</h3>
-            <a mat-list-item routerLink="/groups" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/forum" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>groups</mat-icon>
-              <span>Fan Groups</span>
+              <span>Forum</span>
             </a>
             <a mat-list-item routerLink="/events" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>event</mat-icon>
               <span>Events</span>
+            </a>
+            <a mat-list-item (click)="uploadContent()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+              <mat-icon>computer_arrow_up</mat-icon>
+              <span>Upload</span>
             </a>
             <a mat-list-item routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>storefront</mat-icon>
@@ -268,6 +275,14 @@ export class HomeContainerComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   isMobile$!: Observable<boolean>;
 
+
+  private userService = inject(UserService);
+  user: UserInterface | null = null;
+  subscriptions: Subscription[] = [];
+  isAuthenticated = false;
+  private router = inject(Router);
+  readonly dialog = inject(MatDialog);
+  
   constructor(private breakpointObserver: BreakpointObserver) {}
 
   ngOnInit() {
@@ -287,6 +302,17 @@ export class HomeContainerComponent implements OnInit, OnDestroy {
         this.sidenavOpen = true;
       }
     });
+
+     this.subscriptions.push(
+        this.userService.getUser().subscribe({
+          next: (response) => {
+            if (response.success) {
+              this.userService.setCurrentUser(response.user);
+              this.isAuthenticated = true;
+            }
+          }
+        })
+      );
   }
 
   toggleSidenav() {
@@ -301,10 +327,24 @@ export class HomeContainerComponent implements OnInit, OnDestroy {
     });
   }
 
+   authDialog() {
+      this.dialog.open(AuthComponent);
+      // After successful auth, set isAuthenticated to true and load user image
+    }
+
+
+   uploadContent(): void {    
+    if (this.isAuthenticated) {
+      this.router.navigateByUrl('upload');
+    } else {
+      this.authDialog();
+    }
+  }
 
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }
