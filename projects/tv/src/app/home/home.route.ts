@@ -57,7 +57,8 @@ export const HomeRoutes: Routes = [
             },
             {   path: 'forum', 
                 loadChildren: () => import('../forum/forum.routes').then(r => r.ForumRoutes) 
-            },      
+            },  
+            { path: 'faq', loadComponent: () => import('../faq/faq.component').then(c => c.faqsComponent) },    
         ]
     }
 ];

@@ -12,6 +12,7 @@ import { FooterService } from './footer.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserInterface, UserService } from '../../common/services/user.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'async-footer',
@@ -24,7 +25,8 @@ import { UserInterface, UserService } from '../../common/services/user.service';
     MatFormFieldModule,
     FormsModule,
     ReactiveFormsModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    RouterModule
   ],
   template: `
     <footer class="main-footer">
@@ -64,9 +66,9 @@ import { UserInterface, UserService } from '../../common/services/user.service';
           <h3 class="section-title">Legal</h3>
           <nav>
             <ul>
-              <li><a mat-button routerLink="/privacy">Privacy Policy</a></li>
-              <li><a mat-button routerLink="/terms">Terms of Service</a></li>
-              <li><a mat-button routerLink="/cookies">Cookie Policy</a></li>
+              <li><a mat-button routerLink="/legal/privacy">Privacy Policy</a></li>
+              <li><a mat-button routerLink="/legal/terms">Terms of Service</a></li>
+              <li><a mat-button routerLink="/legal/cookies">Cookie Policy</a></li>
               <li><a mat-button routerLink="/faq">FAQ</a></li>
             </ul>
           </nav>
