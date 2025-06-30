@@ -90,7 +90,7 @@ template: `
       <button mat-raised-button
               color="primary"
               (click)="onSubmit()"
-              [disabled]="threadForm.invalid">
+              [disabled]="threadForm.invalid || !user">
         Create Thread
       </button>
     </mat-dialog-actions>

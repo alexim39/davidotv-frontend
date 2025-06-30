@@ -12,6 +12,9 @@ import { MatInputModule } from '@angular/material/input';
 import { UserInterface, UserService } from '../common/services/user.service';
 import { Subscription, takeUntil } from 'rxjs';
 import { ReplyComponent } from './reply.component';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../common/component/confirmationDialog.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
 selector: 'app-comment',
@@ -35,10 +38,20 @@ template: `
     <div class="comment-content">
       <div class="comment-header">
         <span class="comment-author"> {{timeAgo(comment.createdAt)}} </span>
-        <span *ngIf="comment.author.isVerified" class="verified-badge" matTooltip="Verified User">
+       <!--  <span *ngIf="comment.author.isVerified" class="verified-badge" matTooltip="Verified User">
           <mat-icon>verified</mat-icon>
-        </span>
+        </span> -->
         <span class="comment-time">{{comment.author.name | titlecase}}</span>
+
+         <!-- Delete button - only shown if user is the owner -->
+            <button *ngIf="isCommentOwner()" 
+                    mat-icon-button 
+                    color="warn" 
+                    (click)="onDeleteComment($event)"
+                    class="delete-button"
+                    matTooltip="Delete comment">
+              <mat-icon>delete</mat-icon>
+            </button>
       </div>
       
       <div class="comment-text">{{comment.content}}</div>
@@ -82,8 +95,9 @@ template: `
   <div class="comment-replies" *ngIf="showReplies">
     <app-reply 
       *ngFor="let reply of replies"
-      [reply]="reply">
-    </app-reply>
+      [reply]="reply"
+      (replyDeleted)="onReplyDeleted($event)"
+    />
   </div>
 
 `,
@@ -134,6 +148,21 @@ styles: [`
         margin-right: auto; // Pushes it to the left
         order: -1; // Makes it appear first in the flex row
       }
+
+       .delete-button {
+          margin-left: 8px;
+          width: 24px;
+          height: 24px;
+          line-height: 24px;
+          color: #f44336; // Red color for delete button
+          font-weight: bold;
+          
+          mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
+        }
     }
     
     .comment-text {
@@ -243,14 +272,16 @@ export class CommentComponent implements OnInit, OnDestroy {
   @Input() comment!: Comment;
   @Input() threadId!: string;
   @Input() isAuthor!: boolean;
-  @Input() deleteComment!: string;
+  //@Input() deleteComment!: string;
   @Output() likeComment = new EventEmitter<string>();
+  @Output() commentDeleted = new EventEmitter<string>(); // New output for deletion
 
   private userService = inject(UserService);
   currentUser: UserInterface | null = null;
   private forumService = inject(ForumService);
   private cd = inject(ChangeDetectorRef);
   subscriptions: Subscription[] = [];
+  private snackBar = inject(MatSnackBar);
   
   replyControl = new FormControl('', Validators.required);
   isReplying = false;
@@ -260,6 +291,8 @@ export class CommentComponent implements OnInit, OnDestroy {
 
   replies: Reply[] = [];
   isLoadingReplies = false;
+
+  private dialog = inject(MatDialog);
 
   ngOnInit() {
     //console.log('sent comments ',this.comment)
@@ -276,16 +309,59 @@ export class CommentComponent implements OnInit, OnDestroy {
   }
 
 
-   private loadCurrentUser(): void {
-      this.subscriptions.push(
-      this.userService.getCurrentUser$.subscribe({
-        next: (user) => {
-          this.currentUser = user;
-          //console.log('current user ',this.user)
-        }
-      })
-    )
+    private loadCurrentUser(): void {
+        this.subscriptions.push(
+        this.userService.getCurrentUser$.subscribe({
+          next: (user) => {
+            this.currentUser = user;
+            //console.log('current user ',this.user)
+          }
+        })
+      )
     }
+
+    // Check if current user is the owner of the comment
+    isCommentOwner(): boolean {
+      return this.currentUser?._id === this.comment.author._id;
+    }
+
+    // Handle comment deletion
+    onDeleteComment(event: Event) {
+      event.stopPropagation();
+      
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        data: {
+          title: 'Delete Comment',
+          message: 'Are you sure you want to delete this comment?',
+          confirmText: 'Delete',
+          cancelText: 'Cancel'
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.deleteComment();
+        }
+      });
+    }
+
+    // Delete comment implementation
+  private deleteComment() {
+    if (!this.currentUser) return;
+
+    this.forumService.deleteComment(this.comment._id, this.currentUser._id).subscribe({
+      next: () => {
+        // Emit to parent component that comment was deleted
+        this.commentDeleted.emit(this.comment._id);
+        // The parent component should handle removing the comment from the list
+      },
+      error: (error) => {
+        console.error('Error deleting comment:', error);
+        this.snackBar.open('Failed to delete comment. Please try again.', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
 
   toggleReply() {
     this.isReplying = !this.isReplying;
@@ -343,7 +419,34 @@ export class CommentComponent implements OnInit, OnDestroy {
 }
 
   toggleLike() {
+    if (!this.currentUser) return;
+
+    //this.likeComment.emit(this.comment._id);
+
+    // Optimistic UI update
+    const wasLiked = this.comment.isLiked;
+    this.comment.isLiked = !wasLiked;
+    this.comment.likeCount += this.comment.isLiked ? 1 : -1;
+    this.cd.markForCheck();
+
+    // Emit to parent to handle backend update and revert if needed
     this.likeComment.emit(this.comment._id);
+
+    // if (!this.thread || !this.currentUser) return;
+
+    // this.forumService.toggleLikeComment(commentId, this.currentUser._id).pipe(
+    //   takeUntil(this.destroy$)
+    // ).subscribe({
+    //   next: (updatedComment) => {
+    //     if (updatedComment) {
+    //       this.updateCommentInList(updatedComment);
+    //       this.cd.markForCheck();
+    //     }
+    //   },
+    //   error: (err) => {
+    //     this.showError('Failed to update like');
+    //   }
+    // });
   }
 
   toggleReplies() {
@@ -352,5 +455,12 @@ export class CommentComponent implements OnInit, OnDestroy {
 
   timeAgo(date: string | Date): string {
     return timeAgoUtil(date);
+  }
+
+  onReplyDeleted(replyId: any) {
+    this.replies = this.replies.filter(r => r._id !== replyId);
+    this.comment.replyCount = (this.comment.replyCount || 0) - 1;
+    this.snackBar.open('Reply deleted successfully', 'Close', { duration: 3000 });
+    //this.cd.detectChanges();
   }
 }

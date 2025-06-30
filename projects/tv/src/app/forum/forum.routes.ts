@@ -1,5 +1,4 @@
 import { Routes } from "@angular/router";
-import { ThreadListComponent } from "./thread-list.component";
 import { ForumPageComponent } from "./forum-page.component";
 import { ThreadDetailComponent } from "./thread-detail.component";
 

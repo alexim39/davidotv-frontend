@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { ForumPageComponent } from '../forum/forum-page.component';
 
 @Component({
   selector: 'async-community',
@@ -12,7 +13,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatIconModule,
     MatTabsModule,
     MatCardModule,
-    MatButtonModule
+    MatButtonModule,
+    ForumPageComponent
   ],
   template: `
     <section class="community-section">
@@ -24,7 +26,7 @@ import { MatButtonModule } from '@angular/material/button';
       <mat-tab-group>
         <mat-tab label="Latest Posts">
           <div class="posts-container">
-            <mat-card *ngFor="let post of fanPosts" class="post-card">
+            <!-- <mat-card *ngFor="let post of fanPosts" class="post-card">
               <mat-card-header>
                 <img mat-card-avatar [src]="post.user.avatar" alt="User avatar" loading="lazy">
                 <mat-card-title>{{post.user.name}}</mat-card-title>
@@ -45,19 +47,23 @@ import { MatButtonModule } from '@angular/material/button';
                   <mat-icon>share</mat-icon>
                 </button>
               </mat-card-actions>
-            </mat-card>
+            </mat-card> -->
+            <app-forum-page/>
           </div>
         </mat-tab>
+
         <mat-tab label="Upcoming Events">
           <div class="events-container">
             <p>No upcoming events at this time. Check back later!</p>
           </div>
         </mat-tab>
+
         <mat-tab label="Top Fans">
           <div class="fans-container">
             <p>Top fans leaderboard coming soon!</p>
           </div>
         </mat-tab>
+        
       </mat-tab-group>
     </section>
   `,
@@ -104,5 +110,27 @@ import { MatButtonModule } from '@angular/material/button';
   `]
 })
 export class CommunityComponent {
-  @Input() fanPosts: any[] = [];
+  fanPosts: any[] = [
+    {
+      user: {
+        name: 'SuperFan Ade',
+        avatar: 'https://via.placeholder.com/40x40'
+      },
+      date: new Date(),
+      content: 'Just met Davido backstage at the concert! He was so humble and took pictures with everyone #30BG',
+      image: 'https://via.placeholder.com/600x300',
+      likes: 245,
+      comments: 32
+    },
+    {
+      user: {
+        name: 'Chioma Lover',
+        avatar: 'https://via.placeholder.com/40x40'
+      },
+      date: new Date(Date.now() - 86400000),
+      content: 'Who else is excited for the new album dropping next week? I already pre-ordered!',
+      likes: 189,
+      comments: 45
+    }
+  ];
 }

@@ -83,33 +83,36 @@ export class ForumService {
 
   // Method to like/disklike a thread
   toggleLikeThread(threadId: string, userId: string): Observable<any> {
-    console.log('Toggling like for thread:', threadId, 'by user:', userId);
+    //console.log('Toggling like for thread:', threadId, 'by user:', userId);
     return this.apiService.put<any>(`forum/thread/like`, {threadId, userId}, undefined, true);
   }
 
-
-
-
-
-
-
-
-
-
   getThreadsByTag(tag: string): Observable<any> {
-    return this.apiService.get<Thread[]>(`forum/threads/tags/${tag}`, undefined, undefined, true);
+    return this.apiService.get<any>(`forum/threads/tags/${tag}`, undefined, undefined, true);
   }
 
-
-  addReply(commentId: string, content: string): Observable<Comment> {
-    return this.apiService.post<Comment>(`forum/comments/${commentId}/replies`, { content }, undefined,  true);
+  // Comment Operations
+  toggleLikeComment(commentId: string, userId: string): Observable<Comment> {
+    return this.apiService.post<Comment>(`forum/comments/like`, {commentId, userId}, undefined,  true);
   }
 
-  toggleLikeComment(commentId: string): Observable<Comment> {
-    return this.apiService.post<Comment>(`forum/comments/like`, {commentId}, undefined,  true);
+  toggleLikeReply(replyId: string, userId: string): Observable<Comment> {
+    return this.apiService.post<Comment>(`forum/comments/reply/like`, {replyId, userId}, undefined,  true);
   }
 
-  deleteComment(commentId: string): Observable<{ success: boolean }> {
-    return this.apiService.delete<{ success: boolean }>(`forum/comments/${commentId}`, undefined, undefined, true);
+  // Delete Thread by ID
+  deleteThread(threadId: string, userId: string): Observable<any> {
+    return this.apiService.delete<any>(`forum/thread/${threadId}/${userId}`, undefined, undefined, true);
   }
+
+  // Delete a comment by ID
+  deleteComment(commentId: string, userId: string): Observable<{ success: boolean }> {
+    return this.apiService.delete<{ success: boolean }>(`forum/comment/${commentId}/${userId}`, undefined, undefined, true);
+  }
+
+  // Delete a reply by ID
+  deleteReply(replyId: string, userId: string): Observable<{ success: boolean }> {
+    return this.apiService.delete<{ success: boolean }>(`forum/reply/${replyId}/${userId}`, undefined, undefined, true);
+  }
+ 
 }

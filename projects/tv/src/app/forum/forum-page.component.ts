@@ -33,7 +33,7 @@ import { ChangeDetectorRef } from '@angular/core';
         <button mat-icon-button *ngIf="currentView === 'detail'" (click)="backToList()">
           <mat-icon>arrow_back</mat-icon>
         </button>
-        <span>DavidoTV Forum</span>
+        <span class="title">Community Forum</span>
         <span class="spacer"></span>
         <button mat-raised-button color="accent" (click)="openCreateThreadDialog()">
           <mat-icon>add</mat-icon>
@@ -104,6 +104,22 @@ import { ChangeDetectorRef } from '@angular/core';
       
       .spacer {
         flex: 1 1 auto;
+      }
+      .title {
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin-left: 15%;
+        @media (max-width: 900px) {
+          margin-left: 2em;
+          font-size: 1.2rem;
+        }
+        @media (max-width: 600px) {
+          margin-left: 0;
+          font-size: 1rem;
+          text-align: left;
+          width: 100%;
+          display: block;
+        }
       }
     }
 
@@ -246,8 +262,6 @@ export class ForumPageComponent implements OnInit, OnDestroy {
   }
 
   navigateToThread(threadId: any): void {
-  //navigateToThread(threadId: string): void {
-  console.log('Navigating to thread:', threadId);
     if (!threadId) this.router.navigate(['/forum/thread', threadId]);  
   }
 
@@ -276,7 +290,8 @@ export class ForumPageComponent implements OnInit, OnDestroy {
         this.cd.detectChanges(); 
       })
     ).subscribe({
-      next: (response: any) => {
+      next: (response) => {
+        console.log('response by tag ',response)
         this.threads = response?.data || [];
         this.cd.detectChanges(); 
       },

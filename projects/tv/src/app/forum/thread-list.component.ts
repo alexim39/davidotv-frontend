@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,8 +6,13 @@ import { MatChipsModule } from '@angular/material/chips';
 import { TruncatePipe } from '../common/pipes/truncate.pipe';
 import { timeAgo as timeAgoUtil } from '../common/utils/time.util';
 import { CommonModule } from '@angular/common';
-import { Thread } from './forum.service';
+import { ForumService, Thread } from './forum.service';
 import { MatButtonModule } from '@angular/material/button';
+import { UserInterface, UserService } from '../common/services/user.service';
+import { Subject, Subscription, takeUntil } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../common/component/confirmationDialog.component';
 @Component({
 selector: 'app-thread-list',
 imports: [MatCardModule, MatIconModule, MatButtonModule, MatChipsModule, TruncatePipe, CommonModule ],
@@ -53,6 +58,16 @@ template: `
           <mat-icon>visibility</mat-icon>
           {{thread.viewCount}}
         </button>
+
+        <!-- Delete button - only shown if user is the owner -->
+            <button *ngIf="isThreadOwner(thread)" 
+                    mat-button 
+                    color="warn" 
+                    (click)="onDeleteComment(thread._id, $event)"
+                    class="delete-button">
+              <mat-icon>delete</mat-icon>
+              Delete
+            </button>
       </mat-card-actions>
     </mat-card>
   </div>
@@ -133,6 +148,12 @@ styles: [`
         font-size: 18px;
       }
     }
+
+    .delete-button {
+      margin-left: auto; // Push delete button to the right
+      color: #f44336; // Red color for delete button
+      font-weight: bold;
+    }
   }
 }
 
@@ -177,7 +198,91 @@ styles: [`
 export class ThreadListComponent {
   @Input() threads: Thread[] = [];
 
-  constructor(private router: Router) { }
+  private userService = inject(UserService);
+  currentUser: UserInterface | null = null;
+  subscriptions: Subscription[] = [];
+  private forumService = inject(ForumService);
+  private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
+  private cd = inject(ChangeDetectorRef);
+  // Cleanup
+  private destroy$ = new Subject<void>();
+  private dialog = inject(MatDialog);
+
+  ngOnInit() {
+    this.loadCurrentUser();
+  }
+
+   ngOnDestroy(): void {
+     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+
+  private loadCurrentUser(): void {
+      this.subscriptions.push(
+      this.userService.getCurrentUser$.subscribe({
+        next: (user) => {
+          this.currentUser = user;
+          //console.log('current user ',this.currentUser)
+        }
+      })
+    )
+  }
+
+  // Check if current user is the owner of the thread
+  isThreadOwner(thread: Thread): boolean {
+    if (!this.currentUser?._id) return false;
+    return thread.author._id === this.currentUser?._id;
+  }
+
+   // Handle comment deletion
+    onDeleteComment(threadId: string, event: Event) {
+      event.stopPropagation();
+      
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        data: {
+          title: 'Delete Thread',
+          message: 'Are you sure you want to delete this thread?',
+          confirmText: 'Delete',
+          cancelText: 'Cancel'
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.deleteThread(threadId);
+        }
+      });
+    }
+
+   // Delete thread handler
+  private deleteThread(threadId: string) {
+    if (!this.currentUser) return;
+    
+    
+    // Here you would typically:
+    // 1. Show a confirmation dialog
+    // 2. Call your thread service to delete the thread
+    // 3. Emit an event to parent component or update local threads array
+
+      this.forumService.deleteThread(threadId, this.currentUser._id).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (response) => {
+          // Remove the thread from the local array
+          this.threads = this.threads.filter(t => t._id !== threadId);
+          this.cd.detectChanges();
+          this.snackBar.open(response.message, 'Close', { duration: 3000 });
+        },
+        error: (error) => {
+          this.snackBar.open('Failed to delete thread. Please try again.', 'Close', { duration: 3000 });
+        }
+      });
+
+  }
 
   openThread(threadId: string) {
     if (!threadId) return;
@@ -188,4 +293,7 @@ export class ThreadListComponent {
   timeAgo(date: string | Date): string {
     return timeAgoUtil(date);
   }
+
+
+
 }

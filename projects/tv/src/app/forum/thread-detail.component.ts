@@ -121,26 +121,6 @@ import { UserInterface, UserService } from '../common/services/user.service';
       <h3 id="comments-heading">Comments ({{ thread.commentCount }})</h3>
 
       <!-- Comment Form -->
-     <!--  <form [formGroup]="commentForm" class="comment-form">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Add your comment</mat-label>
-          <textarea matInput 
-                   formControlName="content"
-                   rows="4"
-                   aria-label="Comment text area"
-                   [attr.maxlength]="2000"></textarea>
-          <mat-hint align="end">{{ remainingChars }} characters remaining</mat-hint>
-        </mat-form-field>
-        <button mat-raised-button 
-                color="primary"
-                (click)="addComment()"
-                [disabled]="commentForm.invalid || isSubmitting"
-                aria-label="Post comment">
-          <span *ngIf="!isSubmitting">Post Comment</span>
-          <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
-        </button>
-      </form> -->
-
       <form [formGroup]="commentForm" class="comment-form">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Add your comment</mat-label>
@@ -173,7 +153,7 @@ import { UserInterface, UserService } from '../common/services/user.service';
           [threadId]="thread._id"
           [isAuthor]="isCommentAuthor(comment)"
           (likeComment)="toggleLikeComment($event)"
-          (deleteComment)="handleDeleteComment($event)">
+          (commentDeleted)="onCommentDeleted($event)">
         </app-comment>
 
         <!-- Empty State -->
@@ -529,7 +509,7 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
   toggleLikeComment(commentId: string): void {
     if (!this.thread || !this.currentUser) return;
 
-    this.forumService.toggleLikeComment(commentId).pipe(
+    this.forumService.toggleLikeComment(commentId, this.currentUser._id).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: (updatedComment) => {
@@ -544,7 +524,16 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleDeleteComment(commentId: any): void {
+  onCommentDeleted(commentId: any) {
+    this.comments = this.comments.filter(c => c._id !== commentId);
+    this.snackBar.open('Comment has been deleted', 'Close', { duration: 3000 });
+    if (this.thread) {
+      this.thread.commentCount = Math.max(0, this.thread.commentCount - 1);
+    }
+        //this.cd.markForCheck();
+  }
+
+ /*  handleDeleteComment(commentId: any): void {
     if (!this.thread || !this.currentUser) return;
 
     this.forumService.deleteComment(commentId).pipe(
@@ -561,7 +550,7 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
         this.showError('Failed to delete comment');
       }
     });
-  }
+  } */
 
   private updateCommentInList(updatedComment: Comment): void {
     const index = this.comments.findIndex(c => c._id === updatedComment._id);

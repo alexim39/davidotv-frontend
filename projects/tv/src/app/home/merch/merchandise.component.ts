@@ -216,7 +216,27 @@ import { MatChipsModule } from '@angular/material/chips';
   styleUrls: ['./merchandise.component.scss']
 })
 export class MerchandiseComponent implements OnInit {
- @Input() featuredMerch: any[] = [];
+ featuredMerch: any[] = [
+    {
+      id: 1,
+      image: './img/cap.JPG',
+      name: 'Official Davido Cap',
+      price: 29.99
+    },
+    {
+      id: 2,
+      image: './img/shirt.JPG',
+      name: '30BG Logo T-Shirt',
+      price: 24.99
+    },
+    {
+      id: 3,
+      image: './img/hoodie.JPG',
+      name: 'Davido Tour Hoodie',
+      price: 49.99
+    },
+  ];
+  
   currentIndex = 0;
   itemsPerView = 5;
   currentPage = 0;
