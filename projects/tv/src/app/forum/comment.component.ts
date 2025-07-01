@@ -459,7 +459,7 @@ export class CommentComponent implements OnInit, OnDestroy {
 
   onReplyDeleted(replyId: any) {
     this.replies = this.replies.filter(r => r._id !== replyId);
-    this.comment.replyCount = (this.comment.replyCount || 0) - 1;
+    //this.comment.replyCount = (this.comment.replyCount || 0) - 1;
     this.snackBar.open('Reply deleted successfully', 'Close', { duration: 3000 });
     //this.cd.detectChanges();
   }
