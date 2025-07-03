@@ -2,76 +2,117 @@ import {
   Component,
   Input,
   OnInit,
-  HostListener
+  OnDestroy,
+  HostListener,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  ChangeDetectorRef,
+  inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Event as AppEvent } from './event.model'; // rename to avoid conflict with DOM Event
+import { Event } from './event.model';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { EventService } from './event.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { UserInterface, UserService } from '../common/services/user.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { HttpErrorResponse } from '@angular/common/http';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { EventDetailDialogComponent } from './event-detail-dialog.component';
 
 @Component({
   selector: 'app-events-carousel',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule, MatButtonModule],
+  providers: [EventService],
+  imports: [
+    CommonModule, 
+    MatCardModule, 
+    MatProgressBarModule, 
+    MatIconModule, 
+    MatButtonModule, 
+    MatProgressSpinnerModule,
+    MatDialogModule,
+  ],
   template: `
-    <section class="carousel-wrapper">
-      <div class="carousel-header">
-        <h2>
-          Featured Events
-        </h2>
-        <div class="controls">
-          <button mat-icon-button (click)="previous()" [disabled]="current === 0" aria-label="Previous">
-            <mat-icon>chevron_left</mat-icon>
-          </button>
-          <button mat-icon-button (click)="next()" [disabled]="current >= maxSlide" aria-label="Next">
-            <mat-icon>chevron_right</mat-icon>
-          </button>
-        </div>
-      </div>
+   <section class="carousel-wrapper">
+  <div class="carousel-header">
+    <h2><!-- Featured Events --></h2>
+    <div class="controls">
+      <button mat-icon-button (click)="manualPrevious()" aria-label="Previous">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button mat-icon-button (click)="manualNext()" aria-label="Next">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  </div>
 
-      <div class="carousel-content">
-        <div class="carousel-track" [style.transform]="transformStyle">
-          <mat-card
-            class="event-card"
-            *ngFor="let event of events"
-            (click)="handleEventClick(event.id)"
-          >
-            <img mat-card-image [src]="event.imageUrl" [alt]="event.title" />
-            <div class="card-content">
-              <h3>{{ event.title }}</h3>
-              <p class="meta">
-                <mat-icon>event</mat-icon> {{ event.date | date: 'mediumDate' }}
-                <span class="location">
-                  <mat-icon>location_on</mat-icon> {{ event.location }}
-                </span>
-              </p>
-              <div class="buttons">
-                <button mat-flat-button color="primary" (click)="handleTicketClick($event, event.id)">Get Tickets</button>
-                <button mat-stroked-button color="primary" (click)="handleReminderClick($event, event.id)">Remind Me</button>
-              </div>
-            </div>
-          </mat-card>
-        </div>
-      </div>
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 
-      <div class="carousel-indicators">
-        <button
-          *ngFor="let dot of indicators; let i = index"
-          mat-icon-button
-          [class.active]="i === current"
-          (click)="goTo(i)"
-        >
-          <mat-icon>{{ i === current ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
-        </button>
-      </div>
-    </section>
+  <!-- Show error message if present -->
+  <div *ngIf="errorMessage" class="error-message">
+    <mat-icon color="warn">error_outline</mat-icon>
+    {{ errorMessage }}
+  </div>
+
+
+  <div class="carousel-container" *ngIf="!errorMessage && duplicatedEvents.length > 0" #carouselContainer
+       (mouseenter)="pauseAutoScroll()" (mouseleave)="resumeAutoScroll()">
+    <div class="carousel-track" [style.transform]="'translateX(' + offset + 'px)'">
+      <mat-card
+        class="event-card"
+        *ngFor="let event of duplicatedEvents"
+        (mouseenter)="hoveredCard = event._id" 
+        (mouseleave)="hoveredCard = null"
+        [class.paused]="hoveredCard === event._id"
+        (click)="handleEventClick(event)"
+      >
+        <img mat-card-image [src]="event.imageUrl" [alt]="event.title" />
+        <div class="card-content">
+          <h3>{{ event.title }}</h3>
+          <p class="description">{{ event.description }}</p>
+          <p class="meta">
+            <mat-icon>event</mat-icon> {{ event.date | date: 'mediumDate' }}
+            <span class="location">
+              <mat-icon>location_on</mat-icon> {{ event.location }}
+            </span>
+          </p>
+          <div class="buttons">
+            <button mat-flat-button color="primary" (click)="handleTicketClick(event.externalLink); $event.stopPropagation()">
+              Get Tickets
+            </button>
+            <button mat-stroked-button color="primary" (click)="handleReminderClick(event); $event.stopPropagation()" [disabled]="loading || isUserInterested(event)">
+              Remind Me
+            </button>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+
+     
+    
+  </div>
+
+  <!-- Show no events message if not loading, no error, and no events -->
+  <div *ngIf="!errorMessage && duplicatedEvents.length === 0 && !loading" class="no-events-message">
+    <mat-icon color="warn">info</mat-icon>
+    No featured events found.
+  </div>
+</section>
   `,
   styles: [`
     .carousel-wrapper {
       width: 100%;
-      padding: 2rem 1rem;
-      //background: #f9f9f9;
+      padding: 1rem;
+      position: relative;
+      overflow: hidden;
+      margin-top: -3rem;
     }
 
     .carousel-header {
@@ -86,11 +127,8 @@ import { Event as AppEvent } from './event.model'; // rename to avoid conflict w
       margin: 0;
     }
 
-    .controls button {
-      //color: #333;
-    }
-
-    .carousel-content {
+    .carousel-container {
+      width: 100%;
       overflow: hidden;
       position: relative;
     }
@@ -98,28 +136,40 @@ import { Event as AppEvent } from './event.model'; // rename to avoid conflict w
     .carousel-track {
       display: flex;
       gap: 1rem;
-      transition: transform 0.5s ease-in-out;
+      will-change: transform;
+      width: max-content;
     }
 
     .event-card {
-      min-width: 100%;
+      width: 300px;
       flex-shrink: 0;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       cursor: pointer;
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .event-card:hover {
       transform: scale(1.02);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .event-card.paused {
+      animation: pulse 1.5s infinite;
+      box-shadow: 0 0 0 3px #8f0045;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
     }
 
     img[mat-card-image] {
       width: 100%;
-      aspect-ratio: 16 / 9;
+      height: 180px;
       object-fit: cover;
-      max-width: 25em;
     }
 
     .card-content {
@@ -129,7 +179,19 @@ import { Event as AppEvent } from './event.model'; // rename to avoid conflict w
     .card-content h3 {
       margin: 0 0 0.5rem;
       font-size: 1.2rem;
-      //color: #222;
+    }
+
+    .description {
+      font-size: 0.7rem;
+      margin-bottom: 0.5rem;
+      max-height: 3.6rem; /* 2 lines */ 
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* Limit to 2 lines */
+      -webkit-box-orient: vertical; 
+      line-height: 1.2rem;
+      color: #666;
     }
 
     .meta {
@@ -138,6 +200,7 @@ import { Event as AppEvent } from './event.model'; // rename to avoid conflict w
       gap: 1rem;
       color: #666;
       font-size: 0.9rem;
+      margin-bottom: 0.5rem;
     }
 
     .meta mat-icon {
@@ -152,94 +215,204 @@ import { Event as AppEvent } from './event.model'; // rename to avoid conflict w
     }
 
     .buttons {
-      margin-top: 1rem;
       display: flex;
       gap: 0.5rem;
     }
 
-    .carousel-indicators {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-top: 1rem;
+    .buttons button {
+      flex: 1;
     }
 
-    .carousel-indicators button.active mat-icon {
+    .no-events-message, .error-message {
+      text-align: center;
       color: #8f0045;
-    }
-
-    /* Responsive breakpoints */
-    @media (min-width: 600px) {
-      .event-card { min-width: 48%; }
-    }
-
-    @media (min-width: 960px) {
-      .event-card { min-width: 31%; }
-    }
-
-    @media (min-width: 1280px) {
-      .event-card { min-width: 23%; }
+      margin: 2rem 0;
+      font-size: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
     }
   `]
 })
-export class EventsCarouselComponent implements OnInit {
-  @Input() events: AppEvent[] = [];
+export class EventsCarouselComponent implements OnInit, OnDestroy, AfterViewInit {
+  @Input() events: Event[] = [];
+  @ViewChild('carouselContainer') carouselContainer!: ElementRef;
 
-  current = 0;
-  slidesPerView = 1;
+  offset = 0;
+  hoveredCard: string | null = null;
+  duplicatedEvents: Event[] = [];
+  scrollSpeed = 50; // pixels per second
+  animationFrameId: number | null = null;
+  lastTimestamp = 0;
+  isAutoScrollPaused = false;
+  cardWidth = 316; // 300px width + 16px gap
 
-  ngOnInit() {
-    this.updateSlidesPerView();
+  errorMessage: string | null = null;
+  private dialog = inject(MatDialog);
+
+  constructor(
+    private cd: ChangeDetectorRef,
+    private eventService: EventService,
+  ) {}
+
+  private router = inject(Router);
+  subscriptions: Subscription[] = [];
+  private userService = inject(UserService);
+  loading = false;
+  currentUser: UserInterface | null = null;
+  private snackBar = inject(MatSnackBar);
+  
+  ngOnInit(): void {
+    this.loadEvents();
+    this.getCurrentUser();
   }
 
-  @HostListener('window:resize')
-  onResize() {
-    this.updateSlidesPerView();
+  private getCurrentUser() {
+     this.subscriptions.push(
+      this.userService.getCurrentUser$.subscribe({
+        next: (user) => {
+          this.currentUser = user;
+          //console.log('current user ',this.currentUser)
+        }
+      })
+    )
   }
 
-  updateSlidesPerView(): void {
-    const width = window.innerWidth;
-    if (width >= 1280) this.slidesPerView = 4;
-    else if (width >= 960) this.slidesPerView = 3;
-    else if (width >= 600) this.slidesPerView = 2;
-    else this.slidesPerView = 1;
+
+  private loadEvents() {
+    try {
+      // Defensive: handle undefined/null events input
+      if (!this.events || !Array.isArray(this.events) || this.events.length === 0) {
+        this.duplicatedEvents = [];
+        this.errorMessage = 'No featured events available.';
+        return;
+      }
+      // Duplicate events to create seamless loop
+      this.duplicatedEvents = [...this.events, ...this.events];
+      this.errorMessage = null;
+    } catch (err) {
+      this.duplicatedEvents = [];
+      this.errorMessage = 'Failed to load events. Please try again later.';
+      console.error('Error loading events:', err);
+    }
   }
 
-  get maxSlide(): number {
-    return Math.max(0, this.events.length - this.slidesPerView);
+  ngAfterViewInit() {
+    this.startAutoScroll();
   }
 
-  get indicators(): number[] {
-    return Array.from({ length: this.events.length - this.slidesPerView + 1 }, (_, i) => i);
+  ngOnDestroy() {
+    this.stopAutoScroll();
+
+     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  get transformStyle(): string {
-    return `translateX(-${this.current * (100 / this.slidesPerView)}%)`;
+  startAutoScroll() {
+    this.lastTimestamp = performance.now();
+    this.animate();
   }
 
-  previous(): void {
-    if (this.current > 0) this.current--;
+  stopAutoScroll() {
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
   }
 
-  next(): void {
-    if (this.current < this.maxSlide) this.current++;
+  animate(timestamp?: number) {
+    if (!timestamp) timestamp = performance.now();
+    
+    if (!this.isAutoScrollPaused && this.hoveredCard === null) {
+      const deltaTime = timestamp - this.lastTimestamp;
+      this.offset -= (this.scrollSpeed * deltaTime) / 1000;
+      
+      // Reset offset when we've scrolled through one set of events
+      if (Math.abs(this.offset) >= this.cardWidth * this.events.length) {
+        this.offset = 0;
+      }
+      this.cd.detectChanges(); // <-- Add this line
+    }
+    
+    this.lastTimestamp = timestamp;
+    this.animationFrameId = requestAnimationFrame((ts) => this.animate(ts));
   }
 
-  goTo(index: number): void {
-    this.current = index;
+  pauseAutoScroll() {
+    this.isAutoScrollPaused = true;
   }
 
-  handleEventClick(eventId: string): void {
-    console.log('Event clicked:', eventId);
+  resumeAutoScroll() {
+    this.isAutoScrollPaused = false;
+    this.lastTimestamp = performance.now();
   }
 
-  handleTicketClick(e: MouseEvent, eventId: string): void {
-    e.stopPropagation();
-    console.log('Ticket click for:', eventId);
+  manualPrevious() {
+    this.offset += this.cardWidth;
+    if (this.offset > 0) {
+      this.offset = -this.cardWidth * (this.duplicatedEvents.length - 1);
+    }
   }
 
-  handleReminderClick(e: MouseEvent, eventId: string): void {
-    e.stopPropagation();
-    console.log('Reminder set for:', eventId);
+  manualNext() {
+    this.offset -= this.cardWidth;
+    if (Math.abs(this.offset) >= this.cardWidth * this.events.length) {
+      this.offset = 0;
+    }
   }
+
+   handleEventClick(event: Event): void {
+    this.dialog.open(EventDetailDialogComponent, {
+      data: { event },
+      width: '600px',
+      maxWidth: '95vw',
+      autoFocus: false
+    });
+  }
+
+  handleTicketClick(externalLink: string | undefined): void {
+    if (externalLink) {
+      window.open(externalLink, '_blank');
+    }
+  }
+
+
+  handleReminderClick(event: any): void {
+    if (!this.currentUser) {
+      this.snackBar.open('You need to sign in to mark reminder.', 'Close', { duration: 3000 });
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = null;
+    this.cd.detectChanges();
+
+    this.subscriptions.push(
+      this.eventService.markInterest({eventId: event.id, userId: this.currentUser?._id}).subscribe({
+        next: (response) => {
+          this.snackBar.open(response.message, 'Close', { duration: 3000 });
+          this.loading = false;
+          this.cd.detectChanges();
+        },
+        error: (error: HttpErrorResponse) => {
+          let errorMessage = 'Server error occurred, please try again.'; // default error message.
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message; // Use backend's error message if available.
+          }
+          this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
+          this.loading = false;
+          this.errorMessage = errorMessage;
+          this.cd.detectChanges();
+        }
+      })
+    );
+  }
+
+ isUserInterested(event: any): boolean {
+  if (!event.interestedUsers || !this.currentUser) return false;
+  return event.interestedUsers.some(
+    (entry: any) => entry.user && entry.user._id === this.currentUser?._id
+  );
+}
+
+
 }

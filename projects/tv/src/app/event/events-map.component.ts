@@ -127,7 +127,7 @@ import { MatIconModule } from '@angular/material/icon';
 export class EventsMapComponent {
   events: Event[] = [
     {
-      id: '1',
+      _id: '1',
       title: 'Lagos Concert',
       date: new Date('2023-12-15'),
       location: 'Eko Convention Center',
@@ -135,7 +135,7 @@ export class EventsMapComponent {
       mockCoords: { x: 30, y: 60 }
     },
     {
-      id: '2',
+      _id: '2',
       title: 'Abuja Meet & Greet',
       date: new Date('2023-11-20'),
       location: 'International Conference Center',
@@ -143,7 +143,7 @@ export class EventsMapComponent {
       mockCoords: { x: 55, y: 40 }
     },
     {
-      id: '3',
+      _id: '3',
       title: 'Online Listening Party',
       date: new Date('2023-12-01'),
       location: 'Virtual Event',

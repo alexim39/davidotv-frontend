@@ -5,24 +5,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-
+import { Event } from './event.model'
 interface DialogData {
   event: Event;
 }
 
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  date: Date;
-  location: string;
-  imageUrl: string;
-  attendees: number;
-  attendeesList: { name: string; avatar: string }[];
-  price: number;
-  category: string;
-  color?: string;
-}
 
 @Component({
   selector: 'app-event-detail-dialog',
@@ -40,10 +27,10 @@ interface Event {
       <div class="event-header">
         <img [src]="event.imageUrl" [alt]="event.title + ' event image'" width="800" height="300">
         <div class="event-actions">
-          <button mat-icon-button aria-label="Add to favorites">
+          <button mat-icon-button aria-label="Add to favorites" (click)="toggleFavorite()">
             <mat-icon>{{isFavorite ? 'favorite' : 'favorite_border'}}</mat-icon>
           </button>
-          <button mat-icon-button aria-label="Share event">
+          <button mat-icon-button aria-label="Share event" (click)="shareEvent()">
             <mat-icon>share</mat-icon>
           </button>
           <button mat-icon-button mat-dialog-close aria-label="Close dialog">
@@ -80,13 +67,13 @@ interface Event {
             </div>
           </div>
           
-          <div class="meta-item" *ngIf="event.price > 0">
+          <!-- <div class="meta-item" *ngIf="event.price > 0">
             <mat-icon aria-hidden="true">local_offer</mat-icon>
             <div>
               <div class="meta-label">Price</div>
               <div class="meta-value">From $ {{event.price | number}}</div>
             </div>
-          </div>
+          </div> -->
         </div>
         
         <div class="event-description">
@@ -94,7 +81,7 @@ interface Event {
           <p>{{event.description}}</p>
         </div>
         
-        <div class="event-attendees" *ngIf="event.attendeesList.length > 0">
+        <!-- <div class="event-attendees" *ngIf="event.attendeesList.length > 0">
           <h3>Who's going ({{event.attendees}})</h3>
           <div class="attendees-list">
             <div class="attendee" *ngFor="let attendee of event.attendeesList">
@@ -108,15 +95,16 @@ interface Event {
               +{{event.attendees - event.attendeesList.length}} more
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
       
       <div class="event-footer">
         <button mat-flat-button 
                 color="primary" 
                 class="action-button"
-                (click)="handleAction()">
-          {{event.price > 0 ? 'Get Tickets' : 'RSVP'}}
+                (click)="handleAction(event)">
+          <!-- {{event.price > 0 ? 'Get Tickets' : 'RSVP'}} -->
+           Get Tickets
         </button>
         <button mat-stroked-button 
                 color="primary" 
@@ -152,11 +140,11 @@ interface Event {
           gap: 0.5rem;
           
           button {
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
+           // background-color: rgba(139, 139, 139, 0.5);
+           // color: white;
             
             &:hover {
-              background-color: rgba(0, 0, 0, 0.7);
+              background-color: rgba(177, 177, 177, 0.7);
             }
           }
         }
@@ -189,7 +177,7 @@ interface Event {
             
             .meta-label {
               font-size: 0.8rem;
-              color: rgba(0, 0, 0, 0.6);
+              //color: rgba(0, 0, 0, 0.6);
             }
             
             .meta-value {
@@ -253,8 +241,8 @@ interface Event {
               width: 50px;
               height: 50px;
               border-radius: 50%;
-              background-color: #f5f5f5;
-              color: rgba(0, 0, 0, 0.6);
+              //background-color: #f5f5f5;
+              //color: rgba(0, 0, 0, 0.6);
               font-size: 0.8rem;
             }
           }
@@ -265,7 +253,7 @@ interface Event {
         display: flex;
         gap: 1rem;
         padding: 1rem 2rem;
-        border-top: 1px solid rgba(0, 0, 0, 0.12);
+        border-top: 1px solid rgba(79, 79, 79, 0.12);
         
         .action-button {
           flex: 1;
@@ -280,7 +268,7 @@ export class EventDetailDialogComponent {
   isFavorite = false;
 
   // Default mock data if none is provided
-  private defaultEvent: Event = {
+ /*  private defaultEvent: Event = {
     id: '1',
     title: 'Davido Live in Concert',
     description: 'Experience an unforgettable night with Davido performing his greatest hits along with special guests. This event will feature fireworks, special effects, and a full band.',
@@ -298,10 +286,10 @@ export class EventDetailDialogComponent {
     price: 50,
     category: 'concert',
     color: '#3f51b5'
-  };
+  }; */
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) {
-    this.event = data?.event || this.defaultEvent;
+    this.event = data?.event || {};
   }
 
   getDateString(date: Date): string {
@@ -313,24 +301,42 @@ export class EventDetailDialogComponent {
     });
   }
 
-  getTimeString(date: Date): string {
-    return new Date(date).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
+ getTimeString(date: Date): string {
+  // Force UTC to avoid timezone offset issues
+  return new Date(date).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'UTC'
+  });
+}
 
-  handleAction(): void {
-    console.log(this.event.price > 0 ? 'Redirecting to ticket purchase...' : 'Processing RSVP...');
+  handleAction(event: Event): void {
+    //console.log(this.event.price > 0 ? 'Redirecting to ticket purchase...' : 'Processing RSVP...');
     // In a real app, this would navigate to purchase/RSVP flow
+
+    if (event.externalLink) {
+      window.open(event.externalLink, '_blank');
+    }
   }
 
   shareEvent(): void {
-    console.log('Sharing event:', this.event.title);
+    //console.log('Sharing event:', this.event.title);
     // In a real app, this would open native share dialog
+
+    if (navigator.share) {
+      navigator.share({
+        url: window.location.href
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      //this.snackBar.open('Link copied to clipboard!', '', { duration: 2000 });
+    }
   }
 
   toggleFavorite(): void {
     this.isFavorite = !this.isFavorite;
   }
+
+
 }

@@ -1,5 +1,5 @@
 export interface Event {
-  id: string;
+  _id: string;
   title: string;
   description?: string;  // Made optional
   date: Date;
@@ -13,6 +13,14 @@ export interface Event {
     type: 'primary' | 'accent' | 'warn';
     text: string;
   };
+  externalLink?: string; // Made optional
+  interestedUsers?: [
+    {
+      attendedAt: Date,
+      user: { _id: string, name: string; }
+      _id: string
+    }
+  ]
   // Add these new properties for map functionality
   color?: string;
   mockCoords?: {

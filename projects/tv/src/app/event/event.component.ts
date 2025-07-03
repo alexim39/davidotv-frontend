@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -11,7 +11,6 @@ import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { EventsMapComponent } from './events-map.component';
-import { EventCardComponent } from './event-card.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { EventsSidebarComponent } from './events-sidebar.component';
@@ -22,9 +21,12 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { EventsListComponent } from './events-list.component';
+import { Subscription } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-event',
+  providers: [EventService],
   standalone: true,
   imports: [
     MatCardModule,
@@ -59,8 +61,8 @@ import { EventsListComponent } from './events-list.component';
             <button mat-flat-button color="primary" class="search-button">Search</button>
           </div>
           <div class="cta-buttons">
-            <button mat-flat-button color="primary">Browse Events</button>
-            <button mat-stroked-button color="primary">Create Fan Event</button>
+            <!-- <button mat-flat-button color="primary">Creat Event</button> -->
+            <button mat-stroked-button color="primary">Browse Eventst</button>
           </div>
         </div>
       </section>
@@ -68,14 +70,16 @@ import { EventsListComponent } from './events-list.component';
       <!-- Featured Events Carousel -->
       <section class="featured-events">
         <h2 class="section-title">Featured Events</h2>
-        <app-events-carousel [events]="featuredEvents"></app-events-carousel>
+         
+        <app-events-carousel *ngIf="featuredEvents && featuredEvents.length > 0" [events]="featuredEvents"/>
+        <mat-progress-bar *ngIf="loading" mode="indeterminate"/>
       </section>
 
       <!-- Main Content -->
       <div class="main-content" [class.mobile]="isMobile">
         <!-- Desktop Sidebar -->
         <aside class="sidebar" *ngIf="!isMobile">
-          <app-events-sidebar></app-events-sidebar>
+          <app-events-sidebar/>
         </aside>
 
         <!-- Main Events Area -->
@@ -101,17 +105,17 @@ import { EventsListComponent } from './events-list.component';
 
           <!-- Events List -->
           <div *ngIf="viewMode === 'list'">
-            <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+            <!-- <mat-progress-bar *ngIf="loading" mode="indeterminate"/> -->
             
             <div class="events-grid">
-              <app-events-list></app-events-list>
+              <app-events-list [category]="selectedCategory"/>
             </div>
           </div>
           
 
           <!-- Map View -->
           <div *ngIf="viewMode === 'map'" class="map-view">
-            <app-events-map></app-events-map>
+            <app-events-map/>
           </div>
         </main>
       </div>
@@ -234,9 +238,10 @@ import { EventsListComponent } from './events-list.component';
           }
           
           .events-grid {
-            display: grid;
+           /*  display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
+            background: red; */
           }
           
           .map-view {
@@ -250,7 +255,7 @@ import { EventsListComponent } from './events-list.component';
     }
   `]
 })
-export class EventComponent implements OnInit {
+export class EventComponent implements OnInit, OnDestroy {
   events: Event[] = [];
   featuredEvents: Event[] = [];
   categories = ['Concerts', 'Meet & Greets', 'Fan Parties', 'Online Events', 'Viewing Parties', 'Charity Events'];
@@ -259,13 +264,16 @@ export class EventComponent implements OnInit {
   viewMode: 'list' | 'map' = 'list';
   loading = true;
 
+  subscriptions: Subscription[] = [];
+
   constructor(
     private eventService: EventService,
     public dialog: MatDialog,
     private bottomSheet: MatBottomSheet,
     private breakpointObserver: BreakpointObserver,
     private router: Router, 
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cd: ChangeDetectorRef 
   ) {
     this.breakpointObserver.observe([
       Breakpoints.Handset
@@ -275,8 +283,7 @@ export class EventComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadEvents();
-    this.loadFeaturedEvents();
+    this.getFeaturedEvents();
     this.updateViewMode();
   }
 
@@ -285,118 +292,42 @@ export class EventComponent implements OnInit {
     this.viewMode = url.includes('map') ? 'map' : 'list';
   }
 
-  loadEvents(): void {
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  private getFeaturedEvents(): void {
     this.loading = true;
-    // Using mock data instead of service call
-    this.events = this.getMockEvents();
-    this.loading = false;
-  }
+    this.cd.detectChanges();
 
-  loadFeaturedEvents(): void {
-    // Using mock data instead of service call
-    this.featuredEvents = this.getMockFeaturedEvents();
+    this.subscriptions.push(
+      this.eventService.getFeaturedEvents().subscribe({
+        next: (response) => {
+          // Map to expected structure
+          this.featuredEvents = (response.data || []).map((e: Event) => ({
+            id: e._id || e._id,
+            title: e.title,
+            imageUrl: e.imageUrl || '/img/event-banner.png',
+            date: e.date,
+            location: e.location,
+            externalLink: e.externalLink || '',
+            description: e.description || '',
+            interestedUsers: e.interestedUsers
+          }));
+          //console.log('featuredEvents for carousel:', response.data);
+          this.loading = false;
+          this.cd.detectChanges();
+        },
+        error: (eror: HttpErrorResponse) => {
+          this.featuredEvents = [];
+          this.loading = false;
+          this.cd.detectChanges();
+        }
+      })
+    );
   }
-
-  private getMockEvents(): Event[] {
-    return [
-      {
-        id: '1',
-        title: 'Davido Live in Lagos',
-        description: 'Annual homecoming concert with special guests',
-        date: new Date('2023-12-15T20:00:00'),
-        location: 'Eko Convention Center, Lagos',
-        imageUrl: '/img/event-banner.png',
-        attendees: 12500,
-        price: 50,
-        category: 'concert'
-      },
-      // Add more mock events as needed
-    ];
-  }
-
-  private getMockFeaturedEvents(): Event[] {
-    return [
-      {
-        id: '1',
-        title: 'Featured Concert',
-        description: 'Special featured event',
-        date: new Date('2023-12-20T20:00:00'),
-        location: 'National Stadium, Lagos',
-        imageUrl: 'img/davido-banner.png',
-        attendees: 15000,
-        price: 75,
-        category: 'concert'
-      },
-      {
-        id: '1',
-        title: 'Featured Concert',
-        description: 'Special featured event',
-        date: new Date('2023-12-20T20:00:00'),
-        location: 'National Stadium, Lagos',
-        imageUrl: 'img/davido-banner.png',
-        attendees: 15000,
-        price: 75,
-        category: 'concert'
-      },
-      {
-        id: '1',
-        title: 'Featured Concert',
-        description: 'Special featured event',
-        date: new Date('2023-12-20T20:00:00'),
-        location: 'National Stadium, Lagos',
-        imageUrl: 'img/davido-banner.png',
-        attendees: 15000,
-        price: 75,
-        category: 'concert'
-      },
-      {
-        id: '1',
-        title: 'Featured Concert',
-        description: 'Special featured event',
-        date: new Date('2023-12-20T20:00:00'),
-        location: 'National Stadium, Lagos',
-        imageUrl: 'img/davido-banner.png',
-        attendees: 15000,
-        price: 75,
-        category: 'concert'
-      },
-      {
-        id: '1',
-        title: 'Featured Concert',
-        description: 'Special featured event',
-        date: new Date('2023-12-20T20:00:00'),
-        location: 'National Stadium, Lagos',
-        imageUrl: 'img/davido-banner.png',
-        attendees: 15000,
-        price: 75,
-        category: 'concert'
-      },
-      {
-        id: '1',
-        title: 'Featured Concert',
-        description: 'Special featured event',
-        date: new Date('2023-12-20T20:00:00'),
-        location: 'National Stadium, Lagos',
-        imageUrl: 'img/davido-banner.png',
-        attendees: 15000,
-        price: 75,
-        category: 'concert'
-      },
-      {
-        id: '1',
-        title: 'Featured Concert',
-        description: 'Special featured event',
-        date: new Date('2023-12-20T20:00:00'),
-        location: 'National Stadium, Lagos',
-        imageUrl: 'img/davido-banner.png',
-        attendees: 15000,
-        price: 75,
-        category: 'concert'
-      },
-      // Add more featured mock events
-    ];
-  }
-
+  
+  
   openEventDetail(event: Event): void {
     if (this.isMobile) {
       this.bottomSheet.open(EventDetailDialogComponent, {
@@ -421,7 +352,7 @@ export class EventComponent implements OnInit {
 
   onCategoryChange(category: string): void {
     this.selectedCategory = category;
-    this.loadEvents();
+    console.log('Selected category:', this.selectedCategory);
   }
 
   toggleViewMode(): void {
