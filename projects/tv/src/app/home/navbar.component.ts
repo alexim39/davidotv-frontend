@@ -467,7 +467,7 @@ export class NavbarComponent implements OnDestroy, OnInit {
   mobileMenuOpen = false;
   searchQuery = '';
   isAuthenticated = false; // This should come from your auth service
-  notificationsCount = 3; // Example notification count
+  notificationsCount = 0; // Example notification count
   imageSource: string = ''; // User avatar image source
 
   readonly dialog = inject(MatDialog);

@@ -46,15 +46,18 @@ import { RouterModule } from '@angular/router';
         width: 100%;
         padding-right: 2em;
         border-right: 1px solid #ccc;
+        
         mat-list {
           mat-list-item {
             a {
               text-decoration: none;
-              color: rgb(56, 56, 56);
+              //color: rgb(56, 56, 56);
               font-weight: bold;
+              color: #8f0045;
             }
             a:hover {
-              color: rgb(151, 149, 149);
+              //color: rgb(151, 149, 149);
+              color: #ffb1c5;
             }
             a.active {
               color: rgb(151, 149, 149);

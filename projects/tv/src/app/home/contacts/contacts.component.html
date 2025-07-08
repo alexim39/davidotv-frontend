@@ -1,0 +1,170 @@
+
+<section class="head">
+  <article>
+    <h2>Our Contact Details</h2>
+    <!-- <h3>{{course.subTitle}}</h3> -->
+    <div>
+      <p>
+        We're here to help! Whether you have questions, need support, or have general inquiries about DavidoTV, our team is ready to assist you.
+      </p>
+    </div>
+  </article>
+</section>
+  
+<section class="breadcrumb-wrapper">
+  <div class="breadcrumb">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="scrollToTop()">Home</a> &gt;
+      <a routerLink="/contacts" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="scrollToTop()">Support</a> &gt;
+      <span>contacts</span>
+  </div>
+</section>
+
+  
+
+<section class="body">
+  <article class="writeup">
+    <h3>Our Office Addresses</h3>
+
+    <div class="contact-wrapper">
+
+      <div class="contact-details">
+          
+        <!-- <p>Come visit any of our offices to receive answers to all your inquiries. We are delighted to welcome you.</p> -->
+    
+        <div class="address-wrapper">
+          <div class="fa-icon">
+            <div class="fa fa-globe" aria-hidden="true"></div>
+          </div>
+          <div class="address-text">
+            <h6>PH Address (Main Office)</h6>
+            <p>66 Nkpor Road, Rumuolumeni, Port Harcourt, <br>Rivers State, Nigeria</p>
+          </div>
+        </div>
+
+
+        <div class="address-wrapper">
+          <div class="fa-icon">
+            <div class="fa fa-globe" aria-hidden="true"></div>
+          </div>
+          <div class="address-text">
+            <h6>Bonny Address</h6>
+            <p>87 MG Hart Lane, Wilbros road Bonny Island, <br>Rivers State, Nigeria</p>
+          </div>
+        </div>
+
+        <div class="address-wrapper">
+          <div class="fa-icon">
+            <div class="fa fa-send" aria-hidden="true"></div>
+          </div>
+          <div class="address-text">
+            <h6>Emaill Addresses</h6>
+            <p>contact&#64;davidotv.com <!-- <br>support&#64;async.ng, <br>contacts&#64;async.ng --></p>
+          </div>
+        </div>
+
+        <!-- <div class="address-wrapper">
+          <div class="fa-icon">
+            <div class="fa fa-phone" aria-hidden="true"></div>
+          </div>
+          <div class="address-text">
+            <h6>Phone Numbers</h6>
+            <p>
+              <a href="tel:09131301019">09131301019</a>,<br>
+              <a href="tel:09062537816">09062537816</a>
+            </p>
+          </div>
+        </div> -->
+
+      </div>
+
+      <div class="contact-form">
+        <form [formGroup]="contactForm" (submit)="onSubmit()">
+          <div class="form-wrapper">
+            <mat-form-field appearance="outline">
+              <mat-label>Name</mat-label>
+              <input matInput formControlName="name">
+              <mat-error *ngIf="contactForm.get('name')?.hasError('required') ">
+                Name is required
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Surname</mat-label>
+              <input matInput formControlName="surname">
+              <mat-error *ngIf="contactForm.get('surname')?.hasError('required') ">
+                Surname is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Your Email</mat-label>
+            <input matInput type="email" formControlName="email">
+            <mat-error *ngIf="contactForm.get('email')?.hasError('email') ">
+              Email is invalid
+            </mat-error>
+            <mat-error *ngIf="contactForm.get('email')?.hasError('required') ">
+              Email is required
+            </mat-error>
+          </mat-form-field>
+
+          <!-- New Reason Dropdown -->
+          <mat-form-field appearance="outline">
+          <mat-label>Reason for Contact</mat-label>
+          <mat-select formControlName="reason">
+            <mat-option value="" disabled>Select a reason</mat-option>
+            <mat-option value="general">General Inquiry</mat-option>
+            <mat-option value="support">Support</mat-option>
+            <mat-option value="feedback">Feedback</mat-option>
+            <mat-option value="partnership">Partnership</mat-option>
+            <mat-option value="advertising">Advertising</mat-option>
+            <mat-option value="press">Press/Media</mat-option>
+            <mat-option value="careers">Careers/Jobs</mat-option>
+            <mat-option value="technical">Technical Issue</mat-option>
+            <mat-option value="billing">Billing/Payments</mat-option>
+            <mat-option value="content">Content Submission</mat-option>
+            <mat-option value="legal">Legal</mat-option>
+            <mat-option value="privacy">Privacy/Data Request</mat-option>
+            <mat-option value="collaboration">Collaboration</mat-option>
+            <mat-option value="suggestion">Suggestion</mat-option>
+            <mat-option value="complaint">Complaint</mat-option>
+            <mat-option value="other">Other</mat-option>
+          </mat-select>
+          <mat-error *ngIf="contactForm.get('reason')?.hasError('required')">
+            Please select a reason
+          </mat-error>
+        </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Messsage Heading</mat-label>
+            <input matInput formControlName="subject">
+            <mat-error *ngIf="contactForm.get('subject')?.hasError('required') ">
+              Subject is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Leave a message</mat-label>
+            <textarea matInput formControlName="message"></textarea>
+            <mat-error *ngIf="contactForm.get('message')?.hasError('required') ">
+              Messsage is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-progress-bar mode="indeterminate" *ngIf="isSpinning"></mat-progress-bar>
+
+          <div class="btn">
+            <button mat-flat-button color="primary" [disabled]="isSpinning">Submit <i class="fa fa-angle-double-right"></i></button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+    
+  </article>
+
+</section>
+
+<!-- <div class="cta-btn">
+  <h3>Wish to speak to somone?</h3>
+  <a mat-flat-button routerLink="/booking" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="scrollToTop()">Book One-On-One Session</a>
+</div> -->

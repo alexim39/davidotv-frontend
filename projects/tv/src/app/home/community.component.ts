@@ -5,6 +5,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { ForumPageComponent } from '../forum/forum-page.component';
+import { EventsCarouselComponent } from '../event/events-carousel.component';
 
 @Component({
   selector: 'async-community',
@@ -14,7 +15,8 @@ import { ForumPageComponent } from '../forum/forum-page.component';
     MatTabsModule,
     MatCardModule,
     MatButtonModule,
-    ForumPageComponent
+    ForumPageComponent,
+    EventsCarouselComponent
   ],
   template: `
     <section class="community-section">
@@ -54,7 +56,8 @@ import { ForumPageComponent } from '../forum/forum-page.component';
 
         <mat-tab label="Upcoming Events">
           <div class="events-container">
-            <p>No upcoming events at this time. Check back later!</p>
+            <!-- <p>No upcoming events at this time. Check back later!</p> -->
+             <app-events-carousel/>
           </div>
         </mat-tab>
 

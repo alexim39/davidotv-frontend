@@ -55,7 +55,6 @@ import { RouterModule } from '@angular/router';
             <ul>
               <li><a mat-button routerLink="/about">About Us</a></li>
               <li><a mat-button routerLink="/events">Events</a></li>
-              <li><a mat-button routerLink="/gallery">Gallery</a></li>
               <li><a mat-button routerLink="/contact">Contact</a></li>
             </ul>
           </nav>
