@@ -2,6 +2,15 @@ import { Injectable } from "@angular/core";
 import { ApiService } from "./api.service";
 import { Observable } from "rxjs";
 
+export interface VideoInterface {
+  id: string;
+  videoId: string;
+  title: string;
+  channel: string;
+  savedAt: Date;
+  duration: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class VideoService {
   constructor(private apiService: ApiService) {}

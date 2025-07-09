@@ -8,14 +8,18 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { timeAgo as timeAgoUtil, formatDuration as videoDuration } from '../common/utils/time.util';
-import { YoutubeVideoInterface } from '../common/services/youtube.service';
-import { VideoService } from '../common/services/videos.service';
+import { VideoInterface, VideoService } from '../common/services/videos.service';
 import { TruncatePipe } from '../common/pipes/truncate.pipe';
 import { MatDividerModule } from '@angular/material/divider';
 import { Subscription } from 'rxjs';
 import { UserInterface, UserService } from '../common/services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
+import { PlaylistComponent } from './playlist/playlist.component';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDialog } from '@angular/material/dialog';
+import { AddPlaylistDialogComponent } from './playlist/add-video.component';
+import { SavedVideoComponent } from './saved/saved.component';
 
 @Component({
   selector: 'async-library',
@@ -29,8 +33,10 @@ import { HttpErrorResponse } from '@angular/common/http';
     MatTabsModule,
     MatTooltipModule,
     RouterModule,
-    TruncatePipe,
-    MatDividerModule
+    MatDividerModule,
+    PlaylistComponent,
+    MatMenuModule,
+    SavedVideoComponent
   ],
   template: `
     <div class="library-container">
@@ -54,164 +60,122 @@ import { HttpErrorResponse } from '@angular/common/http';
       <div class="content-section">
         <mat-tab-group dynamicHeight>
           <mat-tab label="Saved Videos">
-            <div class="tab-content">
-              <ng-container *ngIf="!isLoading  else loadingTpl">
-                <div class="video-grid" *ngIf="savedVideos.length > 0 && isAuthenticated; else emptyStateTpl">
-                  <mat-card class="video-card" *ngFor="let video of savedVideos" [routerLink]="['/watch', video.videoId]">
-                    <div class="thumbnail-container">
-                      <img [src]="'https://i.ytimg.com/vi/' + video.videoId + '/mqdefault.jpg'" 
-                           alt="{{ video.title }}" 
-                           class="thumbnail">
-                      <div class="duration-badge" *ngIf="video.duration">{{ formatDuration(video.duration) }}</div>
-                      <div class="card-actions">
-                        <button mat-icon-button (click)="removeFromLibrary(video.videoId); $event.stopPropagation()" 
-                                matTooltip="Remove from library">
-                          <mat-icon>delete</mat-icon>
-                        </button>
-                      </div>
-                    </div>
-                    <mat-card-content>
-                      <h3 class="video-title" matTooltip="{{ video.title }}">{{ video.title | truncate:50 }}</h3>
-                      <p class="video-meta">
-                        <span>{{ video.channel }}</span>
-                        <!-- <span>{{ video.views | number }} views</span> -->
-                        <span>saved: {{ timeAgo(video.savedAt) }}</span>
-                      </p>
-                    </mat-card-content>
-                  </mat-card>
-                </div>
-              </ng-container>
-            </div>
+            <async-saved-video/>
           </mat-tab>
 
           <mat-tab label="Playlists">
-            <div class="tab-content">
-              <div class="playlists-empty-state">
-                <mat-icon class="empty-icon">playlist_add</mat-icon>
-                <h3>Your playlists will appear here</h3>
-                <p>Create playlists to organize your favorite Davido content</p>
-                <button mat-flat-button color="primary" class="create-btn">
-                  Create playlist
-                </button>
-              </div>
-            </div>
+            <app-playlist/>
           </mat-tab>
         </mat-tab-group>
       </div>
 
-      <ng-template #loadingTpl>
-        <div class="loading-container">
-          <mat-spinner diameter="50"></mat-spinner>
-          <p>Loading your library...</p>
-        </div>
-      </ng-template>
 
-      <ng-template #emptyStateTpl>
-        <div class="empty-state">
-          <mat-icon class="empty-icon">bookmark_border</mat-icon>
-          <h3>No saved videos yet</h3>
-          <p>Tap the bookmark icon on any video to save it here</p>
-          <button mat-flat-button color="primary" [routerLink]="['/videos']" class="browse-btn">
-            Browse videos
-          </button>
-        </div>
-      </ng-template>
     </div>
   `,
-  styleUrls: ['./library.component.scss']
+styles: [`
+      .header-section {
+  padding: 16px 24px;
+  background-color: var(--background-color);
+  position: relative;
+  top: 0;
+  z-index: 10;
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1800px;
+    margin: 0 auto;
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .header-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        color: var(--primary-color);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 500;
+      }
+    }
+
+    .sort-btn, .clear-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .actions-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+
+.content-section {
+  padding: 16px 24px;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 16px;
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+  max-width: 500px;
+  margin: 0 auto;
+
+  .empty-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+    opacity: 0.7;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+
+  p {
+    margin: 0 0 24px 0;
+    color: var(--text-secondary);
+  }
+
+  .browse-btn, .create-btn {
+    padding: 8px 24px;
+    border-radius: 20px;
+  }
+}
+
+`]
 })
-export class LibraryComponent implements OnInit, OnDestroy {
-  savedVideos: any[] = [];
-  isLoading = true;
-  isAuthenticated = false;
-
-  subscriptions: Subscription[] = [];
-  user: UserInterface | null = null; ;
-  private snackBar = inject(MatSnackBar);
-
-  constructor(
-    private videoService: VideoService,
-    private userService: UserService,
-    private cdRef: ChangeDetectorRef
-  ) {}
-
-  ngOnInit(): void {
-    this.subscriptions.push(
-        this.userService.getCurrentUser$.subscribe({
-            next: (user) => {
-                this.user = user;
-                this.isAuthenticated = !!user;
-                if (this.isAuthenticated) {
-                    this.loadSavedVideos();
-                } else {
-                    this.isLoading = false;
-                }
-            },
-            error: () => {
-                this.isAuthenticated = false;
-                this.isLoading = false;
-            }
-        })
-    );
-}
-
-  loadSavedVideos(): void {
-    // Only proceed if authenticated and user exists
-    if (this.user && this.isAuthenticated) {
-        this.isLoading = true;
-        this.cdRef.detectChanges(); 
-        this.videoService.getSavedVideos(this.user._id).subscribe({
-            next: (response) => {
-              //console.log('saved video ',response.data)
-              this.savedVideos = response.data;
-              this.isLoading = false;
-              this.cdRef.detectChanges();  
-            },
-            error: (error: HttpErrorResponse) => {
-                const errorMessage = error.error?.message || 'Server error occurred, please try again.';
-                this.snackBar.open(errorMessage, 'Ok', {duration: 3000});
-                this.isLoading = false;
-                this.cdRef.detectChanges(); 
-            }
-        });
-    } else {
-        this.isAuthenticated = false;
-    }
-  }
-
-  removeFromLibrary(youtubeVideoId: string): void {
-    if (this.user && this.isAuthenticated) {
-       this.videoService.removeVideoFromLibrary(this.user._id, youtubeVideoId).subscribe({
-        next: (response) => {
-          this.savedVideos = this.savedVideos.filter(v => v.videoId !== youtubeVideoId);
-          this.snackBar.open(response.message, 'Ok',{duration: 3000});
-          this.cdRef.detectChanges(); 
-        },
-        error: (error: HttpErrorResponse) => {
-          let errorMessage = 'Server error occurred, please try again.'; // default error message.
-            if (error.error && error.error.message) {
-              errorMessage = error.error.message; // Use backend's error message if available.
-            }  
-            this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
-            this.cdRef.detectChanges(); 
-        }
-      });
-    } else {
-        this.isAuthenticated = false;
-    }
-   
-  }
-
-  timeAgo(date: string | Date): string {
-    return timeAgoUtil(date);
-  }
-
-  formatDuration(duration: string): string {
-    return videoDuration(duration)
-  }
-
-  ngOnDestroy(): void {
-    // destroy the subscription for user
-    this.subscriptions.forEach(subscription => subscription.unsubscribe());
-  }
-}
+export class LibraryComponent{}
