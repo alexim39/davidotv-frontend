@@ -205,7 +205,7 @@ export class BannerComponent {
     'Upload your remix of Davido songs, and fan art to share with the community.',
     'Vote for your favorite Davido performances and remixes.',
     'Get customized Davido shirts, caps, etc, and exclusive content by being an active fan.',
-    'Be part of an active Davido community and get free giveaways'
+    'Be part of an active fan community and get free giveaways'
   ];
 
   videoUrls: string[] = [
