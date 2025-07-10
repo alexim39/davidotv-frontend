@@ -59,7 +59,8 @@ export const HomeRoutes: Routes = [
             },  
             { path: 'faq', loadComponent: () => import('../faq/faq.component').then(c => c.faqsComponent) },    
             { path: 'about', loadComponent: () => import('../home/about/about.component').then(c => c.AboutComponent) },    
-            { path: 'contact', loadComponent: () => import('../home/contacts/contacts.component').then(c => c.ContactComponent) },    
+            { path: 'contact', loadComponent: () => import('../home/contacts/contacts.component').then(c => c.ContactComponent) }, 
+            { path: 'store', loadChildren: () => import('./../store/store.route').then(r => r.StoreRoutes) },   
         ]
     }
 ];

@@ -10,6 +10,7 @@ import { LibraryService } from '../../library.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserInterface, UserService } from '../../../common/services/user.service';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-video-item',
@@ -54,12 +55,12 @@ import { Subscription } from 'rxjs';
               <mat-icon>auto_delete</mat-icon>
               <span>Remove from playlist</span>
             </button>
-           <!--  <button mat-menu-item>
-              <mat-icon>watch_later</mat-icon>
-              <span>Save to watch later</span>
-            </button> -->
-           <!--  <mat-divider></mat-divider>
-            <button mat-menu-item>
+            <button mat-menu-item (click)="playVideo(video)">
+              <mat-icon>music_video</mat-icon>
+              <span>Play video</span>
+            </button>
+            <!--<mat-divider></mat-divider>
+             <button mat-menu-item (click)="shareVideo(video)">
               <mat-icon>share</mat-icon>
               <span>Share</span>
             </button> -->
@@ -184,6 +185,7 @@ export class VideoItemComponent implements OnInit, OnDestroy {
   private snackBar = inject(MatSnackBar);
   private libraryService = inject(LibraryService);
   private cd = inject(ChangeDetectorRef);
+  private router = inject(Router);
 
   private userService = inject(UserService);
   currentUser: UserInterface | null = null;
@@ -240,6 +242,21 @@ export class VideoItemComponent implements OnInit, OnDestroy {
           this.cd.detectChanges();
         }
       });
+    }
+  }
+
+  playVideo(video: any) {
+    this.router.navigate(['/watch', video.youtubeVideoId]);
+  }
+  
+  shareVideo(video: any) {
+    if (navigator.share) {
+      navigator.share({
+        url: window.location.href
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      this.snackBar.open('Link copied to clipboard!', '', { duration: 2000 });
     }
   }
 }

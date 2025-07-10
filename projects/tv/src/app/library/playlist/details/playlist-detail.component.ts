@@ -17,9 +17,6 @@ import { ConfirmationDialogComponent } from './confirmation-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subscription } from 'rxjs';
 import { UserInterface, UserService } from '../../../common/services/user.service';
-//import { PlaylistEditDialogComponent } from '../playlist-edit-dialog/playlist-edit-dialog.component';
-//import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
-//import { VideoItemComponent } from '../video-item/video-item.component';
 
 @Component({
   selector: 'app-playlist-detail',
@@ -60,11 +57,11 @@ import { UserInterface, UserService } from '../../../common/services/user.servic
               <mat-icon>delete</mat-icon>
               <span>Delete playlist</span>
             </button>
-            <!-- <mat-divider></mat-divider>
-             <button mat-menu-item>
+            <mat-divider></mat-divider>
+             <button mat-menu-item (click)="shareVideo()" [disabled]="!playlist.isPublic">
               <mat-icon>share</mat-icon>
               <span>Share</span>
-            </button> -->
+            </button>
           </mat-menu>
         </div>
       </div>
@@ -81,7 +78,7 @@ import { UserInterface, UserService } from '../../../common/services/user.servic
         <div class="playlist-info-section">
           <div class="playlist-thumbnail">
             <img [src]="getPlaylistThumbnail()" alt="Playlist thumbnail" class="thumbnail-image">
-            <div class="video-count">{{ playlist.videos?.length || 0 }} videos</div>
+            <div class="video-count">{{ playlist.videoCount || 0 }} videos</div>
           </div>
           
           <div class="playlist-meta">
@@ -101,18 +98,18 @@ import { UserInterface, UserService } from '../../../common/services/user.servic
             </div>
             
             <div class="playlist-actions">
-              <button mat-raised-button color="primary" class="play-all-button">
+              <button mat-stroked-button color="primary" class="play-all-button">
                 <mat-icon>play_arrow</mat-icon>
                 PLAY ALL
               </button>
-              <button mat-stroked-button class="shuffle-button">
+              <button mat-raised-button class="shuffle-button">
                 <mat-icon>shuffle</mat-icon>
                 SHUFFLE
               </button>
               <!-- <button mat-icon-button matTooltip="Save to library">
                 <mat-icon>bookmark_add</mat-icon>
               </button> -->
-              <button mat-icon-button matTooltip="Share">
+              <button mat-icon-button matTooltip="Share" (click)="shareVideo()" [disabled]="!playlist.isPublic">
                 <mat-icon>share</mat-icon>
               </button>
             </div>
@@ -473,6 +470,7 @@ export class PlaylistDetailComponent implements OnInit, OnDestroy {
       this.playlistId = playlistId; // set playlist id for video item component
       this.libraryService.getPlaylistById(playlistId).subscribe({
         next: (response) => {
+          //console.log('pl ', response.data)
           this.playlist = response.data;
           this.loading = false;
           this.cd.detectChanges();
@@ -578,13 +576,24 @@ export class PlaylistDetailComponent implements OnInit, OnDestroy {
     });
   }
 
- onVideoRemoved(videoId: string): void {
-  if (!this.playlist?.videos) return;
-  
-  // Create a new array reference for change detection
-  this.playlist = {
-    ...this.playlist,
-    videos: this.playlist.videos.filter((video: any) => video.youtubeVideoId !== videoId)
-  };
-}
+  onVideoRemoved(videoId: string): void {
+    if (!this.playlist?.videos) return;
+    
+    // Create a new array reference for change detection
+    this.playlist = {
+      ...this.playlist,
+      videos: this.playlist.videos.filter((video: any) => video.youtubeVideoId !== videoId)
+    };
+  }
+
+  shareVideo() {
+    if (navigator.share) {
+      navigator.share({
+        url: window.location.href
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      this.snackBar.open('Link copied to clipboard!', '', { duration: 2000 });
+    }
+  }
 }

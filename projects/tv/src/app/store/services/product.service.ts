@@ -1,84 +1,174 @@
 import { Injectable } from '@angular/core';
-import { Product, ProductFilter } from '../models/product.model';
-import { mockProducts } from './../product.mock-data';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, delay, tap } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  type: string;
+  rating: number;
+  reviews: number;
+  isNew: boolean;
+  isLimited: boolean;
+  stock: number;
+  createdAt: Date;
+}
+
+@Injectable()
 export class ProductService {
-  private products: Product[] = mockProducts;
+  private products: Product[] = [];
+  private apiUrl = 'api/products'; // In a real app, this would be your backend API endpoint
 
-  getProducts(filter?: ProductFilter): Product[] {
-    let result = [...this.products];
+  constructor(private http: HttpClient) {
+    this.initializeMockData();
+  }
+
+  // Initialize mock data for demonstration
+  private initializeMockData() {
+    const categories = [
+      { id: 'clothing', name: 'Apparel & Fashion' },
+      { id: 'accessories', name: 'Accessories' },
+      { id: 'merch', name: 'Home & Lifestyle' },
+      { id: 'music', name: 'Music & Collectibles' },
+      { id: 'limited', name: 'Exclusive' }
+    ];
+
+    const types = ['Standard', 'Premium', 'Exclusive', 'Limited Edition'];
+
+    // Generate mock products
+    for (let i = 1; i <= 50; i++) {
+      const category = categories[i % categories.length];
+      const isNew = i <= 10;
+      const isLimited = category.id === 'limited' || i % 7 === 0;
+      
+      this.products.push({
+        id: `${category.id}-${i}`,
+        name: `Davido ${category.name.split(' ')[0]} ${i}`,
+        description: `Official Davido ${category.name.toLowerCase()} product. ${isLimited ? 'Limited availability!' : ''}`,
+        price: 19.99 + (i * 3) + (isLimited ? 20 : 0),
+        image: this.getRandomProductImage(),
+        category: category.id,
+        type: types[i % types.length],
+        rating: Math.floor(Math.random() * 2) + 3, // 3-5 stars
+        reviews: Math.floor(Math.random() * 50),
+        isNew,
+        isLimited,
+        stock: isLimited ? Math.floor(Math.random() * 20) + 5 : Math.floor(Math.random() * 100) + 20,
+        createdAt: new Date(Date.now() - (i * 24 * 60 * 60 * 1000)) // Staggered dates
+      });
+    }
+  }
+
+  private getRandomProductImage(): string {
+    const images = [
+      'https://m.media-amazon.com/images/I/61-jBuhtgZL._AC_UY1100_.jpg',
+      'https://i.ebayimg.com/images/g/9~AAAOSwPc9V2H6~/s-l1600.jpg',
+      'https://i5.walmartimages.com/asr/9a9f8f3f-5a5e-4f9b-8b8e-5e8f5b5e5e5e_1.3b9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c.jpeg',
+      'https://static-01.daraz.com.np/p/7a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a.jpg',
+      'https://example.com/path/to/product-image-1.jpg',
+      'https://example.com/path/to/product-image-2.jpg',
+      'https://example.com/path/to/product-image-3.jpg'
+    ];
+    return images[Math.floor(Math.random() * images.length)];
+  }
+
+  // Get all products (with optional pagination)
+  getProducts(page: number = 1, limit: number = 12): Observable<{ products: Product[]; total: number }> {
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const paginatedProducts = this.products.slice(start, end);
     
-    if (filter) {
-      if (filter.category) {
-        result = result.filter(p => p.categories.includes(filter.category!));
-      }
-      
-      if (filter.priceMin) {
-        result = result.filter(p => p.price >= filter.priceMin!);
-      }
-      
-      if (filter.priceMax) {
-        result = result.filter(p => p.price <= filter.priceMax!);
-      }
-      
-      if (filter.colors?.length) {
-        result = result.filter(p => 
-          p.colors.some(c => filter.colors!.includes(c.name))
-        );
-      }
-      
-      if (filter.sizes?.length) {
-        result = result.filter(p => 
-          p.sizes.some(s => filter.sizes!.includes(s))
-        );
-      }
-      
-      if (filter.sortBy) {
-        switch (filter.sortBy) {
-          case 'price-asc':
-            result.sort((a, b) => a.price - b.price);
-            break;
-          case 'price-desc':
-            result.sort((a, b) => b.price - a.price);
-            break;
-          case 'newest':
-            // Assuming newer products have higher IDs
-            result.sort((a, b) => parseInt(b.id) - parseInt(a.id));
-            break;
-          case 'popular':
-            result.sort((a, b) => b.rating - a.rating);
-            break;
-        }
-      }
+    // Simulate API delay
+    return of({
+      products: paginatedProducts,
+      total: this.products.length
+    }).pipe(delay(500));
+  }
+
+  // Get products by category
+  getProductsByCategory(categoryId: string, page: number = 1, limit: number = 12): Observable<{ products: Product[]; total: number }> {
+    let filteredProducts = this.products;
+    
+    if (categoryId !== 'all') {
+      filteredProducts = this.products.filter(p => p.category === categoryId);
     }
     
-    return result;
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const paginatedProducts = filteredProducts.slice(start, end);
+    
+    return of({
+      products: paginatedProducts,
+      total: filteredProducts.length
+    }).pipe(delay(500));
   }
 
-  getProductById(id: string): Product {
+  // Get featured products
+  getFeaturedProducts(limit: number = 4): Observable<Product[]> {
+    const featured = this.products
+      .sort((a, b) => b.rating - a.rating || b.reviews - a.reviews)
+      .slice(0, limit);
+    
+    return of(featured).pipe(delay(300));
+  }
+
+  // Get new arrivals
+  getNewArrivals(limit: number = 4): Observable<Product[]> {
+    const newArrivals = this.products
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit);
+    
+    return of(newArrivals).pipe(delay(300));
+  }
+
+  // Get limited edition products
+  getLimitedEdition(limit: number = 4): Observable<Product[]> {
+    const limited = this.products
+      .filter(p => p.isLimited)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit);
+    
+    return of(limited).pipe(delay(300));
+  }
+
+  // Get a single product by ID
+  getProductById(id: string): Observable<Product | undefined> {
     const product = this.products.find(p => p.id === id);
-    if (!product) throw new Error(`Product with ID ${id} not found`);
-    return product;
+    return of(product).pipe(
+      delay(300),
+      tap(p => {
+        if (!p) {
+          console.warn(`Product with ID ${id} not found`);
+        }
+      })
+    );
   }
 
-  getFeaturedProducts(): Product[] {
-    return this.products.filter(p => p.isFeatured).slice(0, 8);
+  // Search products
+  searchProducts(query: string): Observable<Product[]> {
+    const normalizedQuery = query.toLowerCase();
+    const results = this.products.filter(p => 
+      p.name.toLowerCase().includes(normalizedQuery) || 
+      p.description.toLowerCase().includes(normalizedQuery)
+    );
+    
+    return of(results).pipe(delay(500));
   }
 
-  getNewArrivals(): Product[] {
-    return this.products.filter(p => p.isNew).slice(0, 8);
-  }
-
-  getRelatedProducts(productId: string): Product[] {
-    const product = this.getProductById(productId);
-    return this.products
-      .filter(p => 
-        p.id !== productId && 
-        p.categories.some(c => product.categories.includes(c))
-      )
-      .slice(0, 4);
+  // Get related products (for product detail page)
+  getRelatedProducts(productId: string, limit: number = 4): Observable<Product[]> {
+    const product = this.products.find(p => p.id === productId);
+    if (!product) return of([]);
+    
+    const related = this.products
+      .filter(p => p.id !== productId && p.category === product.category)
+      .sort(() => 0.5 - Math.random()) // Randomize
+      .slice(0, limit);
+    
+    return of(related).pipe(delay(300));
   }
 }

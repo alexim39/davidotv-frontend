@@ -186,10 +186,11 @@ export class TrendingComponent implements OnInit, OnDestroy {
     private youtubeService: YoutubeService
   ) {
     this.videos = []; // Initialize videos array
-    this.updateItemsPerView(false);
+    
   }
 
   ngOnInit() {
+    this.updateItemsPerView(false);
     this.fetchVideos();
   }
 
@@ -199,9 +200,10 @@ export class TrendingComponent implements OnInit, OnDestroy {
 
   private fetchVideos() {
     this.loading = true;
+    this.cdr.markForCheck();
     this.videoSubscription = this.youtubeService.getTrendingVideos().subscribe({
       next: (response: any) => {
-        console.log('data ',response)
+        //console.log('data ',response)
         if (response) {
           this.videos = response.data.map((video: any) => ({
             youtubeVideoId: video.youtubeVideoId,
@@ -214,12 +216,12 @@ export class TrendingComponent implements OnInit, OnDestroy {
         }
         this.loading = false;
         this.updateItemsPerView();
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Error fetching videos:', error);
         this.loading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       }
     });
   }

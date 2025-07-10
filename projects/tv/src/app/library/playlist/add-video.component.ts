@@ -61,7 +61,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
             <div *ngFor="let playlist of playlists" class="playlist-item" (click)="addVideoToPlaylist(playlist._id)">
               <div class="playlist-thumbnail">
                 <img [src]="getPlaylistThumbnail(playlist)" alt="Playlist thumbnail">
-                <div class="video-count">{{ playlist.videos?.length || 0 }} videos</div>
+                <div class="video-count">{{ playlist.videoCount || 0 }} videos</div>
               </div>
               
               <div class="playlist-info">

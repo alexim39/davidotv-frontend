@@ -1,24 +1,36 @@
 import { Routes } from "@angular/router";
-import { ShopHomeComponent } from "./pages/shop-home.component";
-import { ProductListComponent } from "./pages/product-list.component";
-import { ProductDetailComponent } from "./pages/product-detail.component";
-import { CheckoutComponent } from "./pages/checkout.component";
-import { CartComponent } from "./pages/cart.component";
-
+import { ShopHomeComponent } from "./pages/home.component";
+import { ShopIndexComponent } from "./pages/index.component";
+import { ShopCategoryComponent } from "./pages/category/category.component";
+import { ProductDetailComponent } from "./pages/product/product-detail";
+import { CartPageComponent } from "./pages/cart/cart.component";
+import { CheckoutPageComponent } from "./pages/cart/checkout.component";
 
 export const StoreRoutes: Routes = [
-  { path: '', component: ShopHomeComponent },
-  { path: 'category/:categoryId', component: ProductListComponent },
-  { path: 'product/:id', component: ProductDetailComponent },
-  { path: 'cart', component: CartComponent },
   { 
-    path: 'checkout',
-    component: CheckoutComponent,
-    /* children: [
-      { path: 'shipping', component: ShippingStepComponent },
-      { path: 'payment', component: PaymentStepComponent },
-      { path: 'review', component: ReviewStepComponent },
-      { path: '', redirectTo: 'shipping', pathMatch: 'full' }
-    ] */
-  }
+    path: '', 
+    component: ShopIndexComponent, 
+    children: [
+      {
+        path: '', 
+        component: ShopHomeComponent, 
+      },
+      {
+        path: 'category/:id',
+        component: ShopCategoryComponent
+      },
+      {
+        path: 'product/:id',
+        component: ProductDetailComponent
+      },
+      {
+        path: 'cart',
+        component: CartPageComponent
+      },
+      {
+        path: 'checkout',
+        component: CheckoutPageComponent
+      }
+    ]
+  },
 ];

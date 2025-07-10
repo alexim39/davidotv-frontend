@@ -27,7 +27,7 @@ import { MatButtonModule } from '@angular/material/button';
               EliteSpace (₦50,000)
             </a>  -->
             
-            <a mat-button routerLink="plans" routerLinkActive="active" 
+            <a mat-button routerLink="about" routerLinkActive="active" 
                [routerLinkActiveOptions]="{ exact: true }" 
                (click)="scrollToTop()" class="cta-link">
               Click here for more information
