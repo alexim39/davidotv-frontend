@@ -319,6 +319,7 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
     this.subscriptions.push(
       this.eventService.getAllEvents().subscribe({
         next: (response) => {
+          //console.log('returned events ',response.data)
           // Map to expected structure
           this.events = (response.data || []).map((e: Event) => ({
             id: e._id || e._id,
@@ -356,14 +357,14 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   getTimeString(date: Date): string {
-  // Force UTC to avoid timezone offset issues
-  return new Date(date).toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-    timeZone: 'UTC'
-  });
-}
+    // Force UTC to avoid timezone offset issues
+    return new Date(date).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+      timeZone: 'UTC'
+    });
+  }
 
   handleCardClick(e: MouseEvent, event: Event): void {
     e.stopPropagation();
