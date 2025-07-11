@@ -181,7 +181,7 @@ import { HttpErrorResponse } from '@angular/common/http';
       
       .featured-events {
         padding: 2rem;
-        background-color:rgb(16, 8, 8, 0.8);
+        background-color:rgb(16, 8, 8, 0.2);
         //border-radius: 10px;
         //margin: 0.5em 0;
         

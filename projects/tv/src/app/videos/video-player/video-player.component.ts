@@ -49,7 +49,7 @@ declare global {
         <div class="header-content">
           <div class="logo-container">
             <img src="./img/logo2.PNG" alt="DavidoTv Logo" class="logo">
-            <h1>DavidoTV</h1>
+            <!-- <h1>DavidoTV</h1> -->
           </div>
           <div class="header-actions">
             <button mat-raised-button class="subscribe-btn">
@@ -115,7 +115,7 @@ declare global {
                   mode="determinate" 
                   [value]="(currentTime / duration) * 100"
                   aria-label="Video progress"
-                ></mat-progress-bar>
+                />
                 <div class="time-display">{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</div>
               </div>
             </div>
@@ -123,7 +123,7 @@ declare global {
 
           <ng-template #loadingTpl>
             <div class="loading-container">
-              <mat-spinner diameter="50"></mat-spinner>
+              <mat-spinner diameter="50"/>
               <p class="loading-text">Loading Davido's content...</p>
             </div>
           </ng-template>

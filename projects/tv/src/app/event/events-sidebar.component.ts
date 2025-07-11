@@ -189,7 +189,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
             font-size: 0.9rem;
             
             &:nth-child(2) {
-              color: rgba(161, 161, 161, 0.6);
+              color: #666;
               font-size: 0.8rem;
             }
           }
@@ -200,7 +200,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
   .not-signed-in-message {
     text-align: center;
-    //color: #8f0045;
     margin: 1rem 0;
     font-size: 1rem;
     display: flex;
@@ -229,7 +228,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
       margin-right: 0.3em;
     }
     .event-location {
-      color: #888;
+      color: #666;
       font-size: 0.75em;
     }
   }
@@ -263,14 +262,13 @@ mat-list-item {
     padding: 1em 0;
     .event-title {
       font-weight: 500;
-      //color: #8f0045;
       font-size: 1em;
     }
     .event-location {
       display: flex;
       align-items: center;
       font-size: 0.92em;
-      color: #888;
+      color: #666;
       mat-icon {
         margin-right: 0.2em;
         font-size: 1em;

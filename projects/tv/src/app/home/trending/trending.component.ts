@@ -8,7 +8,7 @@ import { MatChipsModule } from "@angular/material/chips";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { timeAgo as timeAgoUtil, formatViewCount as viewFormat } from '../../common/utils/time.util';
+import { timeAgo as timeAgoUtil, formatViewCount as viewFormat, formatDuration as videoDuration, } from '../../common/utils/time.util';
 import { HomeService } from "../home.service";
 import { Subscription } from 'rxjs';
 import { YoutubeService } from "../../common/services/youtube.service";
@@ -100,9 +100,9 @@ import { YoutubeService } from "../../common/services/youtube.service";
                       loading="lazy"
                       (load)="onImageLoad()"
                     >
-                    <!-- <div class="duration-overlay" *ngIf="video.duration">
-                      {{video.duration}}
-                    </div> -->
+                    <div class="duration-overlay">
+                      {{ formatDuration(video.duration) }}
+                    </div>
                   </div>
                   <mat-card-content>
                     <div class="video-info">
@@ -202,8 +202,7 @@ export class TrendingComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.cdr.markForCheck();
     this.videoSubscription = this.youtubeService.getTrendingVideos().subscribe({
-      next: (response: any) => {
-        //console.log('data ',response)
+      next: (response: any) => {        
         if (response) {
           this.videos = response.data.map((video: any) => ({
             youtubeVideoId: video.youtubeVideoId,
@@ -212,6 +211,7 @@ export class TrendingComponent implements OnInit, OnDestroy {
             channel: video.channel,
             views: (video.views ? video.views : 0),
             publishedAt: video.publishedAt,
+            duration: video.duration || ''
           }));
         }
         this.loading = false;
@@ -301,16 +301,8 @@ export class TrendingComponent implements OnInit, OnDestroy {
     return viewFormat(views);
   }
 
-  formatDuration(seconds: number): string {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    } else {
-      return `${minutes}:${secs.toString().padStart(2, '0')}`;
-    }
+   formatDuration(duration: string): string {
+      return videoDuration(duration);
   }
 
   retry(): void {

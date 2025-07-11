@@ -53,7 +53,7 @@ import { EventDetailDialogComponent } from './event-detail-dialog.component';
     </div>
   </div>
 
-  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"/>
 
   <!-- Show error message if present -->
   <div *ngIf="errorMessage" class="error-message">

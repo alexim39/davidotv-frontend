@@ -43,7 +43,7 @@ import { tap, filter, switchMap } from 'rxjs/operators';
       <div class="content-section">
         
             <div class="tab-content">
-              <ng-container *ngIf="!isLoading  else loadingTpl">
+              <ng-container *ngIf="!isLoading || !user  else loadingTpl">
                 <div class="video-grid" *ngIf="savedVideos.length > 0 && isAuthenticated; else emptyStateTpl">
                   <mat-card class="video-card" *ngFor="let video of savedVideos" [routerLink]="['/watch', video.videoId]">
                     <div class="thumbnail-container">

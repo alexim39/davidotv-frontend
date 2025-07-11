@@ -172,7 +172,7 @@ import { MatDialog } from '@angular/material/dialog';
       }
 
       &.active {
-        //background-color: #e6e6e6;
+        background-color: #666;
         font-weight: 600;
 
         mat-icon {

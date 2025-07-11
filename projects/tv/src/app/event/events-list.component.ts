@@ -191,7 +191,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       align-items: center;
       margin-bottom: 0.5rem;
       font-size: 0.9rem;
-      color: rgba(220, 220, 220, 0.6);
+      color: #666;
     }
     .event-date mat-icon,
     .event-location mat-icon,
@@ -200,7 +200,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       width: 1rem;
       height: 1rem;
       margin-right: 0.5rem;
-      color: #3f51b5;
+      color: #8f0045;
     }
     mat-card-actions {
       padding: 0 1rem 1rem;
