@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #aaa;
+  color: #666;
   font-size: 0.9rem;
   cursor: pointer;
 }
@@ -29,6 +29,12 @@
   display: flex;
   gap: 16px;
   margin-bottom: 24px;
+  .profile {
+    .name {
+      margin-top: -0.1em;
+      color: #666;
+    }
+  }
 }
 
 .user-avatar {

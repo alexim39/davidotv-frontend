@@ -1,7 +1,7 @@
 // src/app/common/services/comment.service.ts
 import { Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
-import { ApiService } from '../../../common/services/api.service';
+import { ApiService } from '../../common/services/api.service';
 
 export interface Comment {
   _id?: string;

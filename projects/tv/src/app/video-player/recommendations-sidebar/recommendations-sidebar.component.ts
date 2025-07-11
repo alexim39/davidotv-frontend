@@ -2,9 +2,10 @@ import { Component, Input, Output, EventEmitter, HostListener, OnInit, OnChanges
 import { CommonModule } from '@angular/common';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
-import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat } from '../../../common/utils/time.util';
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat } from '../../common/utils/time.util';
 import { debounceTime, filter, fromEvent } from 'rxjs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { UserInterface } from '../../common/services/user.service';
 
 @Component({
   selector: 'async-recommendations-sidebar',
@@ -16,7 +17,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         <h3>Up Next</h3>
         <div class="autoplay-toggle">
           <span>Autoplay</span>
-          <mat-slide-toggle [(ngModel)]="autoplay" (change)="autoplayChanged.emit(autoplay)"></mat-slide-toggle>
+          <mat-slide-toggle [(ngModel)]="autoplay" (change)="autoplayChanged()"/>
         </div>
       </div>
       
@@ -34,7 +35,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         </div>
         
         <div *ngIf="isLoading" class="loading-more">
-          <mat-spinner diameter="20"></mat-spinner> Loading videos!
+          <mat-spinner diameter="20"/> Loading videos!
         </div>
         
         <div *ngIf="!hasMoreVideos && recommendedVideos.length > 0" class="no-more-videos">
@@ -45,15 +46,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   `,
   styleUrls: ['./recommendations-sidebar.component.scss']
 })
-export class RecommendationsSidebarComponent implements OnChanges {
+export class RecommendationsSidebarComponent implements OnChanges, OnInit {
 
   @Input() recommendedVideos: any[] = [];
   @Input() isLoading: boolean = false;
   @Input() hasMoreVideos: boolean = true;
-  @Input() autoplay: boolean = false;
+  autoplay: boolean = false;
+  @Input() currentUser: UserInterface | null = null;
   
   @Output() navigateToVideo = new EventEmitter<string>();
-  @Output() autoplayChanged = new EventEmitter<boolean>();
   @Output() loadMore = new EventEmitter<void>(); 
 
     @ViewChild('scrollContainer') scrollContainer!: ElementRef;
@@ -64,6 +65,12 @@ export class RecommendationsSidebarComponent implements OnChanges {
   private lastScrollPosition = 0;
 
   constructor(private cdr: ChangeDetectorRef) {}
+
+  ngOnInit(): void {
+    if (this.currentUser) {
+      this.autoplay = this.currentUser.preferences?.autoplay || false;;
+    }
+  }
 
   ngOnChanges() {
     this.cdr.detectChanges();
@@ -99,6 +106,10 @@ export class RecommendationsSidebarComponent implements OnChanges {
     return (el.scrollHeight - el.scrollTop - el.clientHeight) < scrollThreshold;
   }
 
+  autoplayChanged() {
+    // send backend code to change autoplay
+  }
+
  
 
   @HostListener('window:scroll')
@@ -125,11 +136,5 @@ export class RecommendationsSidebarComponent implements OnChanges {
       this.loadMore.emit();
     }
   }
-
- /*  loadMoreVideos() {
-    if (!this.isLoadingMore && this.hasMoreVideos) {
-      this.loadMore.emit();
-    }
-  } */
 
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError, tap } from 'rxjs';
-import { ApiService } from '../../common/services/api.service';
+import { Observable } from 'rxjs';
+import { ApiService } from '../common/services/api.service';
 import { HttpParams } from '@angular/common/http';
 
 interface PlaylistResponse {
@@ -31,12 +31,6 @@ export class PlaylistService {
       params = params.set('menuType', menuType);
     }
 
-    return this.apiService.get<PlaylistResponse>(`youtube/videos/playlist`, params).pipe(
-      //tap((response: PlaylistResponse) => console.log('API Response:', response)),
-      catchError((error: any) => {
-        console.error('API Error:', error);
-        return throwError(() => new Error('Failed to load videos'));
-      })
-    );
+    return this.apiService.get<PlaylistResponse>(`youtube/videos/playlist`, params);
   }
 }

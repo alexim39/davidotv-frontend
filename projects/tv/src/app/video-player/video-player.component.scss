@@ -169,6 +169,9 @@ $breakpoint-mobile: 768px;
     
     .left-controls, .right-controls {
       @include flex-center(8px);
+      button {
+        color: white;
+      }
     }
   }
   
@@ -397,7 +400,7 @@ button.mat-icon-button {
           font-size: 0.9rem;
           
           @media (max-width: $breakpoint-mobile) {
-            display: none;
+            display: block;
           }
           
           mat-icon {

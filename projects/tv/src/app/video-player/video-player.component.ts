@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, HostListener, OnDestroy, NgZone } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, HostListener, OnDestroy, NgZone, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
@@ -10,12 +10,12 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { PlaylistService } from './playlist.service';
-import { YoutubeService, YoutubeVideoInterface } from '../../common/services/youtube.service';
-import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat, formatLikeCount as likeFormat, formatDislikesCount as dislikesFormat } from '../../common/utils/time.util';
+import { YoutubeService, YoutubeVideoInterface } from '../common/services/youtube.service';
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat, formatLikeCount as likeFormat, formatDislikesCount as dislikesFormat } from '../common/utils/time.util';
 import { Subscription, timer } from 'rxjs';
-import { UserInterface, UserService } from '../../common/services/user.service';
+import { UserInterface, UserService } from '../common/services/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { VideoService } from '../../common/services/videos.service';
+import { VideoService } from '../common/services/videos.service';
 import { VideoCommentsComponent } from './video-comments/video-comments.component';
 import { RecommendationsSidebarComponent } from './recommendations-sidebar/recommendations-sidebar.component';
 import { VideoCommentService, Comment } from './video-comments/video-comments.service';
@@ -82,7 +82,7 @@ declare global {
             </div>
 
             <div class="repeat-indicator" *ngIf="repeatMode !== 'none'">
-              Repeat {{ repeatMode === 'one' ? '1' : 'All' }}
+              Repeat 1
             </div>
 
             <div class="video-controls" *ngIf="!isLoading" [class.hidden]="!showControls && isPlaying">
@@ -98,6 +98,10 @@ declare global {
                   </button>
                   <button mat-icon-button (click)="skipForward()" aria-label="Skip forward 10 seconds">
                     <mat-icon>forward_10</mat-icon>
+                  </button>
+                  <!-- Add this new button -->
+                  <button mat-icon-button (click)="playNextRecommendedVideo()" aria-label="Play next video">
+                    <mat-icon>skip_next</mat-icon>
                   </button>
                   <button mat-icon-button (click)="toggleMute()" aria-label="Toggle mute">
                     <mat-icon>{{ isMuted ? 'volume_off' : 'volume_up' }}</mat-icon>
@@ -185,7 +189,7 @@ declare global {
                     </button>
                     
                     <button mat-mini-fab class="action-btn" (click)="toggleRepeatMode()" [class.active]="repeatMode !== 'none'" matTooltip="Repeat">
-                      <mat-icon>{{ repeatMode === 'one' ? 'repeat_one' : 'repeat' }}</mat-icon>
+                      <mat-icon>repeat_one</mat-icon>
                     </button>
                     
                     <div class="view-count" matTooltip="App Views">
@@ -209,15 +213,14 @@ declare global {
           </div>
         </section>
 
-        <section class="recommendations-section">
+        <section class="recommendations-section" *ngIf="user">
           <async-recommendations-sidebar 
             *ngIf="recommendedVideos.length > 0 || isLoadingMore"
             [recommendedVideos]="recommendedVideos"
             [isLoading]="isLoadingMore"
             [hasMoreVideos]="hasMoreVideos"
-            [autoplay]="autoplay"
+            [currentUser]="user"
             (navigateToVideo)="navigateToVideo($event)"
-            (autoplayChanged)="autoplayChanged($event)"
             (loadMore)="loadSideBarVideos()"
           />
         </section>
@@ -248,19 +251,18 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   currentTime = 0;
   duration = 0;
 
-  pendingAutoPlay: boolean = false;
 
   // Playlist management
   davidoVideos: any[] = [];
   currentVideoIndex = 0;
 
   // Repeat mode
-  repeatMode: 'none' | 'one' | 'all' = 'none';
+  repeatMode: 'none' | 'one' = 'none';
 
   comments: Comment[] = [];
 
   // User data
-  currentUserAvatar = 'https://randomuser.me/api/portraits/men/1.jpg';
+  currentUserAvatar = './img/avatar.png';
 
   @ViewChild('videoFrame') videoFrame!: ElementRef<HTMLIFrameElement>;
 
@@ -283,7 +285,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   pageSize = 10;
   hasMoreVideos = true;
   isLoadingMore = false;
-  autoplay = false;
+
 
   constructor(
     private route: ActivatedRoute, 
@@ -296,7 +298,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private videoService: VideoService,
     private videoCommentService: VideoCommentService,
-    
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -316,6 +318,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       this.userService.getCurrentUser$.subscribe({
         next: (user) => {
           this.user = user;
+          //console.log('current user ', this.user)
         }
       })
     );
@@ -358,25 +361,15 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       });
   }
 
- /*  private getCurrentVideoData(videoId: string) {
+  private getCurrentVideoData(videoId: string) {
     this.youtubeService.getVideoById(videoId).subscribe({
       next: (response: any) => {
-        //console.log('current video ',response)
         this.currentVideo = response.data;
-         this.comments = this.currentVideo.comments;
+        this.comments = this.currentVideo.comments;
+        this.initializeLikeDislikeStates(); // Add this line
       }
     });
-  } */
-
-    private getCurrentVideoData(videoId: string) {
-  this.youtubeService.getVideoById(videoId).subscribe({
-    next: (response: any) => {
-      this.currentVideo = response.data;
-      this.comments = this.currentVideo.comments;
-      this.initializeLikeDislikeStates(); // Add this line
-    }
-  });
-}
+  }
 
   ngOnDestroy() {
     if (this.playerStateInterval) {
@@ -426,17 +419,18 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
           fs: 1,
           iv_load_policy: 3,
           origin: window.location.origin,
-          autoplay: this.autoplay ? 1 : 0
         },
         events: {
           'onReady': this.onPlayerReady.bind(this),
           'onStateChange': this.onPlayerStateChange.bind(this)
         }
       });
+      this.cdr.detectChanges(); // Force update after player initialization
     } else {
       this.player.loadVideoById(this.currentVideoId);
-      if (this.autoplay) {
+      if (this.user?.preferences?.autoplay) {
         this.player.playVideo();
+        this.cdr.detectChanges(); // Force update after player initialization
       }
     }
   }
@@ -445,20 +439,18 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.ngZone.run(() => {
       this.playerReady = true;
       this.isLoading = false;
+
+      this.cdr.detectChanges(); // Force update after player initialization
+      
       const duration = this.player.getDuration();
       this.duration = isNaN(duration) ? 0 : duration;
       this.startUpdateLoop();
-
-      if (this.pendingAutoPlay) {
-        this.playVideo();
-        this.pendingAutoPlay = false;
-      }
 
       const time = this.player.getCurrentTime();
       this.currentTime = isNaN(time) ? 0 : time;
       this.startPlayerStatePolling();
 
-      if (this.autoplay) {
+      if (this.user?.preferences?.autoplay) {
         this.playVideo();
       }
     });
@@ -471,6 +463,9 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       if (state === window.YT.PlayerState.PLAYING) {
         this.isPlaying = true;
         this.showOverlay = false;
+
+        this.cdr.detectChanges(); // Force update after player initialization
+
         this.startWatchHistoryTracking();
         
         if (this.duration === 0 || isNaN(this.duration)) {
@@ -478,6 +473,9 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         }
       } else if (state === window.YT.PlayerState.PAUSED || state === window.YT.PlayerState.ENDED) {
         this.isPlaying = false;
+
+        this.cdr.detectChanges(); // Force update after player initialization
+
         this.stopWatchHistoryTracking();
         
         if (state === window.YT.PlayerState.ENDED) {
@@ -519,31 +517,34 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-    // Update the loadVideo method to load comments
-    loadVideo(videoId: string, autoPlay: boolean = false) {
-      this.currentVideoId = videoId;
-      const url = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=0&disablekb=1&fs=1&iv_load_policy=3&origin=${window.location.origin}`;
-      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-      
-      this.showOverlay = true;
-      this.isPlaying = false;
-      this.isLoading = true;
-      this.duration = 0;
-      this.currentTime = 0;
-      this.playerReady = false;
+  // Update the loadVideo method to load comments
+  loadVideo(videoId: string) {
+    this.currentVideoId = videoId;
 
-      if (this.player && typeof this.player.loadVideoById === 'function') {
-        this.player.loadVideoById(videoId);
-      }
+    this.isLoading = true;
 
-      this.playerReady = false;
-      this.pendingAutoPlay = autoPlay;
-      
-      this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
-      this.getCurrentVideoData(videoId);
-      
+    this.cdr.detectChanges(); // Force update after player initialization
+
+    const url = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=0&disablekb=1&fs=1&iv_load_policy=3&origin=${window.location.origin}`;
+    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    
+    this.showOverlay = true;
+    this.isPlaying = false;
+    this.isLoading = true;
+    this.duration = 0;
+    this.currentTime = 0;
+    this.playerReady = false;
+
+    if (this.player && typeof this.player.loadVideoById === 'function') {
+      this.player.loadVideoById(videoId);
     }
 
+    this.playerReady = false;
+    
+    this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
+    this.getCurrentVideoData(videoId);
+    
+  }
 
   private startUpdateLoop() {
     this.stopUpdateLoop();
@@ -551,8 +552,9 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       if (this.playerReady && this.player && typeof this.player.getCurrentTime === 'function') {
         const time = this.player.getCurrentTime();
         if (!isNaN(time)) {
-          this.ngZone.run(() => {
+          setTimeout(() => {
             this.currentTime = time;
+            this.cdr.detectChanges();
           });
         }
       }
@@ -621,6 +623,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       document.exitFullscreen?.();
       this.isFullscreen = false;
     }
+    this.cdr.detectChanges(); // Force update after player initialization
     this.resetControlsTimer();
   }
 
@@ -666,19 +669,15 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   }
 
   handleVideoEnded() {
-    switch (this.repeatMode) {
-      case 'one':
-        this.currentTime = 0;
-        this.player.seekTo(0, true);
-        this.playVideo();
-        break;
-      case 'all':
-        this.playNextVideo(true);
-        break;
-      default:
-        this.isPlaying = false;
-        this.showOverlay = true;
-        this.showControls = true;
+    if (this.repeatMode === 'one') {
+      this.currentTime = 0;
+      this.player.seekTo(0, true);
+      this.playVideo();
+    } else {
+      this.isPlaying = false;
+      this.showOverlay = true;
+      this.showControls = true;
+      this.cdr.detectChanges();
     }
   }
 
@@ -698,7 +697,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       const nextVideo = this.davidoVideos[nextIndex];
       this.currentVideoIndex = nextIndex;
       this.router.navigate(['/watch', nextVideo.youtubeVideoId]);
-      this.loadVideo(nextVideo.youtubeVideoId, true);
+      this.loadVideo(nextVideo.youtubeVideoId);
       this.playVideo();
     }
   }
@@ -712,7 +711,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       const prevVideo = this.davidoVideos[prevIndex];
       this.currentVideoIndex = prevIndex;
       this.router.navigate(['/watch', prevVideo.youtubeVideoId]);
-      this.loadVideo(prevVideo.youtubeVideoId, true);
+      this.loadVideo(prevVideo.youtubeVideoId);
       this.playVideo();
     }
   }
@@ -720,10 +719,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   toggleRepeatMode() {
     if (this.repeatMode === 'none') {
       this.repeatMode = 'one';
-      this.snackBar.open('Repeat One', '', { duration: 1000 });
-    } else if (this.repeatMode === 'one') {
-      this.repeatMode = 'all';
-      this.snackBar.open('Repeat All', '', { duration: 1000 });
+      this.snackBar.open('Repeat On', '', { duration: 1000 });
     } else {
       this.repeatMode = 'none';
       this.snackBar.open('Repeat Off', '', { duration: 1000 });
@@ -745,6 +741,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
           //this.disliked = false;
           this.appLikes = response.appLikes;
           this.appDislikes = response.appDislikes;
+
+          this.cdr.detectChanges(); // Force update after player initialization
           
           if (response.liked) {
             this.snackBar.open('Video liked', '', { duration: 1000 });
@@ -906,7 +904,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   navigateToVideo(videoId: string) {
     this.router.navigate(['/watch', videoId]);
-    this.loadVideo(videoId, true);
+    this.loadVideo(videoId);
     this.playVideo(); 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -929,10 +927,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   formatDislikesCount(views: number | 0): string {
     return dislikesFormat(views);
-  }
-
-  autoplayChanged(newValue: boolean) {
-    this.autoplay = newValue;
   }
 
   private startWatchHistoryTracking() {
@@ -977,16 +971,43 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       });
     }
 
-    // Initialize like/dislike states
-private initializeLikeDislikeStates() {
-  if (this.user && this.currentVideo) {
-    // Check if user has already liked/disliked this video
-    this.liked = this.currentVideo.likedBy?.includes(this.user._id) || false;
-    this.disliked = this.currentVideo.dislikedBy?.includes(this.user._id) || false;
-    
-    // Initialize counts
-    this.appLikes = this.currentVideo.appLikes || 0;
-    this.appDislikes = this.currentVideo.appDislikes || 0;
+  // Initialize like/dislike states
+  private initializeLikeDislikeStates() {
+    if (this.user && this.currentVideo) {
+      // Check if user has already liked/disliked this video
+      this.liked = this.currentVideo.likedBy?.includes(this.user._id) || false;
+      this.disliked = this.currentVideo.dislikedBy?.includes(this.user._id) || false;
+      
+      // Initialize counts
+      this.appLikes = this.currentVideo.appLikes || 0;
+      this.appDislikes = this.currentVideo.appDislikes || 0;
+    }
   }
-}
+
+  playNextRecommendedVideo() {
+    if (this.recommendedVideos.length === 0) return;
+
+    // Find the current video in the recommendations
+    const currentIndex = this.recommendedVideos.findIndex(video => 
+      video.youtubeVideoId === this.currentVideoId
+    );
+
+    let nextVideo;
+    
+    if (currentIndex === -1) {
+      // If current video isn't in recommendations, play the first one
+      nextVideo = this.recommendedVideos[0];
+    } else if (currentIndex < this.recommendedVideos.length - 1) {
+      // Play the next video in the list
+      nextVideo = this.recommendedVideos[currentIndex + 1];
+    } else {
+      // If we're at the end, loop back to the first video
+      nextVideo = this.recommendedVideos[0];
+    }
+
+    if (nextVideo) {
+      this.navigateToVideo(nextVideo.youtubeVideoId);
+      this.resetControlsTimer();
+    }
+  }
 }

@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { timeAgo as timeAgoUtil } from '../../../common/utils/time.util';
-import { UserInterface, UserService } from '../../../common/services/user.service';
+import { timeAgo as timeAgoUtil } from '../../common/utils/time.util';
+import { UserInterface, UserService } from '../../common/services/user.service';
 import { Subscription } from 'rxjs';
 import { MatInputModule } from '@angular/material/input';
 
@@ -25,7 +25,10 @@ import { MatInputModule } from '@angular/material/input';
     </div>
 
       <div class="add-comment">
-        <img [src]="currentUserAvatar" alt="Your profile" class="user-avatar">
+        <div class="profile">
+          <img [src]="currentUserAvatar" alt="Your profile" class="user-avatar">
+          <h6 class="name">{{user?.name | titlecase}}</h6>
+        </div>
         <div class="comment-form">
           <form (submit)="addComment($event)">
             <input 
@@ -113,7 +116,7 @@ export class VideoCommentsComponent implements OnDestroy {
       this.userService.getCurrentUser$.subscribe({
         next: (user) => {
           this.user = user;
-          console.log('current user ', this.user);
+          //console.log('current user ', this.user);
           // This sets isAuthenticated based on whether user exists
           this.isAuthenticated = user !== null;
         }

@@ -16,7 +16,12 @@ export interface UserInterface {
   createdAt?: Date;
   notification?: boolean;
   darkMode?: boolean;
- 
+  avater?: string;
+  preferences?: {
+    autoplay: boolean;
+    playbackQuality: string
+    theme: string; // dark/light
+  }
 }
 
 @Injectable({ providedIn: 'root' })

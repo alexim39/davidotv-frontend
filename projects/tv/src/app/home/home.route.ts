@@ -1,7 +1,7 @@
 import { Routes } from "@angular/router";
 import { HomeContainerComponent } from "./home-container.component";
 import { HomeComponent } from "./home.component";
-import { VideoPlayerComponent } from "../videos/video-player/video-player.component";
+import { VideoPlayerComponent } from "../video-player/video-player.component";
 
 
 export const HomeRoutes: Routes = [
