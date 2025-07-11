@@ -440,7 +440,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       this.playerReady = true;
       this.isLoading = false;
 
-      this.cdr.detectChanges(); // Force update after player initialization
+      this.cdr.detectChanges();
       
       const duration = this.player.getDuration();
       this.duration = isNaN(duration) ? 0 : duration;
@@ -450,7 +450,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       this.currentTime = isNaN(time) ? 0 : time;
       this.startPlayerStatePolling();
 
-      if (this.user?.preferences?.autoplay) {
+      // Only autoplay if the preference is set and we're not coming from a navigation
+      if (this.user?.preferences?.autoplay && !this.isPlaying) {
         this.playVideo();
       }
     });
@@ -463,23 +464,24 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       if (state === window.YT.PlayerState.PLAYING) {
         this.isPlaying = true;
         this.showOverlay = false;
-
-        this.cdr.detectChanges(); // Force update after player initialization
-
+        this.cdr.detectChanges();
         this.startWatchHistoryTracking();
         
         if (this.duration === 0 || isNaN(this.duration)) {
           this.getDuration();
         }
-      } else if (state === window.YT.PlayerState.PAUSED || state === window.YT.PlayerState.ENDED) {
+      } else if (state === window.YT.PlayerState.PAUSED) {
         this.isPlaying = false;
-
-        this.cdr.detectChanges(); // Force update after player initialization
-
+        this.cdr.detectChanges();
         this.stopWatchHistoryTracking();
-        
-        if (state === window.YT.PlayerState.ENDED) {
-          this.handleVideoEnded();
+      } else if (state === window.YT.PlayerState.ENDED) {
+        this.handleVideoEnded();
+      } else if (state === window.YT.PlayerState.CUED) {
+        // When a new video is cued and autoplay is enabled, play it
+        if (this.user?.preferences?.autoplay) {
+          setTimeout(() => {
+            this.player.playVideo();
+          }, 500);
         }
       }
       
@@ -519,11 +521,11 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   // Update the loadVideo method to load comments
   loadVideo(videoId: string) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     this.currentVideoId = videoId;
-
     this.isLoading = true;
-
-    this.cdr.detectChanges(); // Force update after player initialization
+    this.cdr.detectChanges();
 
     const url = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0&modestbranding=1&controls=0&disablekb=1&fs=1&iv_load_policy=3&origin=${window.location.origin}`;
     this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
@@ -536,14 +538,23 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.playerReady = false;
 
     if (this.player && typeof this.player.loadVideoById === 'function') {
-      this.player.loadVideoById(videoId);
+      this.player.loadVideoById({
+        videoId: videoId,
+        suggestedQuality: 'default'
+      });
+      
+      // Add autoplay here if enabled
+      if (this.user?.preferences?.autoplay) {
+        setTimeout(() => {
+          if (this.player && typeof this.player.playVideo === 'function') {
+            this.player.playVideo();
+          }
+        }, 1000); // Small delay to ensure player is ready
+      }
     }
 
-    this.playerReady = false;
-    
     this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
     this.getCurrentVideoData(videoId);
-    
   }
 
   private startUpdateLoop() {
@@ -673,6 +684,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       this.currentTime = 0;
       this.player.seekTo(0, true);
       this.playVideo();
+    } else if (this.user?.preferences?.autoplay) {
+      this.playNextRecommendedVideo();
     } else {
       this.isPlaying = false;
       this.showOverlay = true;
@@ -902,10 +915,20 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     });
   }
 
+
   navigateToVideo(videoId: string) {
-    this.router.navigate(['/watch', videoId]);
-    this.loadVideo(videoId);
-    this.playVideo(); 
+    this.router.navigate(['/watch', videoId]).then(() => {
+      this.loadVideo(videoId);
+      if (this.user?.preferences?.autoplay) {
+        // Wait for the new player to initialize
+        const checkPlayer = setInterval(() => {
+          if (this.playerReady && this.player) {
+            clearInterval(checkPlayer);
+            this.player.playVideo();
+          }
+        }, 100);
+      }
+    });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -995,18 +1018,23 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     let nextVideo;
     
     if (currentIndex === -1) {
-      // If current video isn't in recommendations, play the first one
       nextVideo = this.recommendedVideos[0];
     } else if (currentIndex < this.recommendedVideos.length - 1) {
-      // Play the next video in the list
       nextVideo = this.recommendedVideos[currentIndex + 1];
     } else {
-      // If we're at the end, loop back to the first video
       nextVideo = this.recommendedVideos[0];
     }
 
     if (nextVideo) {
       this.navigateToVideo(nextVideo.youtubeVideoId);
+      // Add this to ensure autoplay works after navigation
+      if (this.user?.preferences?.autoplay) {
+        setTimeout(() => {
+          if (this.player && typeof this.player.playVideo === 'function') {
+            this.player.playVideo();
+          }
+        }, 1500); // Increased delay to account for navigation
+      }
       this.resetControlsTimer();
     }
   }

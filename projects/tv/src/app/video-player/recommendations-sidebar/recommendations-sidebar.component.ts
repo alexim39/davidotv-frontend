@@ -57,7 +57,7 @@ export class RecommendationsSidebarComponent implements OnChanges, OnInit {
   @Output() navigateToVideo = new EventEmitter<string>();
   @Output() loadMore = new EventEmitter<void>(); 
 
-    @ViewChild('scrollContainer') scrollContainer!: ElementRef;
+  @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
 
 
