@@ -32,7 +32,7 @@
   .profile {
     .name {
       margin-top: -0.1em;
-      color: #666;
+      text-align: center;
     }
   }
 }
@@ -49,10 +49,10 @@
 
   input {
     width: 100%;
-    background: transparent;
+    color: white;
+    background-color: transparent;
     border: none;
     border-bottom: 1px solid #3f3f3f;
-    color: white;
     padding: 8px 0;
     font-size: 0.9rem;
     outline: none;
@@ -87,6 +87,7 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  margin-bottom: -1.5em;
 }
 
 .comment-content {
@@ -126,6 +127,32 @@
     min-width: auto;
     padding: 0;
   }
+}
+
+.reply-box  {
+  flex: 1;
+
+  input {
+    width: 100%;
+    color: white;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid #3f3f3f;
+    padding: 8px 0;
+    font-size: 0.9rem;
+    outline: none;
+
+    &:focus {
+      border-bottom-color: #ff4b2b;
+    }
+  }
+}
+
+.reply-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .likes-count {

@@ -91,6 +91,13 @@ import { HttpErrorResponse } from '@angular/common/http';
                 {{category}}
               </mat-button-toggle>
             </mat-button-toggle-group>
+
+             <mat-button-toggle-group name="timeFilter" aria-label="Time Filter" 
+                [(value)]="selectedTimeFilter" (change)="onTimeFilterChange($event.value)">
+                <mat-button-toggle value="all">All Events</mat-button-toggle>
+                <mat-button-toggle value="active">Active Events</mat-button-toggle>
+                <mat-button-toggle value="past">Past Events</mat-button-toggle>
+            </mat-button-toggle-group>
             
             <button mat-icon-button class="view-toggle" (click)="toggleViewMode()">
               <mat-icon>{{viewMode === 'list' ? 'map' : 'view_list'}}</mat-icon>
@@ -108,7 +115,7 @@ import { HttpErrorResponse } from '@angular/common/http';
             <!-- <mat-progress-bar *ngIf="loading" mode="indeterminate"/> -->
             
             <div class="events-grid">
-              <app-events-list [category]="selectedCategory"/>
+              <app-events-list [category]="selectedCategory" [timeFilter]="selectedTimeFilter"/>
             </div>
           </div>
           
@@ -225,10 +232,18 @@ import { HttpErrorResponse } from '@angular/common/http';
                   padding: 0 1rem;
                 }
               }
+               @media (max-width: 600px) {
+                margin-bottom: 1em;
+               }
             }
             
             .view-toggle {
               margin-left: 1rem;
+            }
+            @media (max-width: 600px) {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
             }
           }
           
@@ -266,6 +281,8 @@ export class EventComponent implements OnInit, OnDestroy {
 
   subscriptions: Subscription[] = [];
 
+  selectedTimeFilter: 'all' | 'active' | 'past' = 'active'; // Default to 'active'
+
   constructor(
     private eventService: EventService,
     public dialog: MatDialog,
@@ -296,7 +313,7 @@ export class EventComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  private getFeaturedEvents(): void {
+  /* private getFeaturedEvents(): void {
     this.loading = true;
     this.cd.detectChanges();
 
@@ -325,6 +342,48 @@ export class EventComponent implements OnInit, OnDestroy {
         }
       })
     );
+  } */
+
+    private getFeaturedEvents(): void {
+      this.loading = true;
+      this.cd.detectChanges();
+
+      this.subscriptions.push(
+          this.eventService.getFeaturedEvents().subscribe({
+              next: (response) => {
+                  let events = (response.data || []).map((e: Event) => ({
+                      id: e._id || e._id,
+                      title: e.title,
+                      imageUrl: e.imageUrl || '/img/event-banner.png',
+                      date: e.date,
+                      location: e.location,
+                      externalLink: e.externalLink || '',
+                      description: e.description || '',
+                      interestedUsers: e.interestedUsers
+                  }));
+
+                  // Apply time filter if not 'all'
+                  if (this.selectedTimeFilter !== 'all') {
+                      const now = new Date();
+                      events = events.filter((event: Event) => {
+                          const eventDate = new Date(event.date);
+                          return this.selectedTimeFilter === 'active' 
+                              ? eventDate >= now 
+                              : eventDate < now;
+                      });
+                  }
+
+                  this.featuredEvents = events;
+                  this.loading = false;
+                  this.cd.detectChanges();
+              },
+              error: (error: HttpErrorResponse) => {
+                  this.featuredEvents = [];
+                  this.loading = false;
+                  this.cd.detectChanges();
+              }
+          })
+      );
   }
   
   
@@ -362,4 +421,31 @@ export class EventComponent implements OnInit, OnDestroy {
       queryParamsHandling: 'merge'
     });
   }
+
+  onTimeFilterChange(filter: 'all' | 'active' | 'past'): void {
+      this.selectedTimeFilter = filter;
+      this.filterEvents();
+  }
+
+ private filterEvents(): void {
+    const now = new Date();
+    
+    if (this.selectedTimeFilter === 'all') {
+        // No filtering needed for 'all'
+        return;
+    }
+    
+    if (this.featuredEvents) {
+        this.featuredEvents = this.featuredEvents.filter(event => {
+            const eventDate = new Date(event.date);
+            return this.selectedTimeFilter === 'active' 
+                ? eventDate >= now 
+                : eventDate < now;
+        });
+    }
+    
+    // Always reload featured events when filter changes
+    this.getFeaturedEvents();
+  }
+  
 }

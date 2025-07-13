@@ -21,6 +21,8 @@ export interface Event {
       _id: string
     }
   ]
+  isActive?: boolean;
+  isCancelled?: boolean;
   // Add these new properties for map functionality
   color?: string;
   mockCoords?: {

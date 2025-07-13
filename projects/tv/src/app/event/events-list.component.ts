@@ -62,6 +62,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
             </div>
           }
           
+          
         </div>
         
         <mat-card-content>
@@ -263,6 +264,8 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
   @Input() category: string = '';
   filteredEvents: Event[] = [];
 
+  @Input() timeFilter: 'all' | 'active' | 'past' = 'active'; // Add timeFilter input
+
 
 
   loading = true;
@@ -279,10 +282,35 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
     this.getCurrentUser();
   }
 
-   ngOnChanges(changes: SimpleChanges) {
-    if (changes['category']) {
-      this.applyCategoryFilter();
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['category'] || changes['timeFilter']) {
+      this.applyFilters();
     }
+  }
+
+  private applyFilters(): void {
+      // First filter by category
+      let filtered = this.events;
+      
+      if (this.category && this.category !== 'All') {
+          filtered = filtered.filter(
+              e => (e.category || '').toLowerCase() === this.category.toLowerCase()
+          );
+      }
+
+      // Then filter by time if not 'all'
+      if (this.timeFilter && this.timeFilter !== 'all') {
+          const now = new Date();
+          filtered = filtered.filter(event => {
+              const eventDate = new Date(event.date);
+              return this.timeFilter === 'active' 
+                  ? eventDate >= now 
+                  : eventDate < now;
+          });
+      }
+
+      this.filteredEvents = filtered;
+      this.cd.detectChanges();
   }
 
    private applyCategoryFilter() {
@@ -312,15 +340,13 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
   } 
 
 
-  private getEvents(): void {
+   private getEvents(): void {
     this.loading = true;
     this.cd.detectChanges();
 
     this.subscriptions.push(
       this.eventService.getAllEvents().subscribe({
         next: (response) => {
-          //console.log('returned events ',response.data)
-          // Map to expected structure
           this.events = (response.data || []).map((e: Event) => ({
             id: e._id || e._id,
             _id: e._id || e._id,
@@ -331,10 +357,11 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
             externalLink: e.externalLink || '',
             description: e.description || '',
             interestedUsers: e.interestedUsers,
-            category: e.category // Make sure category is included!
+            category: e.category
           }));
-          // Set filteredEvents here!
-          this.applyCategoryFilter();
+          
+          // Apply initial filters
+          this.applyFilters();
           this.loading = false;
           this.cd.detectChanges();
         },
@@ -347,6 +374,7 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
       })
     );
   }
+
 
   getDateString(date: Date): string {
     return new Date(date).toLocaleDateString('en-US', {

@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -8,11 +8,20 @@ import { timeAgo as timeAgoUtil } from '../../common/utils/time.util';
 import { UserInterface, UserService } from '../../common/services/user.service';
 import { Subscription } from 'rxjs';
 import { MatInputModule } from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
 
 @Component({
   selector: 'async-video-comments',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, MatInputModule],
+  imports: [
+    CommonModule, 
+     FormsModule,
+     MatIconModule, 
+     MatButtonModule, 
+     MatInputModule,
+     MatFormFieldModule,
+     ReactiveFormsModule
+    ],
   template: `
     <div class="comments-section">
       <div class="comments-header">
@@ -27,7 +36,7 @@ import { MatInputModule } from '@angular/material/input';
       <div class="add-comment">
         <div class="profile">
           <img [src]="currentUserAvatar" alt="Your profile" class="user-avatar">
-          <h6 class="name">{{user?.name | titlecase}}</h6>
+          <h6 class="name"><!-- {{user?.name | titlecase}} - --> {{user?.username }} </h6>
         </div>
         <div class="comment-form">
           <form (submit)="addComment($event)">
@@ -42,8 +51,8 @@ import { MatInputModule } from '@angular/material/input';
             >
             <div class="comment-actions" *ngIf="newComment">
               <button mat-button type="button" (click)="cancelComment()">CANCEL</button>
-              <button mat-raised-button color="primary" type="submit" [disabled]="!newComment.trim() || isSubmitting">
-                {{ isSubmitting ? 'POSTING...' : 'COMMENT' }}
+              <button mat-button color="primary" type="submit" [disabled]="!newComment.trim() || isSubmitting">
+                {{ isSubmitting ? 'POSTING...' : 'POST COMMENT' }}
               </button>
             </div>
           </form>
@@ -52,11 +61,13 @@ import { MatInputModule } from '@angular/material/input';
 
       <div class="comments-list">
         <div class="comment" *ngFor="let comment of comments">
-          <img [src]="comment.userAvatar" alt="{{ comment.username }}" class="comment-avatar">
+          <div class="profile">
+            <img [src]="comment.user.avatar" alt="{{ comment.username }}" class="comment-avatar">
+            <h6 class="name">{{ comment.user.username }}</h6>
+          </div>
           <div class="comment-content">
             <div class="comment-header">
-              <h4>{{ comment.username }}</h4>
-              <span class="comment-time">{{ timeAgo(comment.createdAt) }}</span>
+              <span class="comment-time" style="text-align: right;">{{ timeAgo(comment.createdAt) }}</span>
             </div>
             <p class="comment-text">{{ comment.text }}</p>
             <div class="comment-actions">
@@ -66,14 +77,36 @@ import { MatInputModule } from '@angular/material/input';
               <span class="likes-count">{{ comment.likes }}</span>
               <button mat-button (click)="showReplyBox(comment._id)" *ngIf="!comment.showReplyBox">REPLY</button>
               
-              <div class="reply-box" *ngIf="comment.showReplyBox">
+              <!-- <div class="reply-box" *ngIf="comment.showReplyBox">
                 <input 
                   type="text" 
                   [(ngModel)]="comment.replyText" 
                   placeholder="Write a reply..."
                 >
                 <button mat-button (click)="addReply(comment)">Post</button>
-              </div>
+              </div> -->
+
+              <div class="reply-box" *ngIf="comment.showReplyBox">
+                <form (submit)="addReply(comment)">
+                  <input 
+                    type="text" 
+                    [(ngModel)]="comment.replyText" 
+                    name="comment" 
+                    placeholder="Write a reply..."
+                    aria-label="Add a reply"
+                    required
+                    [disabled]="!isAuthenticated" 
+                  >
+                  <div class="reply-actions" *ngIf="newComment">
+                     <button mat-button type="button" (click)="cancelReply()">CANCEL</button>
+                    <button mat-button color="primary" type="submit" [disabled]="!comment.replyText.trim() || isSubmitting">
+                      {{ isSubmitting ? 'POSTING...' : 'POST REPLY' }}
+                    </button>
+                  </div>
+                 
+                </form>
+               </div> 
+
             </div>
             
             <!-- Replies section -->
@@ -122,6 +155,7 @@ export class VideoCommentsComponent implements OnDestroy {
         }
       })
     );
+    console.log('video comment ', this.comments)
   }
 
   addComment(event: Event) {
@@ -159,6 +193,10 @@ export class VideoCommentsComponent implements OnDestroy {
   }
 
   cancelComment() {
+    this.newComment = '';
+  }
+
+  cancelReply() {
     this.newComment = '';
   }
 

@@ -231,7 +231,7 @@ declare global {
 })
 export class VideoPlayerComponent implements OnInit, OnDestroy {
   safeUrl: SafeResourceUrl | null = null;
-  isLoading = true;
+  isLoading = false;
   showOverlay = true;
   showControls = true;
   controlsTimeout: any;
