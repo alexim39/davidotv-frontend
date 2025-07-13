@@ -219,19 +219,19 @@ export class MerchandiseComponent implements OnInit {
  featuredMerch: any[] = [
     {
       id: 1,
-      image: './img/cap.JPG',
+      image: './img/store/clothing/cap.JPG',
       name: 'Official Davido Cap',
       price: 29.99
     },
     {
       id: 2,
-      image: './img/shirt.JPG',
+      image: './img/store/clothing/shirt.JPG',
       name: '30BG Logo T-Shirt',
       price: 24.99
     },
     {
       id: 3,
-      image: './img/hoodie.JPG',
+      image: './img/store/clothing/hoodie.JPG',
       name: 'Davido Tour Hoodie',
       price: 49.99
     },
