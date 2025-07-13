@@ -61,6 +61,7 @@ export const HomeRoutes: Routes = [
             { path: 'about', loadComponent: () => import('../home/about/about.component').then(c => c.AboutComponent) },    
             { path: 'contact', loadComponent: () => import('../home/contacts/contacts.component').then(c => c.ContactComponent) }, 
             { path: 'store', loadChildren: () => import('./../store/store.route').then(r => r.StoreRoutes) },   
+            { path: 'auth', loadChildren: () => import('./../auth/auth.route').then(r => r.AuthRoutes) },   
         ]
     }
 ];

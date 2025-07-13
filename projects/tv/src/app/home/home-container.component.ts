@@ -130,6 +130,7 @@ import { MatDialog } from '@angular/material/dialog';
   width: var(--desktop-sidenav-width);
   //background-color: #fff;
   padding-top: 12px;
+  border-right: 1px solid #eee;
 
   mat-nav-list {
     display: flex;
@@ -151,7 +152,6 @@ import { MatDialog } from '@angular/material/dialog';
         font-size: 20px;
         width: 24px;
         height: 24px;
-        //color: #606060;
         transition: color 0.2s;
         vertical-align: middle;
         margin-right: 8px;
@@ -172,11 +172,12 @@ import { MatDialog } from '@angular/material/dialog';
       }
 
       &.active {
-        background-color: #666;
-        font-weight: 600;
-
+        //background-color: #666;
+        font-weight: 300;
+        text-decoration: underline;
+        color: #8f0045;
         mat-icon {
-          //color: var(--primary);
+          color: #8f0045;
         }
 
         span {

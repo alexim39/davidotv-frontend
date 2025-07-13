@@ -52,7 +52,7 @@ import { UserInterface, UserService } from '../../common/services/user.service';
 
       <button [disabled]="form.invalid || isSpinning" mat-flat-button color="accent">SIGN IN</button>
 
-      <a (click)="closeDialog()" [routerLink]="['/fp']">Forgot your password?</a>
+      <a (click)="closeDialog()" [routerLink]="['/auth/forgot-password']">Forgot your password?</a>
 
       <mat-progress-bar color="accent" mode="indeterminate" *ngIf="isSpinning"/>
     </form>

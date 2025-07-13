@@ -43,4 +43,22 @@ export class AuthService {
   signOut(formObject: {}): Observable<any> {
     return this.apiService.post<any>('auth/signout', formObject, undefined, true);
   }
+
+  /**
+   * Submits the user change password data to the backend API.
+   * @param formObject The change password data to be submitted.
+   * @returns An Observable that emits the API response or an error.
+   */
+  requestPasswordChange(formObject: any): Observable<any> {
+    return this.apiService.post<any>('auth/forgot-password', formObject, undefined, true);
+  }
+
+  /**
+   * Submits the user reset password data to the backend API.
+   * @param formObject The reset password data to be submitted.
+   * @returns An Observable that emits the API response or an error.
+   */
+  resetPassword(formObject: any): Observable<any> {
+    return this.apiService.post<any>('auth/reset-password', formObject, undefined, true);
+  }
 }

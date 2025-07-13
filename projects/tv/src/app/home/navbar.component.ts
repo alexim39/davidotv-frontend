@@ -139,8 +139,9 @@ template: `
   </div>
 
   <a mat-button routerLink="/" (click)="toggleMobileMenu()">Home</a>
-  <a mat-button routerLink="/videos" (click)="toggleMobileMenu()">Videos</a>
+  <a mat-button routerLink="/videos/trending" (click)="toggleMobileMenu()">Trending</a>
   <a mat-button routerLink="/official/videos" (click)="toggleMobileMenu()">Official</a>
+  <a mat-button routerLink="/videos" (click)="toggleMobileMenu()">Videos</a>
   <a mat-button routerLink="/forum" (click)="toggleMobileMenu()">Forum</a>
   <a mat-button routerLink="/events" (click)="toggleMobileMenu()">Events</a>
   <a mat-button (click)="uploadContent(); toggleMobileMenu()">Upload</a>
@@ -152,15 +153,23 @@ template: `
   </button> -->
 
   <div *ngIf="isAuthenticated" class="mobile-user-section">
-    <a mat-button routerLink="/profile" (click)="toggleMobileMenu()">
+    <a mat-button routerLink="/profile">
       <div class="mobile-user-avatar">
-        <img [src]="imageSource || './img/avatar.png'" alt="User profile" class="mobile-avatar-img">
+        <img [src]="imageSource || './img/avatar.png'" alt="User profile" class="mobile-avatar-img"/>
       </div>
-      {{user?.name | titlecase }} {{user?.lastname | titlecase }}
+      <span class="mobile-user-name">{{user?.name | titlecase }} {{user?.lastname | titlecase }}</span>
     </a>
     <a mat-button routerLink="/notifications" (click)="toggleMobileMenu()">
       <mat-icon [matBadge]="notificationsCount" matBadgeColor="warn">notifications</mat-icon>
       Notifications
+    </a>
+    <a mat-button routerLink="/library" (click)="toggleMobileMenu()">
+      <mat-icon>video_library</mat-icon>
+      Library
+    </a>
+    <a mat-button routerLink="/history" (click)="toggleMobileMenu()">
+      <mat-icon>history</mat-icon>
+      History
     </a>
   </div>
 
@@ -352,7 +361,7 @@ template: `
 
   a,
   button {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     width: 100%;
     text-align: left;
     justify-content: flex-start;
@@ -383,7 +392,6 @@ template: `
       .search-button {
         width: 48px;
         height: 100%;
-        background: transparent;
         border: none;
         border-left: 1px solid #ddd;
         cursor: pointer;
@@ -398,6 +406,7 @@ template: `
     margin: 16px 0;
     border-top: 1px solid #eee;
     padding-top: 16px;
+    overflow-y: auto;
 
     a {
       display: flex;
@@ -414,6 +423,12 @@ template: `
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-bottom: 6px;
+    }
+
+    .mobile-user-name {
+      font-size: 12px;
+      color: #666;
     }
 
     .mobile-avatar-img {
@@ -558,6 +573,7 @@ export class NavbarComponent implements OnDestroy, OnInit {
             localStorage.removeItem('isAuthenticated'); // Remove token from localStorage
             // Navigate to the login page
             this.router.navigate(['/'], { replaceUrl: true });
+            window.location.reload();
           }
         },
         error: (error: HttpErrorResponse) => {

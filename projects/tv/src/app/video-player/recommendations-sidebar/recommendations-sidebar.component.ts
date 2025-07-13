@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, HostListener, OnInit, OnChanges, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener, OnInit, OnChanges, ChangeDetectorRef, ViewChild, ElementRef, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
@@ -66,13 +66,12 @@ export class RecommendationsSidebarComponent implements OnChanges, OnInit {
 
   constructor(private cdr: ChangeDetectorRef) {}
 
-  ngOnInit(): void {
-    if (this.currentUser) {
-      this.autoplay = this.currentUser.preferences?.autoplay || false;;
-    }
-  }
+  ngOnInit(): void {}
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['currentUser'] && changes['currentUser'].currentValue) {
+      this.autoplay = changes['currentUser'].currentValue.preferences?.autoplay || false;
+    }
     this.cdr.detectChanges();
   }
 

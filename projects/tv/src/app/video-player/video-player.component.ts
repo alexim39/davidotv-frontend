@@ -213,7 +213,7 @@ declare global {
           </div>
         </section>
 
-        <section class="recommendations-section" *ngIf="user">
+        <section class="recommendations-section">
           <async-recommendations-sidebar 
             *ngIf="recommendedVideos.length > 0 || isLoadingMore"
             [recommendedVideos]="recommendedVideos"
@@ -286,6 +286,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   hasMoreVideos = true;
   isLoadingMore = false;
 
+   private routeParamSub!: Subscription;
 
   constructor(
     private route: ActivatedRoute, 
@@ -302,15 +303,27 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    const videoId = this.route.snapshot.paramMap.get('id');
+   /*  const videoId = this.route.snapshot.paramMap.get('id');
     if (videoId) {
       this.currentVideoId = videoId;
       this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
       this.loadVideo(videoId);
       this.getCurrentVideoData(videoId);
-    }
+    } */
+
+   // Replace the snapshot with a subscription to route params
+    this.routeParamSub = this.route.paramMap.subscribe(params => {
+      const videoId = params.get('id');
+      if (videoId && videoId !== this.currentVideoId) {
+        this.currentVideoId = videoId;
+        this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
+        this.loadVideo(videoId);
+        this.getCurrentVideoData(videoId);
+      }
+    });
 
     this.loadSideBarVideos();
+
     window.onYouTubeIframeAPIReady = () => this.ngZone.run(() => this.onYouTubeIframeAPIReady());
     this.loadYouTubeAPI();
 
@@ -349,6 +362,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.playlistService.getPlaylistVideos(this.currentPage, this.pageSize)
       .subscribe({
         next: (response) => {
+         //console.log('recommend videos ',response) 
           this.recommendedVideos = [...this.recommendedVideos, ...response.data];
           this.hasMoreVideos = response.pagination.hasNextPage;
           this.currentPage++;
@@ -384,6 +398,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
     this.stopWatchHistoryTracking();
+
+    if (this.routeParamSub) this.routeParamSub.unsubscribe();
   }
 
   loadYouTubeAPI() {
@@ -685,6 +701,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       this.player.seekTo(0, true);
       this.playVideo();
     } else if (this.user?.preferences?.autoplay) {
+      console.log('video has ended, playing next...')
       this.playNextRecommendedVideo();
     } else {
       this.isPlaying = false;
