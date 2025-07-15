@@ -1,0 +1,208 @@
+
+  <mat-toolbar class="navbar">
+    <div class="navbar-container">
+      <!-- Logo -->
+      <div class="logo" mat-button routerLink="/">
+        <mat-icon class="logo-icon">live_tv</mat-icon>
+        <span class="brand-name">
+          Davido<span class="tv-red">TV</span>
+        </span>
+      </div>
+
+      <!-- Desktop Search Bar -->
+      <div class="search-container">
+        <div class="search-bar">
+          <input 
+            type="text" 
+            placeholder="Search DavidoTV videos..." 
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="onSearch()"
+          >
+          <button class="search-button" (click)="onSearch()">
+            <mat-icon>search</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <div class="nav-links">
+        <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <mat-icon>home</mat-icon>
+          <span>Home</span>
+        </a>
+        <a mat-button routerLink="/videos" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <mat-icon>video_library</mat-icon>
+          <span>Videos</span>
+        </a>
+        <a mat-button routerLink="/official/videos" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <mat-icon>verified</mat-icon>
+          <span>Official</span>
+        </a>
+        <a mat-button routerLink="/forum" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <mat-icon>forum</mat-icon>
+          <span>Forum</span>
+        </a>
+        <a mat-button routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <mat-icon>shopping_bag</mat-icon>
+          <span>Store</span>
+        </a>
+      </div>
+
+      <!-- Desktop Actions -->
+      <div class="actions">
+        <button *ngIf="!isAuthenticated" mat-stroked-button color="primary" (click)="authDialog()">
+          <mat-icon>account_circle</mat-icon>
+          <span>Sign In</span>
+        </button>
+        
+        <div *ngIf="isAuthenticated" class="user-actions">
+          <button mat-icon-button class="action-icon" 
+            [matBadge]="notificationsCount" 
+            matBadgeColor="warn"
+            matTooltip="Notifications">
+            <mat-icon>notifications</mat-icon>
+          </button>
+          
+          <button mat-button [matMenuTriggerFor]="userMenu" class="user-profile">
+            <div class="user-avatar">
+              <img [src]="imageSource || './img/avatar.png'" alt="User profile" class="avatar-img">  
+            </div>
+            <span class="user-name">{{user?.name | titlecase }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Hamburger -->
+      <button mat-icon-button class="mobile-toggle" (click)="toggleMobileMenu()">
+        <mat-icon>{{ mobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+      </button>
+    </div>
+  </mat-toolbar>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay" [class.show]="mobileMenuOpen" (click)="toggleMobileMenu()"></div>
+  
+  <!-- Mobile Slide Menu -->
+  <nav class="mobile-slide-menu" [class.open]="mobileMenuOpen">
+    <!-- Mobile User Section -->
+    <div *ngIf="isAuthenticated" class="mobile-user-info">
+      <div class="mobile-user-avatar">
+        <img [src]="imageSource || './img/avatar.png'" alt="User profile" class="mobile-avatar-img"/>
+      </div>
+      <div class="mobile-user-details">
+        <div class="mobile-user-name">{{user?.name | titlecase }} {{user?.lastname | titlecase }}</div>
+        <div class="mobile-user-email">{{user?.email}}</div>
+      </div>
+      <button mat-icon-button class="mobile-notification-badge" 
+        [matBadge]="notificationsCount" 
+        [hidden]="notificationsCount <= 1"
+        matBadgeColor="warn">
+        <mat-icon>notifications</mat-icon>
+      </button>
+    </div>
+
+    <!-- Mobile Search -->
+    <div class="mobile-search">
+      <div class="search-bar">
+        <input 
+          type="text" 
+          placeholder="Search DavidoTV..." 
+          [(ngModel)]="searchQuery"
+          (keyup.enter)="onSearch(); toggleMobileMenu()"
+        >
+        <button class="search-button" (click)="onSearch(); toggleMobileMenu()">
+          <mat-icon>search</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav-section">
+      <h3 class="mobile-section-title">Menu</h3>
+      <a mat-button routerLink="/" (click)="toggleMobileMenu()">
+        <mat-icon>home</mat-icon>
+        <span>Home</span>
+      </a>
+      <a mat-button routerLink="/videos" (click)="toggleMobileMenu()">
+        <mat-icon>video_library</mat-icon>
+        <span>Videos</span>
+      </a>
+      <a mat-button routerLink="/official/videos" (click)="toggleMobileMenu()">
+        <mat-icon>verified</mat-icon>
+        <span>Official</span>
+      </a>
+      <a mat-button routerLink="/forum" (click)="toggleMobileMenu()">
+        <mat-icon>forum</mat-icon>
+        <span>Forum</span>
+      </a>
+      <a mat-button routerLink="/store" (click)="toggleMobileMenu()">
+        <mat-icon>shopping_bag</mat-icon>
+        <span>Store</span>
+      </a>
+    </div>
+
+    <!-- Account Section -->
+    <div *ngIf="isAuthenticated" class="mobile-nav-section">
+      <h3 class="mobile-section-title">Account</h3>
+      <a mat-button routerLink="/profile" (click)="toggleMobileMenu()">
+        <mat-icon>account_circle</mat-icon>
+        <span>Your Channel</span>
+      </a>
+      <a mat-button routerLink="/library" (click)="toggleMobileMenu()">
+        <mat-icon>video_library</mat-icon>
+        <span>Library</span>
+      </a>
+      <a mat-button routerLink="/history" (click)="toggleMobileMenu()">
+        <mat-icon>history</mat-icon>
+        <span>History</span>
+      </a>
+      <a mat-button routerLink="/settings/account" (click)="toggleMobileMenu()">
+        <mat-icon>settings</mat-icon>
+        <span>Settings</span>
+      </a>
+      <button mat-button (click)="logout(); toggleMobileMenu()">
+        <mat-icon>logout</mat-icon>
+        <span>Sign Out</span>
+      </button>
+    </div>
+
+    <!-- Auth Section -->
+    <div *ngIf="!isAuthenticated" class="mobile-auth-section">
+      <p class="mobile-auth-prompt">Sign in to like videos, comment, and subscribe.</p>
+      <button mat-flat-button color="primary" (click)="authDialog(); toggleMobileMenu()">
+        <mat-icon>account_circle</mat-icon>
+        <span>Sign In</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- User Menu (Desktop) -->
+  <mat-menu #userMenu="matMenu" class="user-menu">
+    <div class="user-menu-header">
+      <div class="menu-user-avatar" style="text-align: center;">
+        <img [src]="imageSource || './img/avatar.png'" alt="User profile" style="max-width: 100px; max-height: 80px; align-items: center; object-fit: contain; border-radius: 20%;">
+      </div>
+      <div class="menu-user-info" style="padding: 1em; text-align: center; color: gray;">
+        <div class="menu-user-name">{{user?.name | titlecase }} {{user?.lastname | titlecase }}</div>
+        <div class="menu-user-email">{{user?.email}}</div>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+    <button mat-menu-item routerLink="/profile">
+      <mat-icon>account_circle</mat-icon>
+      <span>Your Channel</span>
+    </button>
+    <button mat-menu-item routerLink="/library">
+      <mat-icon>video_library</mat-icon>
+      <span>Your Videos</span>
+    </button>
+    <button mat-menu-item routerLink="/settings/account">
+      <mat-icon>settings</mat-icon>
+      <span>Settings</span>
+    </button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Sign Out</span>
+    </button>
+  </mat-menu>

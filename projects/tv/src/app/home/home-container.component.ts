@@ -6,7 +6,7 @@ import { MatListModule } from '@angular/material/list';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
-import { NavbarComponent } from './navbar.component';
+import { NavbarComponent } from './navbar/navbar.component';
 import { FooterComponent } from './footer/footer.component';
 import { Router, RouterModule } from '@angular/router';
 import { UserInterface, UserService } from '../common/services/user.service';
@@ -174,8 +174,9 @@ import { MatDialog } from '@angular/material/dialog';
       &.active {
         //background-color: #666;
         font-weight: 300;
-        text-decoration: underline;
+        //text-decoration: underline;
         color: #8f0045;
+        border-bottom: 1px solid #8f0045;
         mat-icon {
           color: #8f0045;
         }

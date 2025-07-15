@@ -330,13 +330,25 @@ button.mat-icon-button {
           border-radius: 16px;
           cursor: pointer;
           transition: all 0.2s ease;
+
+          display: flex; /* Use flexbox for alignment */
+          align-items: center; /* Vertically align items in the center */
+          gap: 4px; /* Add some space between the icon and the text */
           
           mat-icon {
-            font-size: 1rem;
+
+            // You might want to adjust font-size or color for the icon here
+            font-size: 14px; /* Example size, adjust as needed */
+            height: 18px; /* Ensure height matches font-size for proper alignment */
+            width: 18px; /* Ensure width matches font-size */
+            color: #666; /* Example color */
           }
           
           .count {
-            font-size: 0.9rem;
+            // Adjust font-size, color, or font-weight for the text
+            font-size: 14px; /* Example size, adjust as needed */
+            color: #666; /* Example color */
+            line-height: 1; /* Ensure line-height helps with vertical alignment */
           }
           
           &.like-btn {
@@ -392,21 +404,36 @@ button.mat-icon-button {
         
         .view-count {
           @include flex-center(6px);
-          margin-left: 8px;
-          padding: 6px 10px;
+          margin-left: 4px;
+          padding: 6px 12px;
           background: rgba($primary-color, 0.1);
           border-radius: 16px;
           color: $primary-color;
-          font-size: 0.9rem;
+          font-size: 0.8rem;
+
+          display: flex; /* Use flexbox for alignment */
+          align-items: center; /* Vertically align items in the center */
+          gap: 4px; /* Add some space between the icon and the text */
           
           @media (max-width: $breakpoint-mobile) {
             display: block;
           }
           
           mat-icon {
-            font-size: 1rem;
+           // You might want to adjust font-size or color for the icon here
+            font-size: 14px; /* Example size, adjust as needed */
+            height: 18px; /* Ensure height matches font-size for proper alignment */
+            width: 18px; /* Ensure width matches font-size */
+            color: #666; /* Example color */
           }
-        }
+
+          span {
+            // Adjust font-size, color, or font-weight for the text
+            font-size: 14px; /* Example size, adjust as needed */
+            color: #666; /* Example color */
+            line-height: 1; /* Ensure line-height helps with vertical alignment */
+          }
+        } 
       }
     }
   }

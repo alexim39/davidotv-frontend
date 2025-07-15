@@ -21,7 +21,17 @@ export interface UserInterface {
     autoplay: boolean;
     playbackQuality: string
     theme: string; // dark/light
-  }
+  };
+  phone?: string;
+  jobTitle?: string;
+  hobby?: string;
+  skill?: string;
+  testimonial?: {
+    message?: string;
+  };
+  dob?: Date;
+  isActive?: boolean;
+  educationBackground?: string;
 }
 
 @Injectable({ providedIn: 'root' })

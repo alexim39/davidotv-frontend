@@ -16,10 +16,5 @@ export const EventRoutes: Routes = [
       //{ path: 'create', component: EventCreateComponent },
       //{ path: ':id', component: EventDetailComponent }
     ]
-  },
-  /* {
-    path: 'trending',
-    component: TrendingAllContainerComponent,
-    title: "DavidoTV - All Trending Videos"
-  } */
+  }
 ];

@@ -378,6 +378,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   private getCurrentVideoData(videoId: string) {
     this.youtubeService.getVideoById(videoId).subscribe({
       next: (response: any) => {
+        console.log('current video ',response.data)
         this.currentVideo = response.data;
         this.comments = this.currentVideo.comments;
         this.initializeLikeDislikeStates(); // Add this line
