@@ -68,9 +68,7 @@
             <mat-error *ngIf="profileForm.get('phone')?.hasError('required')">
               Phone is required
             </mat-error>
-            <mat-error *ngIf="profileForm.get('phone')?.hasError('pattern')">
-              Please enter a valid phone number
-            </mat-error>
+            <!-- <mat-error *ngIf="profileForm.get('phone')?.hasError('pattern')">Please enter a valid phone number</mat-error> -->
           </mat-form-field>
         </div>
       </div>

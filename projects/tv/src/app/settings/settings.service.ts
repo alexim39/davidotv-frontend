@@ -5,11 +5,11 @@ import { ApiService } from '../common/services/api.service';
 export interface PersonalInfoInterface {
   id: string;
   name: string;
-  surname: string;
+  lastname: string;
   address: string;
   email: string;
   phone: string;
-  dobDatePicker: Date;
+  dob: Date;
   bio: string;
 }
   
@@ -31,9 +31,8 @@ export class SettingsService {
  * @param dataObject The  form data.
  * @returns An observable of the submitted form data.
  */
-   updateProfile(dataObject: PersonalInfoInterface): Observable<any> {
-    console.log('records ', dataObject)
-    return this.apiService.put<any>(`partners/update-profile`, dataObject);
+  updateProfile(dataObject: PersonalInfoInterface): Observable<any> {
+    return this.apiService.put<any>(`user/profile/personal`, dataObject);
   }
 
   /**
@@ -42,7 +41,7 @@ export class SettingsService {
  * @returns An observable of the submitted form data.
  */
   updateProfession(dataObject: ProfessionalInfoInterface): Observable<any> {
-    return this.apiService.put<any>(`partners/update-profession`, dataObject);
+    return this.apiService.put<any>(`user/profile/profession`, dataObject);
   }
 
     /**
@@ -51,7 +50,7 @@ export class SettingsService {
  * @returns An observable of the submitted form data.
  */
   updateUsername(dataObject: any): Observable<any> {
-    return this.apiService.put<any>(`partners/update-username`, dataObject);
+    return this.apiService.put<any>(`user/profile/username`, dataObject);
   }
 
  /**

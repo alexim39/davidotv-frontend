@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -39,6 +39,7 @@ export class PasswordChangeComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   private settingsService = inject(SettingsService);
   private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef); // Add ChangeDetectorRef
 
   @Input() user!: UserInterface;
   passwordForm!: FormGroup;
@@ -50,7 +51,7 @@ export class PasswordChangeComponent implements OnInit, OnDestroy {
     this.initializeForm();
   }
 
-  private initializeForm(): void {
+ private initializeForm(): void {
     this.passwordForm = new FormGroup({
       currentPassword: new FormControl('', [
         Validators.required,
@@ -100,9 +101,10 @@ export class PasswordChangeComponent implements OnInit, OnDestroy {
     } else {
       this.hideNew.set(!this.hideNew());
     }
+    this.cdr.markForCheck(); // Trigger change detection after signal update
   }
 
-  onSubmit(): void {
+   onSubmit(): void {
     if (this.passwordForm.invalid) {
       this.passwordForm.markAllAsTouched();
       this.showNotification('Please fill all fields correctly', 'error');
@@ -123,11 +125,13 @@ export class PasswordChangeComponent implements OnInit, OnDestroy {
           this.showNotification('Password changed successfully!', 'success');
           this.passwordForm.reset();
           this.isLoading = false;
+          this.cdr.detectChanges(); // Trigger change detection after async operation
         },
         error: (error: HttpErrorResponse) => {
           const errorMessage = error.error?.message || 'Failed to change password. Please try again.';
           this.showNotification(errorMessage, 'error');
           this.isLoading = false;
+          this.cdr.detectChanges(); // Trigger change detection after error
         }
       })
     );

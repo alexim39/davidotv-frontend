@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -40,6 +40,10 @@ export class UsernameInfoComponent implements OnInit, OnDestroy {
   private settingsService = inject(SettingsService);
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
+  private cdr = inject(ChangeDetectorRef);
+
+  // List of restricted words
+  private restrictedWords = ['davido', 'davidotv', '30gb', 'obo'];
 
   @Input() user!: UserInterface;
   usernameForm!: FormGroup;
@@ -49,22 +53,58 @@ export class UsernameInfoComponent implements OnInit, OnDestroy {
     this.initializeForm();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['user'] && !changes['user'].firstChange) {
+      this.updateFormWithUserData();
+    }
+  }
+
   private initializeForm(): void {
     this.usernameForm = new FormGroup({
-      username: new FormControl(this.user?.username || '', [
+      username: new FormControl('', [
         Validators.required,
         Validators.minLength(3),
         Validators.maxLength(30),
-        Validators.pattern(/^[a-zA-Z0-9_]+$/)
+        Validators.pattern(/^[a-zA-Z0-9_]+$/),
+        this.restrictedWordsValidator.bind(this) // Add custom validator
       ]),
-      id: new FormControl(this.user?._id || '')
+      id: new FormControl('')
     });
+
+    // Update form if user data is already available
+    if (this.user) {
+      this.updateFormWithUserData();
+    }
+  }
+
+  // Custom validator for restricted words
+  private restrictedWordsValidator(control: FormControl): { [key: string]: any } | null {
+    const value = control.value?.toLowerCase();
+    if (!value) return null;
+
+    const isRestricted = this.restrictedWords.some(word => 
+      value.includes(word.toLowerCase())
+    );
+
+    return isRestricted ? { 'restrictedWord': true } : null;
+  }
+
+  private updateFormWithUserData(): void {
+    this.usernameForm.patchValue({
+      username: this.user?.username || '',
+      id: this.user?._id || ''
+    });
+    this.cdr.markForCheck(); // Ensure UI updates with new data
   }
 
   onSubmit(): void {
     if (this.usernameForm.invalid) {
+      if (this.usernameForm.get('username')?.errors?.['restrictedWord']) {
+        this.showNotification('This username contains a restricted word. Please choose another one.');
+      } else {
+        this.showNotification('Please enter a valid username');
+      }
       this.usernameForm.markAllAsTouched();
-      this.showNotification('Please enter a valid username');
       return;
     }
 
@@ -76,18 +116,20 @@ export class UsernameInfoComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.showNotification('Username updated successfully!', 'success');
           this.isLoading = false;
+          this.cdr.detectChanges(); // Trigger change detection after async operation
         },
         error: (error: HttpErrorResponse) => {
           const errorMessage = error.error?.message || 'Failed to update username. Please try again.';
           this.showNotification(errorMessage);
           this.isLoading = false;
+          this.cdr.detectChanges(); // Trigger change detection after error
         }
       })
     );
   }
 
   showHelp(): void {
-    this.dialog.open(UsernameDialogComponent, {
+    const dialogRef = this.dialog.open(UsernameDialogComponent, {
       width: '450px',
       data: {
         title: 'Username Guidelines',
@@ -99,6 +141,7 @@ export class UsernameInfoComponent implements OnInit, OnDestroy {
             <li>3-30 characters long</li>
             <li>Only letters, numbers and underscores (_)</li>
             <li>No spaces or special characters</li>
+            <li>Cannot contain restricted words (davido, davidotv, 30gb)</li>
           </ul>
 
           <h4>Good Examples:</h4>
@@ -113,6 +156,13 @@ export class UsernameInfoComponent implements OnInit, OnDestroy {
       },
       panelClass: 'help-dialog'
     });
+
+    // Handle dialog closing if needed
+    this.subscriptions.push(
+      dialogRef.afterClosed().subscribe(() => {
+        // Any cleanup or post-dialog logic
+      })
+    );
   }
 
   private showNotification(message: string, panelClass: string = 'error'): void {

@@ -442,10 +442,13 @@ export class ShopCategoryComponent implements OnInit {
   getRandomProductImage(): string {
     const images = [
       //'https://m.media-amazon.com/images/I/61-jBuhtgZL._AC_UY1100_.jpg',
-      '/img/store/clothing/shirt.JPG',
+      '/img/store/clothing/shirt.png',
       //'https://i5.walmartimages.com/asr/9a9f8f3f-5a5e-4f9b-8b8e-5e8f5b5e5e5e_1.3b9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c.jpeg',
-      '/img/store/clothing/hoodie.JPG',
-      '/img/store/clothing/cap.JPG',
+      '/img/store/clothing/hoodie.png',
+      '/img/store/clothing/cap.png',
+      '/img/store/clothing/brimless_cap.png',
+      '/img/store/clothing/cadigan.png',
+      '/img/store/clothing/cup.png',
     ];
     return images[Math.floor(Math.random() * images.length)];
   }

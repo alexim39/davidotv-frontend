@@ -54,25 +54,45 @@
         </h3>
 
         <div class="form-row">
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Best Hobby</mat-label>
-            <input matInput formControlName="hobby" required placeholder="E.g. Singing, Photography">
-            <mat-icon matSuffix>sports_esports</mat-icon>
-            <mat-error *ngIf="professionalForm.get('hobby')?.hasError('required')">
-              Hobby is required
-            </mat-error>
-            <mat-hint>What do you enjoy doing?</mat-hint>
-          </mat-form-field>
+        <!-- Skills Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Skills</mat-label>
+          <mat-chip-grid #skillGrid formControlName="skills">
+            <mat-chip-row *ngFor="let skill of skills" (removed)="removeSkill(skill)">
+              {{ skill }}
+              <button matChipRemove>
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip-row>
+            <input [matChipInputFor]="skillGrid" 
+                  placeholder="E.g. Singing, Photography"
+                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                  (matChipInputTokenEnd)="addSkill($event)">
+          </mat-chip-grid>
+          <mat-error *ngIf="professionalForm.get('skills')?.hasError('required')">
+            At least one skill is required
+          </mat-error>
+        </mat-form-field>
 
-          <mat-form-field appearance="outline" class="form-field">
-            <mat-label>Best Skill</mat-label>
-            <input matInput formControlName="skill" required placeholder="E.g. Video Editing, Graphic Design">
-            <mat-icon matSuffix>build</mat-icon>
-            <mat-error *ngIf="professionalForm.get('skill')?.hasError('required')">
-              Skill is required
-            </mat-error>
-            <mat-hint>What are you really good at?</mat-hint>
-          </mat-form-field>
+          <!-- Hobbies Field -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Hobbies</mat-label>
+          <mat-chip-grid #hobbyGrid formControlName="hobbies">
+            <mat-chip-row *ngFor="let hobby of hobbies" (removed)="removeHobby(hobby)">
+              {{ hobby }}
+              <button matChipRemove>
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip-row>
+            <input [matChipInputFor]="hobbyGrid" 
+                  placeholder="E.g. Video Editing, Graphic Design"
+                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                  (matChipInputTokenEnd)="addHobby($event)">
+          </mat-chip-grid>
+          <mat-error *ngIf="professionalForm.get('hobbies')?.hasError('required')">
+            At least one hobby is required
+          </mat-error>
+        </mat-form-field>
         </div>
       </div>
     </form>

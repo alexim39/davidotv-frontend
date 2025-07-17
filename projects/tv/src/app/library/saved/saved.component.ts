@@ -354,34 +354,34 @@ export class SavedVideoComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-  this.subscriptions.push(
-    this.userService.getCurrentUser$.pipe(
-      tap(user => {
-        this.user = user;
-        this.isAuthenticated = !!user;
-        this.cdRef.markForCheck(); // Mark for check instead of detectChanges
-      }),
-      filter(user => !!user), // Only proceed if user exists
-      switchMap(user => {
-        this.isLoading = true;
-        this.cdRef.markForCheck();
-        return this.videoService.getSavedVideos(user._id);
+    this.subscriptions.push(
+      this.userService.getCurrentUser$.pipe(
+        tap(user => {
+          this.user = user;
+          this.isAuthenticated = !!user;
+          this.cdRef.markForCheck(); // Mark for check instead of detectChanges
+        }),
+        filter(user => !!user), // Only proceed if user exists
+        switchMap(user => {
+          this.isLoading = true;
+          this.cdRef.markForCheck();
+          return this.videoService.getSavedVideos(user._id);
+        })
+      ).subscribe({
+        next: (response) => {
+          this.savedVideos = response.data.reverse();
+          this.isLoading = false;
+          this.cdRef.markForCheck();
+        },
+        error: (error: HttpErrorResponse) => {
+          const errorMessage = error.error?.message || 'Server error occurred, please try again.';
+          this.snackBar.open(errorMessage, 'Ok', {duration: 3000});
+          this.isLoading = false;
+          this.cdRef.markForCheck();
+        }
       })
-    ).subscribe({
-      next: (response) => {
-        this.savedVideos = response.data;
-        this.isLoading = false;
-        this.cdRef.markForCheck();
-      },
-      error: (error: HttpErrorResponse) => {
-        const errorMessage = error.error?.message || 'Server error occurred, please try again.';
-        this.snackBar.open(errorMessage, 'Ok', {duration: 3000});
-        this.isLoading = false;
-        this.cdRef.markForCheck();
-      }
-    })
-  );
-}
+    );
+  }
 
   loadSavedVideos(): void {
     // Only proceed if authenticated and user exists

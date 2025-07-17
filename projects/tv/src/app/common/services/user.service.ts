@@ -22,16 +22,42 @@ export interface UserInterface {
     playbackQuality: string
     theme: string; // dark/light
   };
-  phone?: string;
-  jobTitle?: string;
-  hobby?: string;
-  skill?: string;
   testimonial?: {
     message?: string;
   };
   dob?: Date;
   isActive?: boolean;
-  educationBackground?: string;
+  personalInfo: {
+    address: string;
+    email: string;
+    phone: string;
+    dob: Date;
+    bio: string;
+    jobTitle: string;
+    educationBackground?: string;
+  };
+  professionalInfo: {
+    skills: string[];
+    experience: {
+      company: string;
+      startDate: Date;
+      endDate: Date;
+      description: string;
+      current: boolean;
+    };
+    education: {
+      institution: string;
+      degree: string;
+      fieldOfStudy: string;
+      startDate: Date;
+      endDate: Date;
+      description: string;
+    };
+  };
+  interests: {
+    hobbies: string[];
+    favoriteTopics: string[];
+  };
 }
 
 @Injectable({ providedIn: 'root' })
@@ -40,7 +66,7 @@ export class UserService {
 
 
   /**
-   * Get user data to the backend API.
+   * Get user data from the backend API.
    * @returns An Observable that emits the API response or an error.
    */
   getUser(): Observable<any> {
