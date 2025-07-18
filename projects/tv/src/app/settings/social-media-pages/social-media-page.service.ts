@@ -13,9 +13,8 @@ export class SocialPageService {
    * @param formObject The form data.
    * @returns An observable of the submitted form data.
    */
-  updateTestimonial(formObject: {message: string; partnerId: string}): Observable<any> {
-    //console.log('form record', formObject);
-    return this.apiService.post<any>(`partners/testimonial`, formObject);
+  updateTestimonial(formObject: {message: string; userId: string}): Observable<any> {
+    return this.apiService.put<any>(`user/testimonial`, formObject);
   }
 
 

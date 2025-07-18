@@ -3,6 +3,7 @@ import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { SocialMediaPageSettingComponent } from './social-media-page.component';
 import { UserInterface, UserService } from '../../common/services/user.service';
+import { Router } from '@angular/router';
 
 /**
  * Social Media Page Settings Container Component
@@ -25,6 +26,7 @@ export class SocialMediaPageSettingContainerComponent implements OnInit, OnDestr
   private readonly subscription = new Subscription();
 
   user: UserInterface | null = null;
+  private router = inject(Router);
 
   ngOnInit(): void {
     this.subscribeToCurrentUser();
@@ -40,8 +42,9 @@ export class SocialMediaPageSettingContainerComponent implements OnInit, OnDestr
         this.user = user;
       },
       error: (error: unknown) => {
-        console.error('Failed to load user data:', error);
+        //console.error('Failed to load user data:', error);
         this.user = null;
+        this.router.navigate(['/'], { replaceUrl: true });
       }
     });
 

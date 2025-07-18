@@ -49,28 +49,37 @@ import { MatCardModule } from '@angular/material/card';
       </div>
     </div>
 
-    <div class="social-settings-content">
-      <mat-card class="settings-card">
-        <mat-tab-group animationDuration="200ms">
-          <mat-tab label="Testimonial">
-            <div class="tab-content">
-              <async-testimonial-writeup-settings *ngIf="user" [user]="user"/>
-            </div>
-          </mat-tab>
-        </mat-tab-group>
-      </mat-card>
+    <div class="settings-content">
+      <div class="settings-nav">
+        <button mat-raised-button routerLink="../account" routerLinkActive="active" (click)="scrollToTop()">
+          <mat-icon>account_circle</mat-icon> Account Settings
+        </button>
+      </div>
+
+
+      <div class="social-settings-content">
+        <mat-card class="settings-card">
+          <mat-tab-group animationDuration="200ms">
+            <mat-tab label="Testimonial">
+              <div class="tab-content">
+                <async-testimonial-writeup-settings *ngIf="user" [user]="user"/>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        </mat-card>
+      </div>
     </div>
   </div>
   `,
   styles: [`
   .social-settings-container {
-    background-color: #f9f9f9;
+    //background-color: #f9f9f9;
     min-height: 100vh;
     padding: 0;
   }
 
   .social-settings-header {
-    background-color: white;
+    //background-color: white;
     padding: 16px 24px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     border-bottom: 1px solid #e5e5e5;
@@ -123,7 +132,7 @@ import { MatCardModule } from '@angular/material/card';
       margin: 0;
       font-size: 24px;
       font-weight: 500;
-      color: #030303;
+      //color: #030303;
 
       .social-icon {
         color: #8f0045;
@@ -143,6 +152,37 @@ import { MatCardModule } from '@angular/material/card';
     }
   }
 
+
+  .settings-content {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 0 24px;
+  }
+
+  .settings-nav {
+    margin-bottom: 24px;
+
+    button {
+      //background-color: white;
+      color: #8f0045;
+      border: 1px solid #e5e5e5;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+
+      mat-icon {
+        margin-right: 8px;
+      }
+
+      &:hover {
+        background-color: rgba(143, 0, 69, 0.04);
+      }
+    }
+  }
+
+
   .social-settings-content {
     max-width: 1200px;
     margin: 24px auto;
@@ -157,7 +197,7 @@ import { MatCardModule } from '@angular/material/card';
     ::ng-deep .mat-tab-group {
       .mat-tab-header {
         border-bottom: none;
-        background-color: white;
+        //background-color: white;
       }
 
       .mat-tab-label {

@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { ApiService } from '../../common/services/api.service';
 
 export interface NotificationInterface {
-  state: boolean; partnerId: string; 
+  state: boolean; userId: string; 
 }
 export interface IncomeTargetInterface {
   partnerId: string;
@@ -40,17 +40,10 @@ export class SettingsService {
    * @param formObject The form data.
    * @returns An observable of the submitted form data.
    */
-  getThemeSetting(partnerId: string): Observable<any> {
-    return this.apiService.get<any>(`settings/theme/${partnerId}`);
+  getThemeSetting(userId: string): Observable<any> {
+    return this.apiService.get<any>(`settings/theme/${userId}`);
   }
 
-   /**
-   * Submits the notification form data to the backend.
-   * @param formObject The form data.
-   * @returns An observable of the submitted form data.
-   */
-   setIncomeTarget(formObject: IncomeTargetInterface): Observable<any> {
-    return this.apiService.post<any>('settings/income-target', formObject);
-  }
+
     
 }

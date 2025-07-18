@@ -186,42 +186,40 @@ export class TrendingAllComponent implements OnInit, OnDestroy {
     this.loadVideos();
   }
 
-
-
   loadVideos() {
-  if (this.loading || this.allLoaded) return;
-  
-  this.loading = true;
-  this.error = null;
+    if (this.loading || this.allLoaded) return;
+    
+    this.loading = true;
+    this.error = null;
 
-  this.videoSubscription = this.youtubeService.getTrendingVideos(this.pageSize, this.page, true).subscribe({
-    next: (response: any) => {
-      const newVideos = response.data || [];
-      
-      // If we get fewer videos than requested, we've reached the end
-      if (newVideos.length < this.pageSize) {
-        this.allLoaded = true;
+    this.videoSubscription = this.youtubeService.getTrendingVideos(this.pageSize, this.page, true).subscribe({
+      next: (response: any) => {
+        const newVideos = response.data || [];
+        
+        // If we get fewer videos than requested, we've reached the end
+        if (newVideos.length < this.pageSize) {
+          this.allLoaded = true;
+        }
+
+        // Avoid duplicates
+        const newUnique = newVideos.filter(
+          (v: any) => !this.videos.some(existing => existing.youtubeVideoId === v.youtubeVideoId)
+        );
+
+        this.videos = [...this.videos, ...newUnique];
+        this.filteredVideos = [...this.videos];
+        this.page++;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.error = 'Failed to load videos. Please try again later.';
+        this.loading = false;
+        this.cdr.detectChanges();
+        console.error('Error loading videos:', err);
       }
-
-      // Avoid duplicates
-      const newUnique = newVideos.filter(
-        (v: any) => !this.videos.some(existing => existing.youtubeVideoId === v.youtubeVideoId)
-      );
-
-      this.videos = [...this.videos, ...newUnique];
-      this.filteredVideos = [...this.videos];
-      this.page++;
-      this.loading = false;
-      this.cdr.detectChanges();
-    },
-    error: (err) => {
-      this.error = 'Failed to load videos. Please try again later.';
-      this.loading = false;
-      this.cdr.detectChanges();
-      console.error('Error loading videos:', err);
-    }
-  });
-}
+    });
+  }
 
   onContainerScroll(event: Event): void {
     const container = event.target as HTMLElement;

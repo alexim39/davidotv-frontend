@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { AccountComponent } from './account.component';
 import { UserInterface, UserService } from '../../common/services/user.service';
+import { Router } from '@angular/router';
 
 /**
  * Account Container Component
@@ -22,6 +23,7 @@ export class AccountContainerComponent implements OnInit, OnDestroy {
   private readonly subscriptions = new Subscription();
 
   user: UserInterface | null = null;
+  private router = inject(Router);
 
   ngOnInit(): void {
     this.subscribeToCurrentUser();
@@ -38,8 +40,9 @@ export class AccountContainerComponent implements OnInit, OnDestroy {
         this.user = user;
       },
       error: (error) => {
-        console.error('Error fetching user:', error);
+        //console.error('Error fetching user:', error);
         this.user = null;
+        this.router.navigate(['/'], { replaceUrl: true });
       }
     });
 

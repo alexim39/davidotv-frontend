@@ -17,18 +17,24 @@ export interface UserInterface {
   notification?: boolean;
   darkMode?: boolean;
   avater?: string;
-  preferences?: {
+  preferences: {
     autoplay: boolean;
-    playbackQuality: string
-    theme: string; // dark/light
-  };
+    notification: boolean;
+    playbackQuality: string;
+    theme: string;
+  }
   testimonial?: {
     message?: string;
   };
   dob?: Date;
   isActive?: boolean;
   personalInfo: {
-    address: string;
+    address: {
+      street: string;
+      city: string;
+      state: string;
+      country: string;
+    }
     email: string;
     phone: string;
     dob: Date;
@@ -58,6 +64,7 @@ export interface UserInterface {
     hobbies: string[];
     favoriteTopics: string[];
   };
+ 
 }
 
 @Injectable({ providedIn: 'root' })

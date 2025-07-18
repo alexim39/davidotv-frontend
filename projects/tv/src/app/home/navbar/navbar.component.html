@@ -123,17 +123,25 @@
         <mat-icon>home</mat-icon>
         <span>Home</span>
       </a>
+      <a mat-button routerLink="/videos/trending" (click)="toggleMobileMenu()">
+        <mat-icon>local_fire_department</mat-icon>
+        <span>Trending</span>
+      </a>
+       <a mat-button routerLink="/official/videos" (click)="toggleMobileMenu()">
+        <mat-icon>verified</mat-icon>
+        <span>Official</span>
+      </a>
       <a mat-button routerLink="/videos" (click)="toggleMobileMenu()">
         <mat-icon>video_library</mat-icon>
         <span>Videos</span>
       </a>
-      <a mat-button routerLink="/official/videos" (click)="toggleMobileMenu()">
-        <mat-icon>verified</mat-icon>
-        <span>Official</span>
-      </a>
       <a mat-button routerLink="/forum" (click)="toggleMobileMenu()">
         <mat-icon>forum</mat-icon>
         <span>Forum</span>
+      </a>
+      <a mat-button routerLink="/events" (click)="toggleMobileMenu()">
+        <mat-icon>event</mat-icon>
+        <span>Events</span>
       </a>
       <a mat-button routerLink="/store" (click)="toggleMobileMenu()">
         <mat-icon>shopping_bag</mat-icon>
@@ -155,6 +163,10 @@
       <a mat-button routerLink="/history" (click)="toggleMobileMenu()">
         <mat-icon>history</mat-icon>
         <span>History</span>
+      </a>
+      <a mat-button routerLink="/history" (click)="toggleMobileMenu(); uploadContent()">
+        <mat-icon>computer_arrow_up</mat-icon>
+        <span>Upload</span>
       </a>
       <a mat-button routerLink="/settings/account" (click)="toggleMobileMenu()">
         <mat-icon>settings</mat-icon>

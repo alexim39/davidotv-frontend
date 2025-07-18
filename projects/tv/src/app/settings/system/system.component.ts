@@ -4,7 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { DarkThemeSettingsComponent } from './dark-theme/dark-theme.component';
+//import { DarkThemeSettingsComponent } from './dark-theme/dark-theme.component';
 import { CommonModule } from '@angular/common';
 import { NotificationSettingsComponent } from './notification/notification.component';
 import { HelpDialogComponent } from '../../common/help-dialog.component';
@@ -14,7 +14,7 @@ import { MatCardModule } from '@angular/material/card';
 @Component({
   selector: 'async-system-setting',
   standalone: true,
-  imports: [MatTabsModule, RouterModule, MatCardModule, CommonModule, MatIconModule, MatButtonModule, DarkThemeSettingsComponent, NotificationSettingsComponent],
+  imports: [MatTabsModule, RouterModule, MatCardModule, CommonModule, MatIconModule, MatButtonModule, NotificationSettingsComponent],
   template: `
   <div class="settings-container">
     <div class="settings-header">
@@ -49,9 +49,9 @@ import { MatCardModule } from '@angular/material/card';
 
       <mat-card class="settings-card">
         <mat-tab-group animationDuration="200ms">
-          <mat-tab label="Appearance">
+          <!-- <mat-tab label="Appearance">
             <async-dark-theme-settings *ngIf="user" [user]="user"/>
-          </mat-tab>
+          </mat-tab> -->
           <mat-tab label="Notifications"> 
             <async-notification *ngIf="user" [user]="user"/>
           </mat-tab>
@@ -62,13 +62,13 @@ import { MatCardModule } from '@angular/material/card';
   `,
   styles: [`
   .settings-container {
-    background-color: #f9f9f9;
+    //background-color: #f9f9f9;
     min-height: 100vh;
     padding: 0;
   }
 
   .settings-header {
-    background-color: white;
+    //background-color: white;
     padding: 16px 24px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     border-bottom: 1px solid #e5e5e5;
@@ -121,7 +121,7 @@ import { MatCardModule } from '@angular/material/card';
       margin: 0;
       font-size: 24px;
       font-weight: 500;
-      color: #030303;
+      //color: #030303;
 
       .settings-icon {
         color: #8f0045;
@@ -138,6 +138,7 @@ import { MatCardModule } from '@angular/material/card';
       margin: 4px 0 0;
       color: #606060;
       font-size: 14px;
+
     }
   }
 
@@ -151,7 +152,7 @@ import { MatCardModule } from '@angular/material/card';
     margin-bottom: 24px;
 
     button {
-      background-color: white;
+      //background-color: white;
       color: #8f0045;
       border: 1px solid #e5e5e5;
       border-radius: 4px;
@@ -178,7 +179,7 @@ import { MatCardModule } from '@angular/material/card';
     ::ng-deep .mat-tab-group {
       .mat-tab-header {
         border-bottom: none;
-        background-color: white;
+        //background-color: white;
       }
 
       .mat-tab-label {

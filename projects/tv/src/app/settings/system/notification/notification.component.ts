@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -8,6 +8,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { UserInterface } from '../../../common/services/user.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'async-notification',
@@ -54,11 +55,12 @@ import { MatCardModule } from '@angular/material/card';
   `,
   styles: [`
     .notification-settings {
+      padding: 1em;
       .section-title {
         font-size: 18px;
         font-weight: 500;
         margin: 0 0 8px;
-        color: #030303;
+        //color: #030303;
       }
 
       .section-description {
@@ -106,7 +108,7 @@ import { MatCardModule } from '@angular/material/card';
 
         ::ng-deep .mat-slide-toggle {
           .mat-slide-toggle-bar {
-            background-color: #ccc;
+           // background-color: #ccc;
           }
 
           &.mat-checked .mat-slide-toggle-bar {
@@ -114,7 +116,7 @@ import { MatCardModule } from '@angular/material/card';
           }
 
           .mat-slide-toggle-thumb {
-            background-color: #f1f1f1;
+            //background-color: #f1f1f1;
           }
 
           &.mat-checked .mat-slide-toggle-thumb {
@@ -170,20 +172,21 @@ export class NotificationSettingsComponent implements OnInit, OnDestroy {
   @Input() user!: UserInterface;
   subscriptions: Array<Subscription> = [];
   isTurnedOn: boolean = false;
+  private snackBar = inject(MatSnackBar);
 
   constructor(
      private settingsService: SettingsService,
   ) {}
 
   ngOnInit(): void {
-    // this.isTurnedOn = this.user.notification;
+    this.isTurnedOn = this.user.preferences.notification;
   }
 
   toggleNotification(event: MatSlideToggleChange): void {
     this.isTurnedOn = event.checked;
     const formObject = {
       state: this.isTurnedOn,
-      partnerId: this.user._id 
+      userId: this.user._id 
     }
     this.sendNotificationStateToBackend(formObject);
   }
@@ -191,8 +194,19 @@ export class NotificationSettingsComponent implements OnInit, OnDestroy {
   private sendNotificationStateToBackend(formObject: NotificationInterface): void {
     this.subscriptions.push(
       this.settingsService.toggleNotification(formObject).subscribe({
-        next: (res) => {},
-        error: (error: HttpErrorResponse) => {}
+        next: (response) => {
+          this.snackBar.open(response.message, 'Ok',{duration: 3000});
+        },
+         error: (error: HttpErrorResponse) => {
+          //this.isSpinning = false;
+
+          let errorMessage = 'Server error occurred, please try again.'; // default error message.
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message; // Use backend's error message if available.
+          }  
+          this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
+          //this.cdr.markForCheck();
+        }
       })
     );
   }

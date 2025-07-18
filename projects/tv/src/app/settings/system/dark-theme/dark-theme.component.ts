@@ -231,13 +231,13 @@ export class DarkThemeSettingsComponent implements OnInit, OnDestroy {
     this.isDarkMode = event.checked;
     const formObject = {
       state: this.isDarkMode,
-      partnerId: this.user._id,
+      userId: this.user._id,
     };
   
     this.sendThemeStateToBackend(formObject);
   }
 
-  private sendThemeStateToBackend(formObject: { state: boolean; partnerId: string }): void {
+  private sendThemeStateToBackend(formObject: { state: boolean; userId: string }): void {
     this.subscriptions.push(
       this.settingsService.toggleTheme(formObject).subscribe({
         next: () => {
