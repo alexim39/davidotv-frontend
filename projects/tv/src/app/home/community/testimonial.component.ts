@@ -40,10 +40,10 @@ template: `
       <button mat-button class="engagement-button">
         <mat-icon class="engagement-icon">thumb_down</mat-icon>
       </button>
-      <button mat-button class="engagement-button">
+     <!--  <button mat-button class="engagement-button">
         <mat-icon class="engagement-icon">comment</mat-icon>
         <span class="count">{{testimonial.comments || 0}}</span>
-      </button>
+      </button> -->
       <button mat-button class="engagement-button share-button">
         <mat-icon class="engagement-icon">share</mat-icon>
         <span>Share</span>
