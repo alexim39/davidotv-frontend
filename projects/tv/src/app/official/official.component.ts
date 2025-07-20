@@ -127,7 +127,7 @@ import { YoutubeService } from "../common/services/youtube.service";
 
             <!-- No results -->
             <div *ngIf="!initialLoading && filteredVideos.length === 0 && !error" class="no-results">
-              <mat-icon class="no-results-icon">search_off</mat-icon>
+              <mat-icon>search_off</mat-icon>
               <h3>No videos found</h3>
               <p>Try adjusting your search or filter criteria</p>
               <button mat-flat-button color="primary" (click)="resetFilters()">Reset Filters</button>
@@ -135,7 +135,7 @@ import { YoutubeService } from "../common/services/youtube.service";
 
             <!-- Error state -->
             <div *ngIf="error" class="error-state">
-              <mat-icon class="error-icon">error_outline</mat-icon>
+              <mat-icon>error_outline</mat-icon>
               <h3>Error loading videos</h3>
               <p>{{ error }}</p>
               <button mat-raised-button color="primary" (click)="retryLoading()">Retry</button>

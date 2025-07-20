@@ -180,13 +180,17 @@
     background: var(--bg-color);
 
     mat-icon {
-      margin-right: 16px;
+      //margin-right: 16px;
       color: var(--text-secondary);
     }
 
-    &:hover {
-      background: var(--hover-bg) !important;
-    }
+    &.active {
+        color: #8f0045;
+
+        mat-icon {
+          color: #8f0045;
+        }
+      }
   }
 
   /* Auth Section */

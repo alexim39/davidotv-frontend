@@ -44,6 +44,7 @@ export const HomeRoutes: Routes = [
             { path: 'store', loadChildren: () => import('./../store/store.route').then(r => r.StoreRoutes) },   
             { path: 'auth', loadChildren: () => import('./../auth/auth.route').then(r => r.AuthRoutes) },   
             { path: 'settings', loadChildren: () => import('./../settings/settings-routes').then(r => r.SettingsRoutes) }, 
+            { path: 'chat', loadChildren: () => import('./../chatroom/chatroom.routes').then(r => r.ChatroomRoutes) }, 
         ]
     }
 ];

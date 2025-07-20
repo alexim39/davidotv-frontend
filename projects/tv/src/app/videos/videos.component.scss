@@ -201,7 +201,7 @@
       font-weight: 500;
     } */
 
-    .no-results {
+    .no-results, .error-state {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -210,7 +210,7 @@
       text-align: center;
       padding: 24px;
 
-      .no-results-icon {
+      mat-icon {
         font-size: 48px;
         width: 48px;
         height: 48px;

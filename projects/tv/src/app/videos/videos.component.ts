@@ -126,7 +126,7 @@ import { throttleTime } from 'rxjs/operators';
 
         <!-- No results -->
         <div *ngIf="!loading && filteredVideos.length === 0 && !error" class="no-results">
-          <mat-icon class="no-results-icon">search_off</mat-icon>
+          <mat-icon>search_off</mat-icon>
           <h3>No videos found</h3>
           <p>Try adjusting your search or filter criteria</p>
           <button mat-flat-button color="primary" (click)="resetFilters()">Reset Filters</button>
@@ -134,7 +134,7 @@ import { throttleTime } from 'rxjs/operators';
 
         <!-- Error state -->
         <div *ngIf="error" class="error-state">
-          <mat-icon class="error-icon">error_outline</mat-icon>
+          <mat-icon>error_outline</mat-icon>
           <h3>Error loading videos</h3>
           <p>{{ error }}</p>
           <button mat-raised-button color="primary" (click)="retryLoading()">Retry</button>

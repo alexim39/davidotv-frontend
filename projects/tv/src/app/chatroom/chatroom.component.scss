@@ -1,0 +1,239 @@
+.chat-container {
+  display: flex;
+  height: 100vh;
+
+  &.mobile {
+    .sidenav-container {
+      width: 100%;
+    }
+  }
+}
+
+.sidenav-container {
+  width: 100%;
+  height: 100%;
+
+  .sidenav {
+    width: 300px;
+    border-right: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    .sidebar-header {
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      background-color: #8f0045;
+      color: white;
+
+      h2 {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      button {
+        //color: white;
+      }
+    }
+
+    mat-accordion {
+      mat-expansion-panel {
+        box-shadow: none;
+        border-bottom: 1px solid #eee;
+
+        mat-expansion-panel-header {
+          padding: 0 16px;
+          height: 48px;
+
+          mat-panel-title {
+            font-weight: 500;
+          }
+        }
+
+        mat-nav-list {
+          padding-top: 0;
+
+          a.mat-list-item {
+            height: 48px;
+            color: #333;
+
+            &.active {
+              background-color: rgba(143, 0, 69, 0.1);
+              color: #8f0045;
+            }
+
+            .room-name {
+              margin-left: 8px;
+            }
+
+            .unread-badge {
+              margin-left: auto;
+              background-color: #8f0045;
+              color: white;
+              border-radius: 50%;
+              width: 20px;
+              height: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 0.7rem;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .chat-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .chat-header {
+      padding: 16px;
+      border-bottom: 1px solid #eee;
+      position: relative;
+
+      .menu-button {
+        display: none;
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      h2 {
+        margin: 0;
+        color: #8f0045;
+        text-align: center;
+      }
+
+      .room-description {
+        margin: 4px 0 0;
+        color: #666;
+        font-size: 0.9rem;
+        text-align: center;
+      }
+    }
+
+    .messages-container {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+
+      .message {
+        display: flex;
+        margin-bottom: 16px;
+        max-width: 80%;
+
+        &.sent {
+          margin-left: auto;
+          flex-direction: row-reverse;
+
+          .message-content {
+            border-radius: 18px 18px 0 18px;
+            box-shadow: 0 1px 3px rgba(3, 237, 7, 0.8);
+          }
+        }
+
+        .avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          margin-right: 12px;
+          object-fit: cover;
+          align-self: flex-end;
+        }
+
+        .message-content {
+          padding: 12px 16px;
+          border-radius: 18px 18px 18px 0;
+          box-shadow: 0 1px 3px rgba(237, 3, 155, 0.8);
+
+          .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 0.8rem;
+
+            .sender-name {
+              font-weight: bold;
+            }
+
+            .message-time {
+              color: #999;
+              margin-left: 8px;
+            }
+          }
+
+          .message-text {
+            word-wrap: break-word;
+          }
+        }
+      }
+    }
+
+    .message-input {
+      padding: 16px;
+      border-top: 1px solid #eee;
+
+      .full-width {
+        width: 100%;
+      }
+    }
+  }
+
+  .no-room-selected {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #666;
+    text-align: center;
+    padding: 16px;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      color: #8f0045;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      color: #333;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-container {
+    .sidenav-container {
+      .sidenav {
+        width: 260px;
+      }
+
+      .chat-content {
+        .chat-header {
+          .menu-button {
+            display: block;
+          }
+
+          h2, .room-description {
+            padding-left: 40px;
+            text-align: left;
+          }
+        }
+
+        .messages-container {
+          .message {
+            max-width: 90%;
+          }
+        }
+      }
+    }
+  }
+}

@@ -59,7 +59,9 @@ import { MatDialog } from '@angular/material/dialog';
               <mat-icon>subscriptions</mat-icon>
               <span>Subscriptions</span>
             </a> -->
+
             <mat-divider></mat-divider>
+
             <a mat-list-item routerLink="/library" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>video_library</mat-icon>
               <span>Library</span>
@@ -68,7 +70,9 @@ import { MatDialog } from '@angular/material/dialog';
               <mat-icon>history</mat-icon>
               <span>History</span>
             </a>
+
             <mat-divider></mat-divider>
+
             <h3 matSubheader>FAN COMMUNITY</h3>
             <a mat-list-item routerLink="/forum" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>groups</mat-icon>
@@ -81,6 +85,10 @@ import { MatDialog } from '@angular/material/dialog';
             <a mat-list-item (click)="uploadContent()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>computer_arrow_up</mat-icon>
               <span>Upload</span>
+            </a>
+             <a mat-list-item (click)="chatRoom()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+              <mat-icon>chat</mat-icon>
+              <span>chat rooms</span>
             </a>
             <a mat-list-item routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>storefront</mat-icon>
@@ -335,9 +343,17 @@ export class HomeContainerComponent implements OnInit, OnDestroy {
     }
 
 
-   uploadContent(): void {    
+  uploadContent(): void {    
     if (this.isAuthenticated) {
       this.router.navigateByUrl('upload');
+    } else {
+      this.authDialog();
+    }
+  }
+
+  chatRoom(): void {    
+    if (this.isAuthenticated) {
+      this.router.navigateByUrl('chat');
     } else {
       this.authDialog();
     }
