@@ -1,19 +1,23 @@
-import { ChangeDetectorRef, Component, inject, Input, signal} from '@angular/core';
-import {MatExpansionModule} from '@angular/material/expansion';
-import {MatInputModule} from '@angular/material/input';
-import {MatButtonModule} from '@angular/material/button';
+import { ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';  
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
-import { SocialPageService } from '../social-media-page.service';
+import { AppReviewService } from '../app-review.service';
 import { Subscription } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSelectModule } from '@angular/material/select';
 import { UserInterface } from '../../../common/services/user.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Router } from '@angular/router';
+import { TestimonialInterface } from '../../../home/home.service';
+import { MatDividerModule } from '@angular/material/divider';
+import { DatePipe } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'async-testimonial-writeup-settings',
@@ -27,16 +31,54 @@ import { Router } from '@angular/router';
     ReactiveFormsModule, 
     MatFormFieldModule,
     MatCardModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatDividerModule,
+    DatePipe,
+    MatIconModule,
   ],
-  providers: [SocialPageService],
+  providers: [AppReviewService],
   template: `
   <div class="testimonial-settings">
     <h3 class="section-title">Share Your Experience</h3>
     <p class="section-description">Write a testimonial about your experience with Davidotv</p>
 
+    <!-- Loading state -->
+    <mat-card *ngIf="isLoading" class="loading-state">
+      <mat-card-content>
+        <div class="loading-content">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          <p>Loading your testimonial...</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Error state -->
+    <mat-card *ngIf="error && !isLoading" class="error-state">
+      <mat-card-content>
+        <div class="error-content">
+          <mat-icon>error_outline</mat-icon>
+          <p>{{ error }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card *ngIf="isProfileComplete() && !testimonial?.message && !isLoading" class="write-testimonial-prompt">
+    <mat-card-content>
+      <div class="prompt-content">
+        <mat-icon>edit</mat-icon>
+        <div class="prompt-text">
+          <h4>Share Your Experience</h4>
+          <p>You haven't written a testimonial yet. Let others know about your experience with Davidotv!</p>
+        </div>
+        <button mat-flat-button color="primary" (click)="writeTestimonial()">
+          Write Testimonial
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
     <!-- Profile completion notification -->
-    <mat-card *ngIf="!isProfileComplete()" class="profile-completion-notification">
+    <mat-card *ngIf="!isProfileComplete() && !isLoading" class="profile-completion-notification">
       <mat-card-content>
         <div class="notification-content">
           <span class="notification-icon">⚠️</span>
@@ -51,7 +93,23 @@ import { Router } from '@angular/router';
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="testimonial-form-card">
+    <!-- Existing testimonial display -->
+    <mat-card *ngIf="testimonial && !isLoading && !error" class="existing-testimonial">
+      <mat-card-header>
+        <mat-card-title>Your Current Testimonial</mat-card-title>
+        <mat-card-subtitle>Posted on {{testimonial.createdAt | date}}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p class="testimonial-content">{{ testimonial.message }}</p>
+      </mat-card-content>
+      <mat-divider></mat-divider>
+      <mat-card-actions>
+        <button mat-button color="primary" (click)="editTestimonial()">Edit Testimonial</button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Testimonial form (shown when editing or no testimonial exists) -->
+    <mat-card *ngIf="isEditing && !isLoading" class="testimonial-form-card">
       <form [formGroup]="testimonialForm" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Your Testimonial</mat-label>
@@ -83,13 +141,13 @@ import { Router } from '@angular/router';
           </mat-form-field>
         </div>
 
-          <mat-progress-bar mode="indeterminate" *ngIf="isSpinning"/>
-
+        <mat-progress-bar mode="indeterminate" *ngIf="isSpinning"/>
 
         <div class="form-actions">
           <button mat-flat-button color="primary" type="submit" [disabled]="testimonialForm.invalid || !isProfileComplete()">
-            Publish Testimonial
+            {{ testimonial ? 'Update' : 'Publish' }} Testimonial
           </button>
+          <button *ngIf="testimonial && isEditing" mat-button (click)="cancelEdit()">Cancel</button>
         </div>
       </form>
     </mat-card>
@@ -109,6 +167,32 @@ import { Router } from '@angular/router';
       font-size: 14px;
       color: #606060;
       margin: 0 0 24px;
+    }
+
+    .loading-state, .error-state {
+      margin-bottom: 24px;
+
+      mat-card-content {
+        padding: 16px;
+      }
+
+      .loading-content, .error-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        p {
+          margin: 0;
+        }
+      }
+
+      .error-content {
+        color: #d32f2f;
+
+        mat-icon {
+          color: #d32f2f;
+        }
+      }
     }
 
     .profile-completion-notification {
@@ -143,6 +227,19 @@ import { Router } from '@angular/router';
       }
     }
 
+    .existing-testimonial {
+      margin-bottom: 24px;
+
+      .testimonial-content {
+        white-space: pre-line;
+        line-height: 1.6;
+      }
+
+      mat-divider {
+        margin: 16px 0;
+      }
+    }
+
     .testimonial-form-card {
       padding: 24px;
       border-radius: 8px;
@@ -169,6 +266,7 @@ import { Router } from '@angular/router';
       .form-actions {
         display: flex;
         justify-content: flex-end;
+        gap: 8px;
 
         button {
           padding: 0 24px;
@@ -205,13 +303,66 @@ import { Router } from '@angular/router';
       }
     }
   }
+
+  .write-testimonial-prompt {
+    margin-bottom: 24px;
+   border: 1px solid #666;
+
+    .prompt-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      mat-icon {
+        color: #8f0045;
+        font-size: 32px;
+        height: 32px;
+        width: 32px;
+      }
+
+      .prompt-text {
+        flex: 1;
+
+        h4 {
+          margin: 0 0 4px;
+          font-size: 16px;
+          color: #333;
+        }
+
+        p {
+          margin: 0;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .write-testimonial-prompt {
+      .prompt-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
+
   `]
 })
-export class TestimonialWriteupSettingsComponent {
+export class TestimonialWriteupSettingsComponent implements OnInit, OnDestroy {
   @Input() user!: UserInterface;
+  @Input() testimonial: TestimonialInterface | null = null;
+  @Input() isLoading = false;
+  @Input() error: string | null = null;
+  
   subscriptions: Array<Subscription> = [];
   private snackBar = inject(MatSnackBar);
   isSpinning = false;
+  isEditing = false;
   
   testimonialForm!: FormGroup;  
   private cdr = inject(ChangeDetectorRef);
@@ -219,21 +370,25 @@ export class TestimonialWriteupSettingsComponent {
 
   constructor(
     private fb: FormBuilder,
-    private socialPageService: SocialPageService,
+    private socialPageService: AppReviewService,
   ) {}
 
   ngOnInit(): void {
+    this.initForm();
+  }
+
+  initForm(): void {
     this.testimonialForm = this.fb.group({  
-      message: [this.user?.testimonial?.message || '', {
+      message: [this.testimonial?.message || '', {
         validators: [Validators.required],
         asyncValidators: []
       }],
       country: [this.user?.personalInfo?.address?.country, {
-        validators: [Validators.required],
+        //validators: [Validators.required],
         asyncValidators: []
       }],
       state: [this.user?.personalInfo?.address?.state, {
-        validators: [Validators.required],
+        //validators: [Validators.required],
         asyncValidators: []
       }],
     });
@@ -249,39 +404,60 @@ export class TestimonialWriteupSettingsComponent {
     this.router.navigate(['/settings/account']);
   }
 
+  // Edit existing testimonial
+  editTestimonial(): void {
+    this.isEditing = true;
+    this.initForm(); // Reinitialize form with current testimonial
+  }
+
+  // write testimonial
+  writeTestimonial(): void {
+    this.isEditing = true;
+    this.initForm(); // Reinitialize form with current testimonial
+  }
+
+  // Cancel editing
+  cancelEdit(): void {
+    this.isEditing = false;
+  }
+
   onSubmit() {  
     if (!this.isProfileComplete()) {
-      this.snackBar.open('Please complete your profile information first', 'Ok', {duration: 3000});
-      return;
+        this.snackBar.open('Please complete your profile information first', 'Ok', {duration: 3000});
+        return;
     }
 
     this.isSpinning = true;
     if (this.testimonialForm.valid) {  
-      const updateObject = {
-        message: this.testimonialForm.value.message,
-        userId: this.user._id,
-      };
+        const updateObject = {
+            message: this.testimonialForm.value.message,
+            userId: this.user._id,
+        };
 
-      this.subscriptions.push(
-        this.socialPageService.updateTestimonial(updateObject).subscribe({
-          next: (response) => {
-            this.isSpinning = false;
-            this.snackBar.open(response.message, 'Ok',{duration: 3000});
-            this.cdr.markForCheck();
-          },
-          error: (error: HttpErrorResponse) => {
-            this.isSpinning = false;
-            let errorMessage = 'Server error occurred, please try again.';
-            if (error.error && error.error.message) {
-              errorMessage = error.error.message;
-            }  
-            this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
-            this.cdr.markForCheck();
-          }
-        })
-      );
+        // Always use updateTestimonial (it can handle both create and update)
+        this.subscriptions.push(
+            this.socialPageService.updateTestimonial(updateObject).subscribe({
+                next: (response) => {
+                    this.isSpinning = false;
+                    this.isEditing = false;
+                    this.snackBar.open(response.message, 'Ok', {duration: 3000});
+                    // Update the testimonial with the new data
+                    this.testimonial = response.data;
+                    this.cdr.markForCheck();
+                },
+                error: (error: HttpErrorResponse) => {
+                    this.isSpinning = false;
+                    let errorMessage = 'Server error occurred, please try again.';
+                    if (error.error && error.error.message) {
+                        errorMessage = error.error.message;
+                    }  
+                    this.snackBar.open(errorMessage, 'Ok', {duration: 3000});
+                    this.cdr.markForCheck();
+                }
+            })
+        );
     }  
-  } 
+} 
 
   ngOnDestroy() {
     this.subscriptions.forEach(subscription => {

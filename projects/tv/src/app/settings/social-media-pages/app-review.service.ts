@@ -4,7 +4,7 @@ import { ApiService } from '../../common/services/api.service';
 
 
 @Injectable()
-export class SocialPageService {
+export class AppReviewService {
   constructor(private apiService: ApiService) {}
 
 
@@ -15,6 +15,11 @@ export class SocialPageService {
    */
   updateTestimonial(formObject: {message: string; userId: string}): Observable<any> {
     return this.apiService.put<any>(`user/testimonial`, formObject);
+  }
+
+
+  getTestimonial(userId: string | undefined): Observable<any> {
+    return this.apiService.get<any>(`user/testimonial/getOne/${userId}`, undefined, undefined, true);
   }
 
 

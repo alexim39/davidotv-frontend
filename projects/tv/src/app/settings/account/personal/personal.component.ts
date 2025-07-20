@@ -143,7 +143,7 @@ export class PersonalInfoComponent implements OnInit, OnDestroy {
         Validators.required,
         Validators.maxLength(50)
       ]),
-      state: new FormControl('', [
+      state: new FormControl(this.user?.personalInfo?.address?.state, [
         Validators.required,
         Validators.maxLength(50)
       ]),

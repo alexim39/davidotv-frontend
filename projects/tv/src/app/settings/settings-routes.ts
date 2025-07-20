@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { SystemSettingContainerComponent } from './system/system-container.component';
 import { AccountContainerComponent } from './account/account-container.component';
-import { SocialMediaPageSettingContainerComponent } from './social-media-pages/social-media-page-container.component';
+import { AppReveiwSettingContainerComponent } from './social-media-pages/app-review-container.component';
 
 export const SettingsRoutes: Routes = [
   {
@@ -24,8 +24,8 @@ export const SettingsRoutes: Routes = [
       },
       {
         path: 'share-reviews',
-        component: SocialMediaPageSettingContainerComponent,
-        title: "Socal Media Setting - Configure your social profile settings",
+        component: AppReveiwSettingContainerComponent,
+        title: "App Review - Reveiw and testify about DavidoTV",
       },
     ],
   },

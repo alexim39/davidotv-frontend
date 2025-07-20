@@ -9,6 +9,8 @@ import { EventsCarouselComponent } from '../../event/events-carousel.component';
 import { HomeService, TestimonialInterface } from '../home.service';
 import { Subscription } from 'rxjs';
 import { CommunityTestimonialComponent } from './testimonial.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { UserInterface, UserService } from '../../common/services/user.service';
 
 @Component({
   selector: 'async-community',
@@ -53,7 +55,7 @@ import { CommunityTestimonialComponent } from './testimonial.component';
         <mat-tab label="App Reviews">
           <div class="fans-container">
 
-          <community-testimonial *ngIf="testimonials" [testimonials]="testimonials"/>
+          <community-testimonial *ngIf="testimonials && user" [testimonials]="testimonials" [user]="user"/>
             
 
           </div>
@@ -111,35 +113,55 @@ export class CommunityComponent implements OnInit, OnDestroy {
   private homeService = inject(HomeService);
   private cdr = inject(ChangeDetectorRef);
   testimonials: Array<TestimonialInterface> = []
+  subscriptions: Subscription[] = [];
+
+   private snackBar = inject(MatSnackBar);
+   private userService = inject(UserService);
+   user: UserInterface | null = null;
 
    ngOnInit() {
-    this.loadVideos();
+
+     this.subscriptions.push(
+      this.userService.getCurrentUser$.subscribe({
+        next: (user) => {
+          this.user = user;
+          if (this.user ) {
+            this.loadTestimonial(this.user?._id);
+          }
+        }
+      })
+    )
   }
 
 
-    loadVideos() {
+  loadTestimonial(userId: string | undefined) {
     if (this.loading ) return;
     
     this.loading = true;
 
-    this.testimonialsSubscription = this.homeService.getTestimonials().subscribe({
-      next: (response) => {
-        this.loading = true;
+    this.subscriptions.push(
+       this.testimonialsSubscription = this.homeService.getTestimonials(userId).subscribe({
+        next: (response) => {
+          this.loading = true;
+          //console.log('testimonials ',response.testimonials)
+          this.testimonials = response.testimonials;
+        
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          this.loading = false;
+          this.cdr.detectChanges();
+          console.error('Error loading videos:', error);
+        }
+      })
+    )
 
-        console.log('testimonials ',response.testimonials)
-        this.testimonials = response.testimonials;
-       
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        this.loading = false;
-        this.cdr.detectChanges();
-        console.error('Error loading videos:', error);
-      }
-    });
+   
   }
 
    ngOnDestroy() {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+
     if (this.testimonialsSubscription) {
       this.testimonialsSubscription.unsubscribe();
     }

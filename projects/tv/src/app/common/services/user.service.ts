@@ -10,7 +10,6 @@ export interface UserInterface {
   email: string;
   username: string;
   bio?: string;
-  address?: string;
   role?: string;
   profileImage?: string;
   createdAt?: Date;

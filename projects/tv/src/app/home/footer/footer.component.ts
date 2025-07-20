@@ -439,7 +439,7 @@ export class FooterComponent implements OnInit {
   }
 }
 
-   ngOnDestroy() {
+  ngOnDestroy() {
     // unsubscribe list
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   } 

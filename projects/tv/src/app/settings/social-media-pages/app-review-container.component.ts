@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { SocialMediaPageSettingComponent } from './social-media-page.component';
+import { AppReviewSettingComponent } from './app-review.component';
 import { UserInterface, UserService } from '../../common/services/user.service';
 import { Router } from '@angular/router';
 
@@ -11,17 +11,17 @@ import { Router } from '@angular/router';
  * @description Wrapper component for social media page settings that manages user data
  */
 @Component({
-  selector: 'async-social-media-page-setting-container',
+  selector: 'async-review-setting-container',
   standalone: true,
-  imports: [CommonModule, SocialMediaPageSettingComponent],
+  imports: [CommonModule, AppReviewSettingComponent],
   template: `
-    <async-social-media-page-setting 
+    <async-review-setting 
       *ngIf="user" 
       [user]="user"
     />
   `,
 })
-export class SocialMediaPageSettingContainerComponent implements OnInit, OnDestroy {
+export class AppReveiwSettingContainerComponent implements OnInit, OnDestroy {
   private readonly userService = inject(UserService);
   private readonly subscription = new Subscription();
 
