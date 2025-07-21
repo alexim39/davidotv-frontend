@@ -204,7 +204,6 @@ declare global {
             <async-video-comments 
               [comments]="comments"
               [currentUserAvatar]="currentUserAvatar"
-              [currentUserId]="user?._id || ''"
               (commentAdded)="onCommentAdded($event)"
               (commentLiked)="onCommentLiked($event)"
               (replyAdded)="onReplyAdded($event)"
@@ -872,20 +871,61 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
+  // onCommentAdded(commentData: {text: string}) {
+  //   if (!this.user) return;
+
+  //   this.videoCommentService.addComment(
+  //     this.currentVideoId,
+  //     this.user._id,
+  //     commentData.text
+  //   ).subscribe({
+  //     next: (updatedVideo) => {
+  //       this.comments = updatedVideo.comments;
+  //       this.snackBar.open('Comment posted', 'Close', { duration: 2000 });
+  //     },
+  //     error: (err) => {
+  //       this.snackBar.open('Failed to post comment', 'Close', { duration: 3000 });
+  //     }
+  //   });
+  // }
+
+
+
   onCommentAdded(commentData: {text: string}) {
     if (!this.user) return;
+
+    // Create a temporary comment object that matches the Comment interface
+    const tempComment: Comment = {
+      _id: 'temp_' + Date.now(), // Temporary ID
+      videoId: this.currentVideoId,
+      userId: this.user._id,
+      avatar: this.user.avatar || 'img/avatar.png',
+      name: `${this.user.name}`, // or `${this.user.name} ${this.user.lastname}` if available
+      text: commentData.text,
+      likes: 0,
+      createdAt: new Date()
+    };
 
     this.videoCommentService.addComment(
       this.currentVideoId,
       this.user._id,
       commentData.text
     ).subscribe({
-      next: (updatedVideo) => {
-        //this.comments = updatedVideo.comments;
-        this.snackBar.open('Comment posted', 'Close', { duration: 2000 });
+      next: (response) => {
+        console.log('returned comment ', response);
+        
+        // Optimistically add the temporary comment to the beginning of the comments array
+        this.comments = [tempComment, ...this.comments];
+
+        //this.snackBar.open('Comment posted', 'Close', { duration: 2000 });
+
+        this.cdr.detectChanges(); 
       },
-      error: (err) => {
+      error: (error: HttpErrorResponse) => {
+        // Remove the temporary comment if the request fails
+        this.comments = this.comments.filter(c => c._id !== tempComment._id);
         this.snackBar.open('Failed to post comment', 'Close', { duration: 3000 });
+        this.cdr.detectChanges(); 
       }
     });
   }

@@ -7,8 +7,8 @@ export interface Comment {
   _id?: string;
   videoId: string;
   userId: string;
-  userAvatar: string;
-  username: string;
+  avatar?: string;
+  name: string;
   text: string;
   likes: number;
   createdAt?: Date;
@@ -22,19 +22,18 @@ export class VideoCommentService {
 
 
 
-  addComment(videoId: string, userId: string, text: string) {
-    const comment = { userId, videoId, text };
-    return this.apiService.patch(`youtube/comment/add`, comment, undefined, true);
+  addComment(videoId: string, userId: string, text: string): Observable<any> {
+    return this.apiService.patch(`youtube/comment/add`, { userId, videoId, text }, undefined, true);
   }
 
-  likeComment(videoId: string, commentId: string, userId: string) {
+  likeComment(videoId: string, commentId: string, userId: string): Observable<any>  {
     return this.apiService.patch(`youtube/${videoId}/comments/${commentId}/like`, 
       { userId },
       undefined, true
     );
   }
 
-  addReply(videoId: string, parentId: string, userId: string, userAvatar: string, username: string, text: string) {
+  addReply(videoId: string, parentId: string, userId: string, userAvatar: string, username: string, text: string): Observable<any>  {
     return this.apiService.patch(`youtube/${videoId}/comments/${parentId}/replies`, {
       userId,
       userAvatar,

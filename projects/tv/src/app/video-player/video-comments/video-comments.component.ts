@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -36,7 +36,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
       <div class="add-comment">
         <div class="profile">
           <img [src]="currentUserAvatar" alt="Your profile" class="user-avatar">
-          <h6 class="name"><!-- {{user?.name | titlecase}} - --> {{user?.username }} </h6>
+          <h6 class="name">{{user?.name | titlecase}} <!-- - {{user?.username }} --> </h6>
         </div>
         <div class="comment-form">
           <form (submit)="addComment($event)">
@@ -62,8 +62,8 @@ import {MatFormFieldModule} from '@angular/material/form-field';
       <div class="comments-list">
         <div class="comment" *ngFor="let comment of comments">
           <div class="profile">
-            <img [src]="comment.user.avatar" alt="{{ comment.username }}" class="comment-avatar">
-            <h6 class="name">{{ comment.user.username }}</h6>
+            <img [src]="currentUserAvatar" alt="{{ comment.name }}" class="comment-avatar">
+            <h6 class="name">{{ user?.name | titlecase}}</h6>
           </div>
           <div class="comment-content">
             <div class="comment-header">
@@ -72,7 +72,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
             <p class="comment-text">{{ comment.text }}</p>
             <div class="comment-actions">
               <button mat-icon-button (click)="likeComment(comment._id)">
-                <mat-icon>{{ comment.likedBy?.includes(currentUserId) ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
+                <mat-icon>{{ comment.likedBy?.includes(user?._id) ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
               </button>
               <span class="likes-count">{{ comment.likes }}</span>
               <button mat-button (click)="showReplyBox(comment._id)" *ngIf="!comment.showReplyBox">REPLY</button>
@@ -131,7 +131,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 export class VideoCommentsComponent implements OnDestroy {
   @Input() comments: any[] = [];
   @Input() currentUserAvatar: string = '';
-  @Input() currentUserId: string = '';
+ // @Input() currentUser: string = '';
   @Output() commentAdded = new EventEmitter<{text: string}>();
   @Output() commentLiked = new EventEmitter<string>();
   @Output() replyAdded = new EventEmitter<{parentId: string, text: string}>();
@@ -140,6 +140,7 @@ export class VideoCommentsComponent implements OnDestroy {
   isSubmitting = false;
   private snackBar = inject(MatSnackBar);
   private userService = inject(UserService);
+  private cdr = inject(ChangeDetectorRef);
   subscriptions: Subscription[] = [];
   user: UserInterface | null = null;
   isAuthenticated = false;
@@ -163,6 +164,7 @@ export class VideoCommentsComponent implements OnDestroy {
     if (this.newComment.trim()) {
       this.commentAdded.emit({ text: this.newComment });
       this.newComment = '';
+      this.cdr.detectChanges();
     }
   }
 

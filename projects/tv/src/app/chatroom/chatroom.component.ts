@@ -13,11 +13,13 @@ import { MatListModule } from '@angular/material/list';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
 selector: 'app-chat-room',
 providers: [ChatService],
-imports: [CommonModule, MatIconModule, MatSidenavModule, MatExpansionModule, MatListModule, MatFormFieldModule, MatInputModule, FormsModule ],
+imports: [CommonModule, MatIconModule, MatTooltipModule, MatSidenavModule, MatButtonModule, MatExpansionModule, MatListModule, MatFormFieldModule, MatInputModule, FormsModule ],
 template: `
 
 <!-- chat-room.component.html -->

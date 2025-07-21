@@ -15,7 +15,7 @@ export interface UserInterface {
   createdAt?: Date;
   notification?: boolean;
   darkMode?: boolean;
-  avater?: string;
+  avatar?: string;
   preferences: {
     autoplay: boolean;
     notification: boolean;

@@ -8,7 +8,7 @@ export class ChatService {
   private currentUser: User = {
     id: 'user1',
     name: 'Ade Fan',
-    avatar: 'assets/avatars/user1.jpg',
+    avatar: 'img/avatar.png',
     location: 'ng',
     isOnline: true
   };
@@ -108,9 +108,9 @@ export class ChatService {
   private generateMockData(): void {
   // Generate mock users
   const mockUsers: User[] = [
-    { id: 'user2', name: 'Chioma Lover', avatar: 'assets/avatars/user2.jpg', location: 'ng', isOnline: true },
-    { id: 'user3', name: 'OBO Fan', avatar: 'assets/avatars/user3.jpg', location: 'us', isOnline: false },
-    { id: 'user4', name: '30BG Member', avatar: 'assets/avatars/user4.jpg', location: 'gb', isOnline: true }
+    { id: 'user2', name: 'Chioma Lover', avatar: 'img/avatar.png', location: 'ng', isOnline: true },
+    { id: 'user3', name: 'OBO Fan', avatar: 'img/avatar.png',location: 'us', isOnline: false },
+    { id: 'user4', name: '30BG Member', avatar: 'img/avatar.png', location: 'gb', isOnline: true }
   ];
 
   // Generate mock messages for rooms
