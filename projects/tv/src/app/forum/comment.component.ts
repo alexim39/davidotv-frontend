@@ -84,7 +84,7 @@ template: `
                   (click)="addReply()"
                   [disabled]="replyControl.invalid || isSubmitting || !currentUser">
             <span *ngIf="!isSubmitting">Post Reply</span>
-            <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+            <mat-spinner *ngIf="isSubmitting" diameter="20"/>
           </button>
         </div>
       </div>
@@ -349,17 +349,19 @@ export class CommentComponent implements OnInit, OnDestroy {
   private deleteComment() {
     if (!this.currentUser) return;
 
-    this.forumService.deleteComment(this.comment._id, this.currentUser._id).subscribe({
-      next: () => {
-        // Emit to parent component that comment was deleted
-        this.commentDeleted.emit(this.comment._id);
-        // The parent component should handle removing the comment from the list
-      },
-      error: (error) => {
-        console.error('Error deleting comment:', error);
-        this.snackBar.open('Failed to delete comment. Please try again.', 'Close', { duration: 3000 });
-      }
-    });
+    this.subscriptions.push(
+      this.forumService.deleteComment(this.comment._id, this.currentUser._id).subscribe({
+        next: () => {
+          // Emit to parent component that comment was deleted
+          this.commentDeleted.emit(this.comment._id);
+          // The parent component should handle removing the comment from the list
+        },
+        error: (error) => {
+          console.error('Error deleting comment:', error);
+          this.snackBar.open('Failed to delete comment. Please try again.', 'Close', { duration: 3000 });
+        }
+      })
+    )    ;
   }
 
 

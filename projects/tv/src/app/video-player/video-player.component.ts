@@ -204,6 +204,7 @@ declare global {
             <async-video-comments 
               [comments]="comments"
               [currentUserAvatar]="currentUserAvatar"
+              [videoId]="currentVideo._id"
               (commentAdded)="onCommentAdded($event)"
               (commentLiked)="onCommentLiked($event)"
               (replyAdded)="onReplyAdded($event)"
@@ -377,7 +378,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   private getCurrentVideoData(videoId: string) {
     this.youtubeService.getVideoById(videoId).subscribe({
       next: (response: any) => {
-        console.log('current video ',response.data)
+        //console.log('current video ',response.data)
         this.currentVideo = response.data;
         this.comments = this.currentVideo.comments;
         this.initializeLikeDislikeStates(); // Add this line
@@ -871,25 +872,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  // onCommentAdded(commentData: {text: string}) {
-  //   if (!this.user) return;
-
-  //   this.videoCommentService.addComment(
-  //     this.currentVideoId,
-  //     this.user._id,
-  //     commentData.text
-  //   ).subscribe({
-  //     next: (updatedVideo) => {
-  //       this.comments = updatedVideo.comments;
-  //       this.snackBar.open('Comment posted', 'Close', { duration: 2000 });
-  //     },
-  //     error: (err) => {
-  //       this.snackBar.open('Failed to post comment', 'Close', { duration: 3000 });
-  //     }
-  //   });
-  // }
-
-
 
   onCommentAdded(commentData: {text: string}) {
     if (!this.user) return;
@@ -912,7 +894,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       commentData.text
     ).subscribe({
       next: (response) => {
-        console.log('returned comment ', response);
         
         // Optimistically add the temporary comment to the beginning of the comments array
         this.comments = [tempComment, ...this.comments];
@@ -924,7 +905,13 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       error: (error: HttpErrorResponse) => {
         // Remove the temporary comment if the request fails
         this.comments = this.comments.filter(c => c._id !== tempComment._id);
-        this.snackBar.open('Failed to post comment', 'Close', { duration: 3000 });
+
+        let errorMessage = 'Server error occurred, please try again.'; // default error message.
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message; // Use backend's error message if available.
+        }  
+        this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
+
         this.cdr.detectChanges(); 
       }
     });
@@ -942,36 +929,95 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       commentId,
       this.user._id
     ).subscribe({
-      next: (updatedVideo) => {
-        //this.comments = updatedVideo.comments;
+      next: (response) => {
+        this.snackBar.open(response.message, 'Ok',{duration: 3000});
       },
-      error: (err) => {
-        this.snackBar.open('Failed to like comment', 'Close', { duration: 2000 });
+      error: (error: HttpErrorResponse) => {
+        let errorMessage = 'Server error occurred, please try again.'; // default error message.
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message; // Use backend's error message if available.
+        }  
+        this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
+        //this.isLoading = false;
+        this.cdr.markForCheck();
       }
     });
   }
 
-  // Add new method for replies
-  onReplyAdded(replyData: {parentId: string, text: string}) {
-    if (!this.user) return;
 
+  // Add new method for replies with optimistic UI update
+  onReplyAdded(replyData: {parentId: string, text: string}) {
+    if (!this.user) {
+      // Optionally, show a message to the user that they need to be logged in
+      this.snackBar.open('Please log in to post a reply.', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Find the parent comment
+    const parentComment = this.comments.find(c => c._id === replyData.parentId);
+    if (!parentComment) {
+      console.error('Parent comment not found for reply:', replyData.parentId);
+      // Optionally, show an error to the user if the parent comment can't be found
+      this.snackBar.open('Could not find the comment to reply to.', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Ensure parentComment.replies is initialized
+    if (!parentComment.replies) {
+      parentComment.replies = [];
+    }
+
+    // Create a temporary reply object with a unique, temporary ID
+    const tempReplyId = 'temp_reply_' + Date.now();
+    const tempReply: Comment = {
+      _id: tempReplyId, // Temporary ID
+      videoId: this.currentVideoId,
+      userId: this.user._id,
+      avatar: this.user.avatar || 'img/avatar.png',
+      name: this.user.name, // Assuming name is always available
+      text: replyData.text,
+      likes: 0,
+      parentComment: replyData.parentId, // Mark this as a reply
+      createdAt: new Date(),
+      user: { // Add user info to match the backend response structure
+        _id: this.user._id,
+        username: this.user.username || '',
+        name: this.user.name,
+        lastname: this.user.lastname || '',
+        avatar: this.user.avatar || 'img/avatar.png'
+      }
+    };
+
+    // Optimistically add the reply to the parent comment's replies array (unshift to add at beginning)
+    parentComment.replies.unshift(tempReply);
+    this.cdr.detectChanges(); // Manually trigger change detection to update UI immediately
+
+    // Call the service to add the reply to the backend
     this.videoCommentService.addReply(
       this.currentVideoId,
       replyData.parentId,
       this.user._id,
-      this.currentUserAvatar,
-      `${this.user.name} ${this.user.lastname}`,
       replyData.text
     ).subscribe({
-      next: (updatedVideo) => {
-        //this.comments = updatedVideo.comments;
-        this.snackBar.open('Reply posted', 'Close', { duration: 2000 });
+      next: (actualReplyFromServer) => {
+        // Find the temporary reply using its temporary ID
+        const index = parentComment?.replies?.findIndex(r => r._id === tempReplyId);
+        if (index !== -1) {
+          // Replace the temporary reply with the actual response from the server
+          //parentComment?.replies[index] = actualReplyFromServer;
+        }
+        this.cdr.detectChanges(); // Update UI with actual data
       },
-      error: (err) => {
-        this.snackBar.open('Failed to post reply', 'Close', { duration: 3000 });
+      error: (error: HttpErrorResponse) => {
+        console.error('Failed to post reply:', error);
+        this.snackBar.open('Failed to post reply. Please try again.', 'Close', { duration: 3000 });
+        this.cdr.detectChanges(); // Revert UI
       }
     });
   }
+
+
+
 
 
   navigateToVideo(videoId: string) {
