@@ -57,9 +57,12 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
   
 
   <!-- Add Comment Section -->
-  <div class="add-comment-section">
+  <div class="add-comment-section" *ngIf="user">
     <div class="user-avatar-container">
-      <img [src]="currentUserAvatar || 'assets/images/default-avatar.png'" alt="Your profile" class="user-avatar">
+      <img [src]="currentUserAvatar || 'img/avatar.png'" alt="Your profile" class="user-avatar">
+      <span style="display: block; margin-top: 5px; font-size: 9px; color: #666; text-align: center;">
+        {{ user.name | titlecase}}
+      </span>
     </div>
     <div class="comment-input-container">
       <form (submit)="addComment($event)" class="comment-form">

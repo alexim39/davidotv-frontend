@@ -56,10 +56,17 @@
         </button>
         
         <div *ngIf="isAuthenticated" class="user-actions">
-          <button mat-icon-button class="action-icon" 
+          <!-- <button mat-icon-button class="action-icon" 
             [matBadge]="notificationsCount" 
             matBadgeColor="warn"
             matTooltip="Notifications">
+            <mat-icon>notifications</mat-icon>
+          </button> -->
+
+          <button mat-icon-button class="action-icon" 
+                  [matBadge]="notificationsCount" 
+                  [matBadgeHidden]="notificationsCount <= 1"
+                  matBadgeColor="warn">
             <mat-icon>notifications</mat-icon>
           </button>
           
