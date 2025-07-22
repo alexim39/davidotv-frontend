@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HomeService, TestimonialInterface } from '../home.service';
 import { UserInterface } from '../../common/services/user.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 /**
  * @title Indeterminate progress-bar
@@ -311,7 +312,7 @@ template: `
 })
 export class CommunityTestimonialComponent {
    @Input() testimonials!: any[];
-   @Input() user!: UserInterface;
+   @Input() user!: UserInterface | null;
 
   constructor(
     private snackBar: MatSnackBar,
@@ -339,13 +340,14 @@ export class CommunityTestimonialComponent {
     
     this.cdr.markForCheck(); // Trigger change detection
 
+    if (this.user)
     this.homeService.addReaction(this.user._id, testimonial._id, newReaction).subscribe({
-      error: (err) => {
+      error: (error: HttpErrorResponse) => {
         // Rollback on error
         Object.assign(testimonial, previousState);
         this.cdr.markForCheck();
         this.snackBar.open('Failed to update reaction', 'Close', { duration: 3000 });
-        console.error('Reaction update failed:', err);
+        console.error('Reaction update failed:', error);
       }
     });
   }
@@ -366,6 +368,7 @@ export class CommunityTestimonialComponent {
     
     this.cdr.markForCheck(); // Trigger change detection
 
+    if (this.user)
     this.homeService.addReaction(this.user._id, testimonial._id, newReaction).subscribe({
       error: (err) => {
         // Rollback on error

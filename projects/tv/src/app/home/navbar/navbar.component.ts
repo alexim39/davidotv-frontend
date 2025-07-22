@@ -44,7 +44,7 @@ export class NavbarComponent implements OnDestroy, OnInit {
   searchQuery = '';
   isAuthenticated = false;
   notificationsCount = 0;
-  imageSource: string = '';
+  //imageSource: string = '';
 
   readonly dialog = inject(MatDialog);
   isDarkTheme = false;

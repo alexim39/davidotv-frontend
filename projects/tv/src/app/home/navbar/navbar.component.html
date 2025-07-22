@@ -72,7 +72,7 @@
           
           <button mat-button [matMenuTriggerFor]="userMenu" class="user-profile">
             <div class="user-avatar">
-              <img [src]="imageSource || './img/avatar.png'" alt="User profile" class="avatar-img">  
+              <img [src]="user?.avatar || './img/avatar.png'" alt="User profile" class="avatar-img">  
             </div>
             <span class="user-name">{{user?.name | titlecase }}</span>
           </button>
@@ -94,7 +94,7 @@
     <!-- Mobile User Section -->
     <div *ngIf="isAuthenticated" class="mobile-user-info">
       <div class="mobile-user-avatar">
-        <img [src]="imageSource || './img/avatar.png'" alt="User profile" class="mobile-avatar-img"/>
+        <img [src]="user?.avatar || './img/avatar.png'" alt="User profile" class="mobile-avatar-img"/>
       </div>
       <div class="mobile-user-details">
         <div class="mobile-user-name">{{user?.name | titlecase }} {{user?.lastname | titlecase }}</div>
@@ -203,7 +203,7 @@
   <mat-menu #userMenu="matMenu" class="user-menu">
     <div class="user-menu-header">
       <div class="menu-user-avatar" style="text-align: center;">
-        <img [src]="imageSource || './img/avatar.png'" alt="User profile" style="max-width: 100px; max-height: 80px; align-items: center; object-fit: contain; border-radius: 20%; margin-bottom: -1em;">
+        <img [src]="user?.avatar || './img/avatar.png'" alt="User profile" style="max-width: 100px; max-height: 80px; align-items: center; object-fit: contain; border-radius: 20%; margin-bottom: -1em;">
       </div>
       <div class="menu-user-info" style="padding: 1em; text-align: center; color: gray;">
         <div class="menu-user-name">{{user?.name | titlecase }} {{user?.lastname | titlecase }}</div>

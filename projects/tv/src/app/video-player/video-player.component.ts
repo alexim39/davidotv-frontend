@@ -203,7 +203,6 @@ declare global {
 
             <async-video-comments 
               [comments]="comments"
-              [currentUserAvatar]="currentUserAvatar"
               [videoId]="currentVideo._id"
               (commentAdded)="onCommentAdded($event)"
               (commentLiked)="onCommentLiked($event)"
@@ -260,9 +259,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   repeatMode: 'none' | 'one' = 'none';
 
   comments: Comment[] = [];
-
-  // User data
-  currentUserAvatar = './img/avatar.png';
 
   @ViewChild('videoFrame') videoFrame!: ElementRef<HTMLIFrameElement>;
 

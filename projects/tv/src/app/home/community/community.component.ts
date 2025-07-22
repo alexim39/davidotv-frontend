@@ -55,7 +55,7 @@ import { UserInterface, UserService } from '../../common/services/user.service';
         <mat-tab label="App Reviews">
           <div class="fans-container">
 
-          <community-testimonial *ngIf="testimonials && user" [testimonials]="testimonials" [user]="user"/>
+          <community-testimonial *ngIf="testimonials" [testimonials]="testimonials" [user]="user"/>
             
 
           </div>
@@ -125,22 +125,22 @@ export class CommunityComponent implements OnInit, OnDestroy {
       this.userService.getCurrentUser$.subscribe({
         next: (user) => {
           this.user = user;
-          if (this.user ) {
-            this.loadTestimonial(this.user?._id);
-          }
+          //if (this.user ) {}
         }
       })
     )
+    // load testimonial
+    this.loadTestimonial();
   }
 
 
-  loadTestimonial(userId: string | undefined) {
+  loadTestimonial() {
     if (this.loading ) return;
     
     this.loading = true;
 
     this.subscriptions.push(
-       this.testimonialsSubscription = this.homeService.getTestimonials(userId).subscribe({
+       this.testimonialsSubscription = this.homeService.getTestimonials().subscribe({
         next: (response) => {
           this.loading = true;
           //console.log('testimonials ',response.testimonials)

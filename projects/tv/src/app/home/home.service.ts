@@ -22,8 +22,8 @@ export interface TestimonialInterface {
 export class HomeService {
   constructor(private apiService: ApiService) {}
 
-  getTestimonials(userId: string | undefined): Observable<any> {
-    return this.apiService.get<TestimonialInterface[]>(`user/testimonial/${userId}`, undefined, undefined, true);
+  getTestimonials(): Observable<any> {
+    return this.apiService.get<TestimonialInterface[]>(`user/testimonial`, undefined, undefined, true);
   }
 
   addReaction(userId: string, testimonialId: string, reaction: 'like' | 'dislike' | null): Observable<any> {

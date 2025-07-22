@@ -59,7 +59,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
   <!-- Add Comment Section -->
   <div class="add-comment-section" *ngIf="user">
     <div class="user-avatar-container">
-      <img [src]="currentUserAvatar || 'img/avatar.png'" alt="Your profile" class="user-avatar">
+      <img [src]="user.avatar || 'img/avatar.png'" alt="Your profile" class="user-avatar">
       <span style="display: block; margin-top: 5px; font-size: 9px; color: #666; text-align: center;">
         {{ user.name | titlecase}}
       </span>
@@ -181,7 +181,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 export class VideoCommentsComponent implements OnDestroy {
   @Input() comments: any[] = [];
   @Input() videoId: string | undefined;
-  @Input() currentUserAvatar: string = '';
+  //@Input() currentUserAvatar: string = '';
   @Output() commentAdded = new EventEmitter<{text: string}>();
   @Output() commentLiked = new EventEmitter<string>();
   @Output() replyAdded = new EventEmitter<{parentId: string, text: string}>();
