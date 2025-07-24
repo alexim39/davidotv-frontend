@@ -59,8 +59,6 @@ export class RecommendationsSidebarComponent implements OnChanges, OnInit {
 
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
-
-
   // Track the last scroll position to prevent multiple triggers
   private lastScrollPosition = 0;
 
@@ -108,8 +106,6 @@ export class RecommendationsSidebarComponent implements OnChanges, OnInit {
   autoplayChanged() {
     // send backend code to change autoplay
   }
-
- 
 
   @HostListener('window:scroll')
   onWindowScroll() {

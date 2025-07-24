@@ -9,7 +9,7 @@ import { MerchandiseComponent } from './merch/merchandise.component';
 @Component({
   selector: 'async-home',
   imports: [
-   TrendingComponent,
+    TrendingComponent,
     MerchandiseComponent,
     CommunityComponent,
     BannerComponent,

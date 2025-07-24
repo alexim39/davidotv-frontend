@@ -107,15 +107,6 @@ $breakpoint-mobile: 768px;
 .recommendations-section {
   flex: 1;
   min-width: 300px;
-  
-  @media (max-width: $breakpoint-tablet) {
-    flex: 1 1 100%;
-    width: 100%;
-    min-width: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 16px;
-  }
 }
 
 // Video Player Styles
@@ -501,6 +492,34 @@ button.mat-icon-button {
   }
   
   .premium-btn {
+    display: none;
+  }
+}
+
+
+
+
+.mobile-comments-trigger {
+  @include flex-center(8px);
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  
+  mat-icon {
+    color: $primary-color;
+  }
+  
+  span {
+    font-size: 0.9rem;
+  }
+  
+  @media (min-width: $breakpoint-mobile) {
     display: none;
   }
 }

@@ -1,0 +1,192 @@
+<div class="app-container" id="videoplayer">
+    <header class="app-header">
+    <div class="header-content">
+        <div class="logo-container">
+        <img src="./img/logo2.PNG" alt="DavidoTv Logo" class="logo">
+        <!-- <h1>DavidoTV</h1> -->
+        </div>
+        <div class="header-actions">
+        <button mat-raised-button class="subscribe-btn">
+            <mat-icon>notifications</mat-icon>
+            Subscribe
+        </button>
+        <button mat-raised-button color="primary" class="premium-btn">
+            Go Premium
+        </button>
+        </div>
+    </div>
+    </header>
+
+    <main class="main-content">
+    <section class="video-section">
+        <div class="video-container" *ngIf="safeUrl; else loadingTpl">
+        <div class="video-wrapper">
+            <iframe
+            #videoFrame
+            [src]="safeUrl"
+            [class.hidden]="isLoading"
+            width="100%"
+            height="100%"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            aria-label="Davido video player"
+            tabindex="0"
+            ></iframe>
+        </div>
+
+        <div class="repeat-indicator" *ngIf="repeatMode !== 'none'">
+            Repeat 1
+        </div>
+
+        <div class="video-controls" *ngIf="!isLoading" [class.hidden]="!showControls && isPlaying">
+            
+
+            <div class="controls-container">
+            <div class="left-controls">
+                <button mat-icon-button (click)="skipBackward()" aria-label="Skip backward 10 seconds">
+                <mat-icon>replay_10</mat-icon>
+                </button>
+                <button mat-icon-button (click)="togglePlayPause()" aria-label="Play/Pause">
+                <mat-icon>{{ isPlaying ? 'pause' : 'play_arrow' }}</mat-icon>
+                </button>
+                <button mat-icon-button (click)="skipForward()" aria-label="Skip forward 10 seconds">
+                <mat-icon>forward_10</mat-icon>
+                </button>
+                <!-- Add this new button -->
+                <button mat-icon-button (click)="playNextRecommendedVideo()" aria-label="Play next video">
+                <mat-icon>skip_next</mat-icon>
+                </button>
+                <button mat-icon-button (click)="toggleMute()" aria-label="Toggle mute">
+                <mat-icon>{{ isMuted ? 'volume_off' : 'volume_up' }}</mat-icon>
+                </button>
+            </div>
+            <div class="right-controls">
+                <button mat-icon-button (click)="toggleFullscreen()" aria-label="Toggle fullscreen">
+                <mat-icon>{{ isFullscreen ? 'fullscreen_exit' : 'fullscreen' }}</mat-icon>
+                </button>
+            </div>
+            </div>
+
+            <div class="progress-container">
+            <mat-progress-bar 
+                mode="determinate" 
+                [value]="(currentTime / duration) * 100"
+                aria-label="Video progress"
+            />
+            <div class="time-display">{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</div>
+            </div>
+        </div>
+        </div>
+
+        <ng-template #loadingTpl>
+        <div class="loading-container">
+            <mat-spinner diameter="50"/>
+            <p class="loading-text">Loading Davido's content...</p>
+        </div>
+        </ng-template>
+
+        <div class="video-info-container" *ngIf="!isLoading">
+        <div class="video-meta-container">
+            <div class="music-title">
+            <h2 class="song-title">{{ currentVideo.title }}</h2>
+            <div class="artist-info">
+                <span class="artist-name">- {{currentVideo.channel}}</span>
+            </div>
+            </div>
+
+            <div class="video-meta">
+            <div class="youtube-stats">
+                <div class="youtube-badge">
+                <mat-icon class="youtube-icon">smart_display</mat-icon>
+                <span class="youtube-label">YouTube</span>
+                </div>
+                <div class="youtube-metrics">
+                <span class="youtube-metric" matTooltip="Views">
+                    {{ formatViewCount(currentVideo.views)  }} <!-- views -->
+                </span>
+                •
+                <span class="youtube-metric" matTooltip="Likes">
+                    {{ formatLikesCount(currentVideo.likes)  }} <!-- likes -->
+                </span>
+                •
+                <span class="youtube-metric" matTooltip="Dislikes">
+                    {{ formatDislikesCount(currentVideo.dislikes)  }} <!-- dislikes -->
+                </span>
+                •
+                <span class="youtube-metric" matTooltip="Published">
+                    {{ timeAgo(currentVideo.publishedAt) }}
+                </span>
+                </div>
+            </div>
+
+            <div class="app-engagement">
+                <div class="reaction-buttons">
+                <button class="reaction-btn like-btn" (click)="likeVideo()" [class.active]="liked">
+                    <mat-icon>{{ liked ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
+                    <span class="count">{{ appLikes | number }}</span>
+                </button>
+                
+                <button class="reaction-btn dislike-btn" (click)="dislikeVideo()" [class.active]="disliked">
+                    <mat-icon>{{ disliked ? 'thumb_down' : 'thumb_down_off_alt' }}</mat-icon>
+                    <span class="count">{{ appDislikes | number }}</span>
+                </button>
+                </div>
+                
+                <div class="action-buttons">
+                <button mat-mini-fab class="action-btn" (click)="shareVideo()" matTooltip="Share">
+                    <mat-icon>share</mat-icon>
+                </button>
+                
+                <button mat-mini-fab class="action-btn" (click)="saveVideo()" [class.active]="saved" matTooltip="Save">
+                    <mat-icon>{{ saved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+                </button>
+                
+                <button mat-mini-fab class="action-btn" (click)="toggleRepeatMode()" [class.active]="repeatMode !== 'none'" matTooltip="Repeat">
+                    <mat-icon>repeat_one</mat-icon>
+                </button>
+                
+                <div class="view-count" matTooltip="App Views">
+                    <mat-icon>visibility</mat-icon>
+                    <span>{{ formatViewCount(currentVideo.appViews) }}</span>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        @if (isMobile) {
+
+            <div class="mobile-comments-trigger" (click)="openCommentsSheet()">
+                <mat-icon>comment</mat-icon>
+                <span>Comments ({{comments.length}})</span>
+            </div>
+
+        } @else {
+
+        <async-video-comments 
+            [comments]="comments"
+            [videoId]="currentVideo._id"
+            (commentAdded)="onCommentAdded($event)"
+            (commentLiked)="onCommentLiked($event)"
+            (replyAdded)="onReplyAdded($event)"
+        />
+
+        }
+
+        </div>
+    </section>
+
+    <section class="recommendations-section">
+        <async-recommendations-sidebar 
+        *ngIf="recommendedVideos.length > 0 || isLoadingMore"
+        [recommendedVideos]="recommendedVideos"
+        [isLoading]="isLoadingMore"
+        [hasMoreVideos]="hasMoreVideos"
+        [currentUser]="user"
+        (navigateToVideo)="navigateToVideo($event)"
+        (loadMore)="loadSideBarVideos()"
+        />
+    </section>
+    </main>
+</div>

@@ -67,7 +67,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     <div class="comment-input-container">
       <form (submit)="addComment($event)" class="comment-form">
         <mat-form-field appearance="outline" class="full-width">
-          <input
+         <!--  <input
             matInput
             [(ngModel)]="newComment"
             name="comment"
@@ -75,7 +75,18 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
             aria-label="Add a comment"
             required
             [disabled]="!isAuthenticated"
-          >
+          > -->
+          <textarea
+            matInput
+            [(ngModel)]="newComment"
+            name="comment"
+            placeholder="Add a comment..."
+            aria-label="Add a comment"
+            required
+            [disabled]="!isAuthenticated"
+            rows="3"
+            cdkTextareaAutosize
+          ></textarea>
         </mat-form-field>
         <div class="form-actions" *ngIf="newComment">
           <button mat-button type="button" (click)="cancelComment()" class="cancel-button">Cancel</button>
@@ -122,7 +133,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
         <div class="reply-box" *ngIf="comment.showReplyBox">
           <form (submit)="addReply(comment)" class="reply-form">
             <mat-form-field appearance="outline" class="full-width">
-              <input
+             <!-- <input
                 matInput
                 [(ngModel)]="comment.replyText"
                 name="reply"
@@ -130,7 +141,18 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
                 aria-label="Add a reply"
                 required
                 [disabled]="!isAuthenticated"
-              >
+              > -->
+              <textarea
+                matInput
+                [(ngModel)]="comment.replyText"
+                name="reply"
+                placeholder="Write a reply..."
+                aria-label="Add a reply"
+                required
+                [disabled]="!isAuthenticated"
+                rows="2"
+                cdkTextareaAutosize
+              ></textarea>
             </mat-form-field>
             <div class="form-actions">
               <button mat-button type="button" (click)="cancelReply(comment)" class="cancel-button">Cancel</button>

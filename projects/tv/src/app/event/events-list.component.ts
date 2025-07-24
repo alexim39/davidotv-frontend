@@ -99,7 +99,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
               Passed Event
             </button>
 
-           }  @else {
+           }  @else if((event.isCancelled)) {
+            <button mat-flat-button color="primary" class="rsvp-button" (click)="handleRsvp($event, event)"  [disabled]="event.isCancelled">
+             Event Cancelled
+            </button>
+           }
+            @else {
             <button mat-flat-button color="primary" class="rsvp-button" (click)="handleRsvp($event, event)"  [disabled]="isPastEvent(event)">
              Show Attendance Interest
             </button>
@@ -237,27 +242,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   `]
 })
 export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
-  events: Event[] = [
-   /*  {
-      _id: '1',
-      title: 'Davido Live in Concert',
-      description: 'Experience an unforgettable night with Davido performing his greatest hits along with special guests. This event will feature fireworks, special effects, and a full band.',
-      date: new Date('2023-12-15T20:00:00'),
-      location: 'Eko Convention Center, Lagos',
-      imageUrl: 'https://via.placeholder.com/800x300?text=Davido+Concert',
-      attendees: 12500,
-      attendeesList: [
-        { name: 'Ade', avatar: 'https://i.pravatar.cc/150?img=1' },
-        { name: 'Bola', avatar: 'https://i.pravatar.cc/150?img=2' },
-        { name: 'Chioma', avatar: 'https://i.pravatar.cc/150?img=3' },
-        { name: 'Dayo', avatar: 'https://i.pravatar.cc/150?img=4' },
-        { name: 'Emeka', avatar: 'https://i.pravatar.cc/150?img=5' }
-      ],
-      price: 50,
-      category: 'concert',
-      color: '#3f51b5'
-    },, */
-  ];
+  events: Event[] = [];
 
   private favoriteIds = new Set<string>();
 
@@ -347,6 +332,7 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
     this.subscriptions.push(
       this.eventService.getAllEvents().subscribe({
         next: (response) => {
+          //console.log('events ',response)
           this.events = (response.data || []).map((e: Event) => ({
             id: e._id || e._id,
             _id: e._id || e._id,
@@ -357,7 +343,8 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
             externalLink: e.externalLink || '',
             description: e.description || '',
             interestedUsers: e.interestedUsers,
-            category: e.category
+            category: e.category,
+            isCancelled: e.isCancelled
           }));
           
           // Apply initial filters
