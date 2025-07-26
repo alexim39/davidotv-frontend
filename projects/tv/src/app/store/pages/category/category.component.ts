@@ -9,11 +9,11 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { ProductGridComponent } from '../product-grid.component';
-import { ProductService } from '../../services/product.service';
+import { StoreService } from '../../services/store.service';
 
 @Component({
   selector: 'app-shop-category',
-  providers: [ProductService],
+  providers: [StoreService],
   standalone: true,
   imports: [
     CommonModule,
@@ -331,7 +331,7 @@ export class ShopCategoryComponent implements OnInit {
   categoryId: string = '';
   categoryName: string = 'All Products';
   categoryDescription: string = 'Browse all official Davido merchandise';
-  categoryImage: string = 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80';
+  categoryImage: string = '';
   totalProducts: number = 0;
   products: any[] = [];
   isLoading: boolean = true;
@@ -345,7 +345,7 @@ export class ShopCategoryComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private productService: ProductService
+    private productService: StoreService
   ) {}
 
   ngOnInit() {
@@ -362,32 +362,32 @@ export class ShopCategoryComponent implements OnInit {
       'all': {
         name: 'All Products',
         description: 'Browse all official Davido merchandise',
-        image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+        image: 'img/store/category/all.jpg'
       },
       'clothing': {
         name: 'Apparel & Fashion',
         description: 'Official Davido clothing including t-shirts, hoodies, and more',
-        image: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+        image: 'img/store/category/clothing.jpg'
       },
       'accessories': {
         name: 'Accessories',
         description: 'Hats, bags, and other Davido accessories',
-        image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+        image: 'img/store/category/accessories.jpg'
       },
       'merch': {
         name: 'Home & Lifestyle',
         description: 'Davido branded home goods and lifestyle products',
-        image: 'https://images.unsplash.com/photo-1556911220-bff31c812dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+        image: 'img/store/category/merch.jpg'
       },
       'music': {
         name: 'Music & Collectibles',
         description: 'Vinyl records, CDs, and exclusive collectibles',
-        image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+        image: 'img/store/category/music.jpg'
       },
       'limited': {
         name: 'Exclusive Items',
         description: 'Limited edition Davido merchandise',
-        image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+        image: 'img/store/category/limited.jpg'
       }
     };
 

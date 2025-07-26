@@ -90,6 +90,21 @@ template: `
                 (click)="setActiveRoom(getRoomById('asia'))">
               <span class="room-name">#Asia</span>
             </a>
+            <a mat-list-item 
+                [class.active]="(activeRoom$ | async)?.id === 'north-america'"
+                (click)="setActiveRoom(getRoomById('north-america'))">
+              <span class="room-name">#NouthAmerica</span>
+            </a>
+            <a mat-list-item 
+                [class.active]="(activeRoom$ | async)?.id === 'south-america'"
+                (click)="setActiveRoom(getRoomById('south-america'))">
+              <span class="room-name">#SouthAmerica</span>
+            </a>
+            <a mat-list-item 
+                [class.active]="(activeRoom$ | async)?.id === 'australia'"
+                (click)="setActiveRoom(getRoomById('australia'))">
+              <span class="room-name">#Australia</span>
+            </a>
           </mat-nav-list>
         </mat-expansion-panel>
 

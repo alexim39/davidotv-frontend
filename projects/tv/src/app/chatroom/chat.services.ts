@@ -90,7 +90,37 @@ export class ChatService {
       locationCode: 'asia',
       participants: [],
       messages: []
-    }
+    },
+    {
+      id: 'north-america',
+      name: '#NorthAmerica',
+      description: 'For fans in North America',
+      isPublic: true,
+      isLocationBased: true,
+      locationCode: 'north-america',
+      participants: [],
+      messages: []
+    },
+    {
+      id: 'south-america',
+      name: '#SouthAmerica',
+      description: 'For fans in South America',
+      isPublic: true,
+      isLocationBased: true,
+      locationCode: 'south-america',
+      participants: [],
+      messages: []
+    },
+    {
+      id: 'australia',
+      name: '#Australia',
+      description: 'For fans in Australia',
+      isPublic: true,
+      isLocationBased: true,
+      locationCode: 'australia',
+      participants: [],
+      messages: []
+    },
   ];
 
   private privateChats: ChatRoom[] = [];

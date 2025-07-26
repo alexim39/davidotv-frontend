@@ -9,6 +9,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { CurrencyPipe } from '@angular/common';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { QuickViewComponent } from '../../common/component/quick-view.component';
 
 @Component({
   selector: 'async-merchandise',
@@ -22,7 +24,8 @@ import { MatChipsModule } from '@angular/material/chips';
     MatProgressSpinnerModule,
     MatTooltipModule,
     CurrencyPipe,
-    MatChipsModule
+    MatChipsModule,
+    MatDialogModule
   ],
   animations: [
     trigger('slideFade', [
@@ -121,7 +124,11 @@ import { MatChipsModule } from '@angular/material/chips';
                       loading="lazy"
                       class="product-image"
                     >
-                    <div class="quick-view" (click)="viewProduct(item.id); $event.stopPropagation()">
+                    <!-- <div class="quick-view" (click)="viewProduct(item.id); $event.stopPropagation()">
+                      <mat-icon>visibility</mat-icon>
+                      Quick View
+                    </div> -->
+                    <div class="quick-view" (click)="openQuickView(item.id); $event.stopPropagation()">
                       <mat-icon>visibility</mat-icon>
                       Quick View
                     </div>
@@ -219,20 +226,38 @@ export class MerchandiseComponent implements OnInit {
  featuredMerch: any[] = [
     {
       id: 1,
-      image: './img/store/clothing/cap.JPG',
+      image: './img/store/clothing/cap.png',
       name: 'Official Davido Cap',
       price: 29.99
     },
     {
       id: 2,
-      image: './img/store/clothing/shirt.JPG',
+      image: './img/store/clothing/shirt.png',
       name: '30BG Logo T-Shirt',
       price: 24.99
     },
     {
       id: 3,
-      image: './img/store/clothing/hoodie.JPG',
-      name: 'Davido Tour Hoodie',
+      image: './img/store/clothing/hoodie.png',
+      name: '30GB Tour Hoodie',
+      price: 49.99
+    },
+    {
+      id: 3,
+      image: './img/store/clothing/cup.png',
+      name: 'Davido Brand Mug',
+      price: 49.99
+    },
+    {
+      id: 3,
+      image: './img/store/clothing/cadigan.png',
+      name: 'Davido Cardigan Sweater',
+      price: 49.99
+    },
+    {
+      id: 3,
+      image: './img/store/clothing/brimless_cap.png',
+      name: 'Davido Brimless Cap',
       price: 49.99
     },
   ];
@@ -243,7 +268,8 @@ export class MerchandiseComponent implements OnInit {
 
   constructor(
     public router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private dialog: MatDialog
   ) {}
 
 
@@ -320,5 +346,25 @@ export class MerchandiseComponent implements OnInit {
 
   viewProduct(id: string) {
     this.router.navigate(['/store', id]);
+  }
+
+  openQuickView(productId: string): void {
+    const product = this.featuredMerch.find(item => item.id === productId);
+    if (!product) return;
+
+    const dialogRef = this.dialog.open(QuickViewComponent, {
+      width: '90%',
+      maxWidth: '900px',
+      panelClass: 'quick-view-dialog-container',
+      data: product
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'view_details') {
+        this.viewProduct(productId);
+      } else if (result === 'added_to_cart') {
+        this.addToCart(product);
+      }
+    });
   }
 }

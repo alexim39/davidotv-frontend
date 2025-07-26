@@ -1,10 +1,10 @@
 import { Routes } from "@angular/router";
-import { ShopHomeComponent } from "./pages/home.component";
 import { ShopIndexComponent } from "./pages/index.component";
 import { ShopCategoryComponent } from "./pages/category/category.component";
 import { ProductDetailComponent } from "./pages/product/product-detail";
 import { CartPageComponent } from "./pages/cart/cart.component";
 import { CheckoutPageComponent } from "./pages/cart/checkout.component";
+import { ShopHomeContainerComponent } from "./pages/home-container.component";
 
 export const StoreRoutes: Routes = [
   { 
@@ -13,7 +13,7 @@ export const StoreRoutes: Routes = [
     children: [
       {
         path: '', 
-        component: ShopHomeComponent, 
+        component: ShopHomeContainerComponent, 
       },
       {
         path: 'category/:id',

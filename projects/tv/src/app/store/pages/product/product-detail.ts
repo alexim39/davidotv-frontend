@@ -14,11 +14,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { ProductGridComponent } from '../product-grid.component';
-import { ProductService } from '../../services/product.service';
+import { StoreService } from '../../services/store.service';
 
 @Component({
   selector: 'app-product-detail',
-  providers: [ProductService],
+  providers: [StoreService],
   standalone: true,
   imports: [
     CommonModule,
@@ -63,10 +63,10 @@ import { ProductService } from '../../services/product.service';
             <div class="main-image-container">
               <img [src]="selectedImage || product.image" [alt]="product.name" class="main-image">
               @if (product.isNew) {
-                <mat-chip class="new-badge" color="accent" selected>NEW</mat-chip>
+                <mat-chip class="new-badge new" selected>NEW</mat-chip>
               }
               @if (product.isLimited) {
-                <mat-chip class="limited-badge" color="warn" selected>
+                <mat-chip class="limited-badge limited" selected>
                   <mat-icon>whatshot</mat-icon>
                   LIMITED
                 </mat-chip>
@@ -368,6 +368,7 @@ import { ProductService } from '../../services/product.service';
           font-size: 12px;
           font-weight: 600;
           letter-spacing: 0.5px;
+         
 
           &.new-badge {
             left: 12px;
@@ -383,6 +384,14 @@ import { ProductService } from '../../services/product.service';
             }
           }
         }
+         .new {
+            background-color: #e3f2fd !important;
+            color: #2196f3 !important;
+          }
+          .limited {
+            background-color: #ffebee !important;
+            color: #f44336 !important;
+          }
       }
 
       .thumbnail-container {
@@ -870,7 +879,7 @@ export class ProductDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private productService: ProductService,
+    private productService: StoreService,
     private snackBar: MatSnackBar
   ) {}
 

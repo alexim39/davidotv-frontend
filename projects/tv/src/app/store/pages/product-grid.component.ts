@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -59,7 +59,7 @@ interface Product {
                   <button mat-icon-button class="quick-action-btn" (click)="addToWishlist($event, product)" aria-label="Add to wishlist">
                     <mat-icon>favorite_border</mat-icon>
                   </button>
-                  <button mat-icon-button class="quick-action-btn" (click)="quickView($event, product)" aria-label="Quick view">
+                  <button mat-icon-button class="quick-action-btn" (click)="onQuickView($event, product)" aria-label="Quick view">
                     <mat-icon>visibility</mat-icon>
                   </button>
                 </div>
@@ -297,6 +297,7 @@ styles: [`
 })
 export class ProductGridComponent {
   @Input() products: Product[] = [];
+  @Output() quickView = new EventEmitter<any>();
 
   truncateName(name: string, limit: number = 24): string {
     return name.length > limit ? `${name.substring(0, limit)}...` : name;
@@ -316,8 +317,8 @@ export class ProductGridComponent {
     console.log('Added to wishlist:', product);
   }
 
-  quickView(event: Event, product: Product) {
+  onQuickView(event: Event, product: Product) {
     event.stopPropagation();
-    console.log('Quick view:', product);
+    console.log('Quick view:', product, this.quickView);
   }
 }

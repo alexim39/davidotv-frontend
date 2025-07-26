@@ -55,7 +55,7 @@ import { CategoryNavComponent } from './nav.component';
 
     .hero-banner {
       background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-      url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+      url('/img/store/shopping.png');
       background-size: cover;
       background-position: center;
       height: 500px;
@@ -149,7 +149,7 @@ export class ShopIndexComponent implements OnInit, OnDestroy {
     "Wear your support for Africa’s biggest star — quality guaranteed"
   ];
   currentIndex = 0;
-  private intervalId: any;
+  private intervalId: number = 0;
 
   constructor(private cdr: ChangeDetectorRef) {}
 

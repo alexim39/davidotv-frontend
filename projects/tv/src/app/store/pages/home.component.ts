@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ProductService } from '../services/product.service';
+import { ProductInterface, StoreService } from '../services/store.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,7 +14,7 @@ import { ProductGridComponent } from './product-grid.component';
 @Component({
   selector: 'app-shop-home',
   standalone: true,
-  providers: [ProductService],
+  providers: [StoreService],
   imports: [
     CommonModule,
     RouterModule,
@@ -115,140 +115,138 @@ import { ProductGridComponent } from './product-grid.component';
       </section>
     </div>
   `,
-  styles: [`
+styles: [`
+  .section-container {
+    margin-bottom: 40px;
+  }
 
+  .section-header {
+    background: transparent !important;
+    padding: 0 !important;
+    margin-bottom: 16px;
 
-    .section-container {
-      margin-bottom: 40px;
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 500;
+      margin: 0;
     }
 
-    .section-header {
-      background: transparent !important;
-      padding: 0 !important;
-      margin-bottom: 16px;
+    p {
+      color: #666;
+      margin: 0;
+      font-size: 0.9rem;
+    }
 
-      h2 {
-        font-size: 1.5rem;
+    .spacer {
+      flex: 1 1 auto;
+    }
+
+    .view-all {
+      font-weight: 500;
+
+      mat-icon {
+        font-size: 20px;
+        height: 20px;
+        width: 20px;
+      }
+    }
+  }
+
+  .category-promos {
+    margin: 40px 0;
+
+    .promo-banner {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px !important;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.02);
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        transition: background 0.3s ease;
+      }
+
+      &:hover::after {
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .promo-content {
+        z-index: 1;
+        text-align: center;
+        color: white;
+
+        h3 {
+          font-size: 2rem;
+          margin-bottom: 15px;
+          text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+          font-weight: 600;
+        }
+      }
+
+      .promo-link {
         font-weight: 500;
-        margin: 0;
-      }
-
-      p {
-        color: #666;
-        margin: 0;
-        font-size: 0.9rem;
-      }
-
-      .spacer {
-        flex: 1 1 auto;
-      }
-
-      .view-all {
-        font-weight: 500;
+        border-width: 2px;
 
         mat-icon {
-          font-size: 20px;
-          height: 20px;
-          width: 20px;
+          margin-left: 8px;
         }
       }
     }
 
+    .clothing-promo {
+      background-image: url('/img/store/category/clothing.jpg');
+    }
+
+    .accessories-promo {
+      background-image: url('/img/store/category/accessories.jpg');
+    }
+  }
+
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+  }
+
+  @media (max-width: 768px) {
     .category-promos {
-      margin: 40px 0;
-
-      .promo-banner {
-        height: 100%;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-        background-size: cover;
-        background-position: center;
-        border-radius: 8px !important;
-        cursor: pointer;
-        transition: transform 0.3s ease;
-
-        &:hover {
-          transform: scale(1.02);
-        }
-
-        &::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.3);
-          transition: background 0.3s ease;
-        }
-
-        &:hover::after {
-          background: rgba(0, 0, 0, 0.1);
-        }
-
-        .promo-content {
-          z-index: 1;
-          text-align: center;
-          color: white;
-
-          h3 {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-            font-weight: 600;
-          }
-        }
-
-        .promo-link {
-          font-weight: 500;
-          border-width: 2px;
-
-          mat-icon {
-            margin-left: 8px;
-          }
-        }
-      }
-
-      .clothing-promo {
-        background-image: url('https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-      }
-
-      .accessories-promo {
-        background-image: url('https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+      mat-grid-list {
+        grid-template-columns: 1fr;
       }
     }
 
-    .loading-spinner {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 200px;
+    .hero-banner {
+      height: 350px;
     }
-
-    @media (max-width: 768px) {
-      .category-promos {
-        mat-grid-list {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      .hero-banner {
-        height: 350px;
-      }
-    }
-  `]
+  }
+`]
 })
 export class ShopHomeComponent {
-  featuredProducts: any[] = [];
-  newArrivals: any[] = [];
-  limitedEdition: any[] = [];
+  featuredProducts: ProductInterface[] = [];
+  newArrivals: ProductInterface[] = [];
+  limitedEdition: ProductInterface[] = [];
   isLoading = true;
 
-  constructor(public productService: ProductService) {}
+  constructor(public productService: StoreService) {}
 
   ngOnInit() {
     // Simulate API loading
