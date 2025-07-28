@@ -9,6 +9,10 @@ export class ApiService {
   //private readonly baseUrl = 'https://davidotv-j3malln3.b4a.run';
   private readonly baseUrl = 'http://localhost:8080'; // For local testing
 
+  getBaseUrl(): string {
+    return this.baseUrl; 
+  }
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error('Service: An error occurred:', error);
     return throwError(() => error);

@@ -365,7 +365,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       }
     }, 1000);
   }
-
+ 
   loadVideo(videoId: string) {
     this.currentVideoId = videoId;
     this.isLoading = true;
@@ -387,18 +387,28 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         suggestedQuality: 'default'
       });
 
-      if (this.user?.preferences?.autoplay) {
-        setTimeout(() => {
-          if (this.player && typeof this.player.playVideo === 'function') {
-            this.player.playVideo();
-          }
-        }, 1000);
-      }
+      // Always try to play after loading
+      setTimeout(() => {
+        if (this.player && typeof this.player.playVideo === 'function') {
+          this.player.playVideo();
+        }
+      }, 500);
+    } else {
+      // If player is not ready yet, poll until ready and then play
+      const tryPlay = () => {
+        if (this.playerReady && this.player && typeof this.player.playVideo === 'function') {
+          this.player.playVideo();
+        } else {
+          setTimeout(tryPlay, 300);
+        }
+      };
+      tryPlay();
     }
 
     this.currentVideoIndex = this.davidoVideos.findIndex((v: any) => v.id === videoId);
     this.getCurrentVideoData(videoId);
   }
+
 
   private startUpdateLoop() {
     this.stopUpdateLoop();

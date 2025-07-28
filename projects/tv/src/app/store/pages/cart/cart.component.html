@@ -1,0 +1,120 @@
+    <div class="cart-container">
+      <!-- Cart Header -->
+      <div class="cart-header">
+        <h1>Your Shopping Cart</h1>
+        <span class="items-count">{{cartItems.length}} {{cartItems.length === 1 ? 'item' : 'items'}}</span>
+      </div>
+
+      <!-- Cart Content -->
+      <div class="cart-content">
+        <!-- Cart Items -->
+        <div class="cart-items-section">
+          @if (isLoading) {
+            <div class="loading-overlay">
+              <mat-spinner diameter="50"></mat-spinner>
+            </div>
+          }
+
+          @if (cartItems.length > 0) {
+            <div class="cart-items">
+              @for (item of cartItems; track item._id) {
+                <mat-card class="cart-item">
+                  <div class="item-image-container">
+                    <img [src]="item.product.images" [alt]="item.selectedVariant?.name" class="item-image">
+                  </div>
+
+                  <div class="item-details">
+                    <h3 class="item-name">{{item.selectedVariant?.name}}</h3>
+                    @if (item.product.variants) {
+                      <p class="item-variant">Variant: {{item.product.variants}}</p>
+                    }
+                    <p class="item-price">N{{item.product.price | number:'1.2-2'}}</p>
+                    
+                    <div class="item-actions">
+                      <div class="quantity-selector">
+                        <button mat-icon-button (click)="decreaseQuantity(item)" [disabled]="item.quantity <= 1">
+                          <mat-icon>remove</mat-icon>
+                        </button>
+                        <span class="quantity">{{item.quantity}}</span>
+                        <button mat-icon-button (click)="increaseQuantity(item)" [disabled]="item.quantity >= item.product.inventory.stock">
+                          <mat-icon>add</mat-icon>
+                        </button>
+                      </div>
+                      <button mat-button color="warn" (click)="removeItem(item)">
+                        <mat-icon>delete</mat-icon>
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="item-total">
+                    N{{(item.product.price * item.quantity) | number:'1.2-2'}}
+                  </div>
+                </mat-card>
+              }
+            </div>
+
+            <div class="continue-shopping">
+              <button mat-stroked-button routerLink="/store">
+                <mat-icon>arrow_back</mat-icon>
+                Continue Shopping
+              </button>
+            </div>
+          } @else {
+            <div class="empty-cart">
+              <mat-icon class="empty-icon">shopping_cart</mat-icon>
+              <h2>Your cart is empty</h2>
+              <p>Browse our store to find amazing Davido merchandise</p>
+              <button mat-raised-button color="primary" routerLink="/store">
+                Start Shopping
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Order Summary -->
+        @if (cartItems.length > 0) {
+          <mat-card class="order-summary">
+            <h2 class="summary-title">Order Summary</h2>
+            <mat-divider></mat-divider>
+
+            <div class="summary-row">
+              <span>Subtotal ({{getTotalItems()}} items)</span>
+              <span>N{{getSubtotal() | number:'1.2-2'}}</span>
+            </div>
+
+            <div class="summary-row">
+              <span>Shipping</span>
+              <span>{{getShippingCost() === 0 ? 'Free' : 'N' + (getShippingCost() | number:'1.2-2')}}</span>
+            </div>
+
+            <div class="summary-row discount-row">
+              <mat-form-field appearance="outline" class="discount-input">
+                <mat-label>Discount Code</mat-label>
+                <input matInput [(ngModel)]="discountCode" placeholder="Enter code">
+                <button matSuffix mat-button (click)="applyDiscount()">APPLY</button>
+              </mat-form-field>
+              @if (discountApplied) {
+                <span class="discount-amount">-N{{discountAmount | number:'1.2-2'}}</span>
+              }
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="summary-row total-row">
+              <span>Total</span>
+              <span class="total-amount">N{{getTotal() | number:'1.2-2'}}</span>
+            </div>
+
+            <button mat-raised-button color="primary" class="checkout-btn" routerLink="/checkout">
+              Proceed to Checkout
+            </button>
+
+            <div class="secure-checkout">
+              <mat-icon>lock</mat-icon>
+              <span>Secure checkout</span>
+            </div>
+          </mat-card>
+        }
+      </div>
+    </div>

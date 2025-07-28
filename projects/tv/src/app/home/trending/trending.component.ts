@@ -60,7 +60,7 @@ import { YoutubeService } from "../../common/services/youtube.service";
 
       @if (loading) {
         <div class="loading-container" [@fadeInOut]>
-          <mat-spinner diameter="50" strokeWidth="2" color="accent"></mat-spinner>
+          <mat-spinner diameter="50" strokeWidth="2" color="accent"/>
           <p class="loading-text">Loading trending videos...</p>
         </div>
       }

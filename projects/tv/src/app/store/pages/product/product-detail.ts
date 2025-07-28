@@ -14,11 +14,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { ProductGridComponent } from '../product-grid.component';
-import { StoreService } from '../../services/store.service';
+import { StoreService, ProductInterface } from '../../services/store.service';
+import { catchError, finalize, of } from 'rxjs';
+import { CartService } from '../cart/cart.service';
 
 @Component({
   selector: 'app-product-detail',
-  providers: [StoreService],
+  providers: [StoreService, CartService],
   standalone: true,
   imports: [
     CommonModule,
@@ -56,16 +58,16 @@ import { StoreService } from '../../services/store.service';
       </div>
 
       <!-- Product Content -->
-      @if (product) {
+      @if (product && !isLoading) {
         <div class="product-content">
           <!-- Product Gallery -->
           <div class="product-gallery">
             <div class="main-image-container">
-              <img [src]="selectedImage || product.image" [alt]="product.name" class="main-image">
-              @if (product.isNew) {
+              <img [src]="selectedImage || product.images[0].url" [alt]="product.name" class="main-image">
+              @if (product.isNewProduct) {
                 <mat-chip class="new-badge new" selected>NEW</mat-chip>
               }
-              @if (product.isLimited) {
+              @if (product.isLimitedEdition) {
                 <mat-chip class="limited-badge limited" selected>
                   <mat-icon>whatshot</mat-icon>
                   LIMITED
@@ -74,10 +76,10 @@ import { StoreService } from '../../services/store.service';
             </div>
             
             <div class="thumbnail-container">
-              @for (image of [product.image, product.galleryImages]; track image; let i = $index) {
-                <div class="thumbnail" [class.active]="selectedImage === image || (!selectedImage && i === 0)" 
-                     (click)="selectImage(image)">
-                  <img [src]="image" [alt]="'Thumbnail ' + (i + 1)">
+              @for (image of product.images; track image._id; let i = $index) {
+                <div class="thumbnail" [class.active]="selectedImage === image.url || (!selectedImage && i === 0)" 
+                   (click)="selectImage(image.url)">
+                  <img [src]="image.url" [alt]="image.altText || 'Product thumbnail'">
                 </div>
               }
             </div>
@@ -89,23 +91,20 @@ import { StoreService } from '../../services/store.service';
             <div class="price-section">
               <div class="price-container">
                 <span class="current-price">N{{formatPrice(product.price)}}</span>
-                @if (product.originalPrice) {
-                  <span class="original-price">N{{formatPrice(product.originalPrice)}}</span>
-                }
-                @if (product.discount) {
-                  <span class="discount-badge">-{{product.discount}}%</span>
+                @if (product.discountedPrice) {
+                  <span class="original-price">N{{formatPrice(product.discountedPrice)}}</span>
                 }
               </div>
               
               <div class="rating-container">
                 <div class="stars">
                   @for (star of [1,2,3,4,5]; track star) {
-                    <mat-icon [class.filled]="star <= product.rating">star</mat-icon>
+                    <mat-icon [class.filled]="star <= product.rating.average">star</mat-icon>
                   }
                 </div>
-                <span class="reviews">({{product.reviews}} reviews)</span>
-                <span class="stock-status" [class.low-stock]="product.stock < 10">
-                  {{product.stock < 10 ? 'Only ' + product.stock + ' left!' : 'In Stock'}}
+                <span class="reviews">({{product.rating.count}} reviews)</span>
+                <span class="stock-status" [class.low-stock]="product.inventory.stock < 10">
+                  {{product.inventory.stock < 10 ? 'Only ' + product.inventory.stock + ' left!' : 'In Stock'}}
                 </span>
               </div>
             </div>
@@ -115,9 +114,9 @@ import { StoreService } from '../../services/store.service';
               <div class="variants-section">
                 <h3>Options:</h3>
                 <div class="variant-options">
-                  @for (variant of product.variants; track variant.id) {
+                  @for (variant of product.variants; track variant._id) {
                     <button mat-stroked-button 
-                            [class.selected]="selectedVariant?.id === variant.id"
+                            [class.selected]="selectedVariant?._id === variant._id"
                             (click)="selectVariant(variant)">
                       {{variant.name}}
                     </button>
@@ -177,107 +176,51 @@ import { StoreService } from '../../services/store.service';
               <h3>Product Details</h3>
               <p>{{product.description}}</p>
               
-              @if (product.features && product.features.length > 0) {
+              @if (product.tags && product.tags.length > 0) {
                 <div class="features-list">
-                  <h4>Features:</h4>
-                  <ul>
-                    @for (feature of product.features; track feature) {
-                      <li>{{feature}}</li>
+                  <h4>Tags:</h4>
+                  <div class="tags-container">
+                    @for (tag of product.tags; track tag) {
+                      <mat-chip>{{tag}}</mat-chip>
                     }
-                  </ul>
+                  </div>
                 </div>
               }
             </div>
           </mat-tab>
           <mat-tab label="Specifications">
             <div class="tab-content">
-              @if (product.specifications) {
-                <div class="specs-table">
-                  @for (spec of product.specifications | keyvalue; track spec.key) {
-                    <div class="spec-row">
-                      <span class="spec-name">{{spec.key}}:</span>
-                      <span class="spec-value">{{spec.value}}</span>
-                    </div>
-                  }
+              <div class="specs-table">
+                <div class="spec-row">
+                  <span class="spec-name">Brand:</span>
+                  <span class="spec-value">{{product.brand}}</span>
                 </div>
-              } @else {
-                <p>No specifications available for this product.</p>
-              }
-            </div>
-          </mat-tab>
-          <mat-tab label="Reviews">
-            <div class="tab-content">
-              <div class="reviews-header">
-                <div class="average-rating">
-                  <span class="average">{{product.rating.toFixed(1)}}</span>
-                  <div class="stars">
-                    @for (star of [1,2,3,4,5]; track star) {
-                        <mat-icon [class.filled]="star <= getRoundedRating()">star</mat-icon>
-                    }
-                   </div>
-                  <span class="total-reviews">{{product.reviews}} reviews</span>
+                <div class="spec-row">
+                  <span class="spec-name">Collection:</span>
+                  <span class="spec-value">{{product.artistCollection}}</span>
                 </div>
-                <button mat-raised-button color="primary" class="add-review-btn" (click)="openReviewDialog()">
-                  <mat-icon>rate_review</mat-icon>
-                  Write a Review
-                </button>
-              </div>
-
-              <mat-divider></mat-divider>
-
-              <!-- Review Form (hidden by default) -->
-              <div class="review-form" [class.visible]="showReviewForm">
-                <h3>Write Your Review</h3>
-                <div class="rating-input">
-                  <span>Your Rating:</span>
-                  <div class="stars">
-                    @for (star of [1,2,3,4,5]; track star) {
-                      <mat-icon (click)="setReviewRating(star)" 
-                                [class.filled]="star <= reviewRating">
-                        {{star <= reviewRating ? 'star' : 'star_border'}}
-                      </mat-icon>
-                    }
+                <div class="spec-row">
+                  <span class="spec-name">Type:</span>
+                  <span class="spec-value">{{product.type}}</span>
+                </div>
+                @if (product.shippingInfo) {
+                  <div class="spec-row">
+                    <span class="spec-name">Weight:</span>
+                    <span class="spec-value">{{product.shippingInfo.weight}}g</span>
                   </div>
-                </div>
-                <mat-form-field class="review-textarea">
-                  <mat-label>Your Review</mat-label>
-                  <textarea matInput [(ngModel)]="reviewText" rows="4"></textarea>
-                </mat-form-field>
-                <div class="form-actions">
-                  <button mat-button (click)="cancelReview()">Cancel</button>
-                  <button mat-raised-button color="primary" (click)="submitReview()">Submit Review</button>
-                </div>
-              </div>
-
-              <!-- Reviews List -->
-              <div class="reviews-list">
-                @for (review of product.reviewsList || []; track review.id) {
-                  <div class="review-item">
-                    <div class="review-header">
-                      <span class="reviewer">{{review.user}}</span>
-                      <div class="review-rating">
-                        @for (star of [1,2,3,4,5]; track star) {
-                          <mat-icon [class.filled]="star <= review.rating">star</mat-icon>
-                        }
-                      </div>
-                      <span class="review-date">{{review.date}}</span>
-                    </div>
-                    <p class="review-text">{{review.text}}</p>
-                    @if (review.response) {
-                      <div class="review-response">
-                        <strong>Response from DavidoTV:</strong>
-                        <p>{{review.response}}</p>
-                      </div>
-                    }
-                    <mat-divider></mat-divider>
+                  <div class="spec-row">
+                    <span class="spec-name">Dimensions:</span>
+                    <span class="spec-value">
+                      {{product.shippingInfo.dimensions.length}}cm × 
+                      {{product.shippingInfo.dimensions.width}}cm × 
+                      {{product.shippingInfo.dimensions.height}}cm
+                    </span>
                   </div>
                 }
-                @empty {
-                  <div class="no-reviews">
-                    <mat-icon>rate_review</mat-icon>
-                    <p>No reviews yet. Be the first to review!</p>
-                  </div>
-                }
+                <div class="spec-row">
+                  <span class="spec-name">SKU:</span>
+                  <span class="spec-value">{{product.inventory.sku}}</span>
+                </div>
               </div>
             </div>
           </mat-tab>
@@ -286,7 +229,14 @@ import { StoreService } from '../../services/store.service';
         <!-- Related Products -->
         <div class="related-products">
           <h2>You may also like</h2>
-          <app-product-grid [products]="relatedProducts"></app-product-grid>
+          @if (relatedProductsLoading) {
+            <div class="loading-spinner">
+              <mat-spinner diameter="40"></mat-spinner>
+              <p>Loading related products...</p>
+            </div>
+          } @else {
+            <app-product-grid [products]="relatedProducts"></app-product-grid>
+          }
         </div>
       } @else if (!isLoading) {
         <div class="product-not-found">
@@ -299,6 +249,7 @@ import { StoreService } from '../../services/store.service';
     </div>
   `,
   styles: [`
+    /* Your existing styles remain unchanged */
     .product-detail-container {
       max-width: 1400px;
       margin: 0 auto;
@@ -368,7 +319,7 @@ import { StoreService } from '../../services/store.service';
           font-size: 12px;
           font-weight: 600;
           letter-spacing: 0.5px;
-         
+          background: rgba(0, 0, 0, 0.8);
 
           &.new-badge {
             left: 12px;
@@ -384,14 +335,6 @@ import { StoreService } from '../../services/store.service';
             }
           }
         }
-         .new {
-            background-color: #e3f2fd !important;
-            color: #2196f3 !important;
-          }
-          .limited {
-            background-color: #ffebee !important;
-            color: #f44336 !important;
-          }
       }
 
       .thumbnail-container {
@@ -636,158 +579,12 @@ import { StoreService } from '../../services/store.service';
             }
           }
         }
-      }
 
-      .reviews-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-
-        .average-rating {
+        .tags-container {
           display: flex;
-          align-items: center;
+          flex-wrap: wrap;
           gap: 8px;
-
-          .average {
-            font-size: 2rem;
-            font-weight: 700;
-          }
-
-          .stars {
-            display: flex;
-            mat-icon {
-              color: #ffc107;
-              width: 24px;
-              height: 24px;
-              font-size: 24px;
-            }
-          }
-
-          .total-reviews {
-            color: #666;
-          }
-        }
-
-        .add-review-btn {
-          mat-icon {
-            margin-right: 8px;
-          }
-        }
-      }
-
-      .review-form {
-        max-width: 600px;
-        margin: 24px 0;
-        padding: 16px;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        display: none;
-
-        &.visible {
-          display: block;
-        }
-
-        .rating-input {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          margin-bottom: 16px;
-
-          .stars {
-            display: flex;
-            mat-icon {
-              color: #ddd;
-              cursor: pointer;
-              width: 28px;
-              height: 28px;
-              font-size: 28px;
-
-              &.filled {
-                color: #ffc107;
-              }
-            }
-          }
-        }
-
-        .review-textarea {
-          width: 100%;
-          margin-bottom: 16px;
-        }
-
-        .form-actions {
-          display: flex;
-          justify-content: flex-end;
-          gap: 8px;
-        }
-      }
-
-      .reviews-list {
-        .review-item {
-          padding: 16px 0;
-
-          .review-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 8px;
-
-            .reviewer {
-              font-weight: 500;
-            }
-
-            .review-rating {
-              display: flex;
-              mat-icon {
-                color: #ffc107;
-                width: 18px;
-                height: 18px;
-                font-size: 18px;
-              }
-            }
-
-            .review-date {
-              color: #666;
-              font-size: 0.8rem;
-            }
-          }
-
-          .review-text {
-            margin: 0 0 8px;
-            line-height: 1.6;
-          }
-
-          .review-response {
-            border-left: 1px solid gray;
-            border-radius: 45px;
-            padding: 12px;
-            border-radius: 4px;
-            margin: 8px 0 8px 1em;
-
-            p {
-              margin: 8px 0 0;
-            }
-          }
-        }
-
-        .no-reviews {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 40px 0;
-          color: #666;
-
-          mat-icon {
-            font-size: 48px;
-            height: 48px;
-            width: 48px;
-            margin-bottom: 16px;
-          }
-
-          p {
-            margin: 0;
-          }
+          margin-top: 8px;
         }
       }
     }
@@ -827,6 +624,21 @@ import { StoreService } from '../../services/store.service';
       }
     }
 
+    .loading-spinner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 0;
+      gap: 16px;
+      
+      p {
+        color: #666;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+    }
+
     @media (max-width: 960px) {
       .product-content {
         grid-template-columns: 1fr;
@@ -863,23 +675,21 @@ import { StoreService } from '../../services/store.service';
   `]
 })
 export class ProductDetailComponent implements OnInit {
-  product: any = null;
-  relatedProducts: any[] = [];
+ product: ProductInterface | null = null;
+  relatedProducts: ProductInterface[] = [];
   isLoading = true;
+  relatedProductsLoading = false;
   selectedImage: string | null = null;
   selectedVariant: any = null;
   quantity = 1;
   isInWishlist = false;
-  
-  // Review form
-  showReviewForm = false;
-  reviewRating = 0;
-  reviewText = '';
+  isAddingToCart = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private productService: StoreService,
+    private storeService: StoreService,
+    private cartService: CartService,
     private snackBar: MatSnackBar
   ) {}
 
@@ -890,244 +700,45 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  /* loadProduct(productId: string) {
+  loadProduct(productId: string) {
     this.isLoading = true;
-    this.productService.getProductById(productId).subscribe({
-      next: (product) => {
-        if (product) {
-          this.product = {
-            ...product,
-            // Add mock data for demonstration
-            galleryImages: [
-              'https://example.com/path/to/product-image-2.jpg',
-              'https://example.com/path/to/product-image-3.jpg',
-              'https://example.com/path/to/product-image-4.jpg'
-            ],
-            originalPrice: product.price * 1.2, // Add 20% for demo
-            discount: 15, // Demo discount
-            stock: Math.floor(Math.random() * 50) + 5, // Random stock
-            features: [
-              'Official Davido merchandise',
-              'High-quality materials',
-              'Exclusive design',
-              'Limited availability'
-            ],
-            specifications: {
-              'Material': '100% Cotton',
-              'Size': 'One Size',
-              'Color': 'Black',
-              'Weight': '0.3kg',
-              'Origin': 'Nigeria'
-            },
-            reviewsList: [
-              {
-                id: 1,
-                user: 'Oluwaseun A.',
-                rating: 5,
-                date: '2 weeks ago',
-                text: 'Amazing quality! Fits perfectly and the design is even better in person.',
-                response: 'Thank you for your support! We\'re glad you love your Davido merch.'
-              },
-              {
-                id: 2,
-                user: 'Chioma K.',
-                rating: 4,
-                date: '1 month ago',
-                text: 'Great product but delivery took longer than expected.'
-              }
-            ]
-          };
-
-          if (this.product.variants && this.product.variants.length > 0) {
-            this.selectedVariant = this.product.variants[0];
-          }
-
-          this.loadRelatedProducts();
+    
+    this.storeService.getProductById(productId).pipe(
+      catchError(error => {
+        console.error('Error loading product:', error);
+        return of(null);
+      }),
+      finalize(() => this.isLoading = false)
+    ).subscribe(product => {
+      this.product = product;
+      if (product) {
+        if (product.variants && product.variants.length > 0) {
+          this.selectedVariant = product.variants[0];
         }
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
+        this.loadRelatedProducts(productId);
+        this.checkWishlistStatus(productId);
       }
     });
-  } */
+  }
 
-    loadProduct(productId: string) {
-  this.isLoading = true;
-  
-  // Mock products data - replace with your actual service call in production
-  const mockProducts = {
-    '1': {
-      id: '1',
-      name: 'Official Davido 30BG Logo T-Shirt',
-      description: 'Premium quality official Davido merchandise. 100% cotton with the official 30BG logo printed on the front.',
-      price: 39.99,
-      originalPrice: 49.99,
-      discount: 20,
-      image: 'https://m.media-amazon.com/images/I/61-jBuhtgZL._AC_UY1100_.jpg',
-      galleryImages: [
-        'https://i.ebayimg.com/images/g/9~AAAOSwPc9V2H6~/s-l1600.jpg',
-        'https://i5.walmartimages.com/asr/9a9f8f3f-5a5e-4f9b-8b8e-5e8f5b5e5e5e_1.3b9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c.jpeg'
-      ],
-      category: 'clothing',
-      type: 'Standard',
-      rating: 4.5,
-      reviews: 24,
-      isNew: true,
-      isLimited: false,
-      stock: 42,
-      createdAt: new Date('2023-05-15'),
-      features: [
-        '100% premium cotton',
-        'Official 30BG logo',
-        'Machine washable',
-        'Available in multiple sizes'
-      ],
-      specifications: {
-        'Material': '100% Cotton',
-        'Size': 'S, M, L, XL',
-        'Color': 'Black',
-        'Weight': '0.25kg',
-        'Origin': 'Nigeria'
-      },
-      variants: [
-        { id: '1-s', name: 'Small' },
-        { id: '1-m', name: 'Medium' },
-        { id: '1-l', name: 'Large' },
-        { id: '1-xl', name: 'XL' }
-      ],
-      reviewsList: [
-        {
-          id: 1,
-          user: 'Oluwaseun A.',
-          rating: 5,
-          date: '2 weeks ago',
-          text: 'Amazing quality! Fits perfectly and the design is even better in person.',
-          response: 'Thank you for your support! We\'re glad you love your Davido merch.'
-        },
-        {
-          id: 2,
-          user: 'Chioma K.',
-          rating: 4,
-          date: '1 month ago',
-          text: 'Great product but delivery took longer than expected.'
-        }
-      ]
-    },
-    '2': {
-      id: '2',
-      name: 'Limited Edition Davido Signed Album',
-      description: 'Collector\'s item - limited edition signed copy of Davido\'s latest album. Only 500 copies available worldwide.',
-      price: 199.99,
-      originalPrice: 249.99,
-      discount: 20,
-      image: 'https://static-01.daraz.com.np/p/7a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a.jpg',
-      galleryImages: [
-        'https://example.com/path/to/album-cover-2.jpg',
-        'https://example.com/path/to/album-back.jpg',
-        'https://example.com/path/to/signature-closeup.jpg'
-      ],
-      category: 'music',
-      type: 'Limited Edition',
-      rating: 5,
-      reviews: 8,
-      isNew: false,
-      isLimited: true,
-      stock: 3, // Low stock to show the warning
-      createdAt: new Date('2023-01-10'),
-      features: [
-        'Hand-signed by Davido',
-        'Includes bonus tracks',
-        'Collector\'s edition packaging',
-        'Certificate of authenticity'
-      ],
-      specifications: {
-        'Format': 'CD + Digital',
-        'Tracks': '15',
-        'Release Date': 'January 2023',
-        'Weight': '0.15kg',
-        'Authenticity': 'Certificate included'
-      },
-      variants: [
-        { id: '2-cd', name: 'CD Version' },
-        { id: '2-vinyl', name: 'Vinyl Version' }
-      ],
-      reviewsList: [
-        {
-          id: 1,
-          user: 'Ade B.',
-          rating: 5,
-          date: '3 weeks ago',
-          text: 'Worth every penny! The signature is authentic and the album sounds amazing.'
-        },
-        {
-          id: 2,
-          user: 'Funke S.',
-          rating: 5,
-          date: '2 months ago',
-          text: 'Perfect gift for any Davido fan. Packaging was excellent and arrived safely.'
-        }
-      ]
-    }
-  };
-
-  // Simulate API delay
-  setTimeout(() => {
-    const product = mockProducts[productId as keyof typeof mockProducts];
-    
-    if (product) {
-      this.product = product;
-      if (this.product.variants && this.product.variants.length > 0) {
-        this.selectedVariant = this.product.variants[0];
-      }
-      this.loadRelatedProducts();
-    }
-    
-    this.isLoading = false;
-  }, 800);
-}
-
-  /* loadRelatedProducts() {
-    this.productService.getRelatedProducts(this.product.id).subscribe(products => {
+  loadRelatedProducts(productId: string) {
+    this.relatedProductsLoading = true;
+    this.storeService.getRelatedProducts(productId).pipe(
+      catchError(error => {
+        console.error('Error loading related products:', error);
+        return of([]);
+      }),
+      finalize(() => this.relatedProductsLoading = false)
+    ).subscribe(products => {
       this.relatedProducts = products;
     });
-  } */
+  }
 
-    loadRelatedProducts() {
-  // Mock related products - replace with actual service call in production
-  this.relatedProducts = [
-    {
-      id: '3',
-      name: 'Davido Tour Cap',
-      price: 29.99,
-      image: 'https://i.ebayimg.com/images/g/9~AAAOSwPc9V2H6~/s-l1600.jpg',
-      isNew: true,
-      isLimited: false,
-      rating: 4,
-      reviews: 12
-    },
-    {
-      id: '4',
-      name: '30BG Hoodie',
-      price: 59.99,
-      image: 'https://i5.walmartimages.com/asr/9a9f8f3f-5a5e-4f9b-8b8e-5e8f5b5e5e5e_1.3b9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c.jpeg',
-      isNew: false,
-      isLimited: true,
-      rating: 5,
-      reviews: 8
-    },
-    {
-      id: '5',
-      name: 'Davido Wristband Set',
-      price: 19.99,
-      image: 'https://static-01.daraz.com.np/p/7a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a.jpg',
-      isNew: true,
-      isLimited: false,
-      rating: 3,
-      reviews: 5
-    }
-  ];
-}
+  checkWishlistStatus(productId: string) {
+    // In a real app, you would call a wishlist service here
+    // For now, we'll just set it to false
+    this.isInWishlist = false;
+  }
 
   selectImage(image: string) {
     this.selectedImage = image;
@@ -1138,7 +749,7 @@ export class ProductDetailComponent implements OnInit {
   }
 
   increaseQuantity() {
-    if (this.quantity < 10) {
+    if (this.product && this.quantity < Math.min(10, this.product.inventory.stock)) {
       this.quantity++;
     }
   }
@@ -1150,73 +761,51 @@ export class ProductDetailComponent implements OnInit {
   }
 
   addToCart() {
-    const productToAdd = {
-      ...this.product,
-      variant: this.selectedVariant,
-      quantity: this.quantity
+    if (!this.product || this.isAddingToCart) return;
+
+    this.isAddingToCart = true;
+
+    const cartItem = {
+      product: this.product._id,
+      quantity: this.quantity,
+      priceAtAddition: this.product.discountedPrice || this.product.price,
+      ...(this.selectedVariant && { 
+        selectedVariant: {
+          name: this.selectedVariant.name,
+          option: this.selectedVariant.option
+        }
+      })
     };
 
-    // In a real app, you would call a cart service here
-    console.log('Added to cart:', productToAdd);
-    this.snackBar.open('Added to cart', 'Dismiss', {
-      duration: 3000,
-      panelClass: 'success-snackbar'
+    this.cartService.addToCart(cartItem).pipe(
+      finalize(() => this.isAddingToCart = false)
+    ).subscribe({
+      next: () => {
+        this.snackBar.open('Added to cart', 'Dismiss', {
+          duration: 3000,
+          panelClass: 'success-snackbar'
+        });
+      },
+      error: (error) => {
+        console.error('Error adding to cart:', error);
+        this.snackBar.open('Failed to add to cart', 'Dismiss', {
+          duration: 3000,
+          panelClass: 'error-snackbar'
+        });
+      }
     });
   }
 
   toggleWishlist() {
+    if (!this.product) return;
+
+    const productId = this.product._id;
+    // In a real app, you would call a wishlist service here
     this.isInWishlist = !this.isInWishlist;
     const message = this.isInWishlist ? 'Added to wishlist' : 'Removed from wishlist';
     this.snackBar.open(message, 'Dismiss', {
       duration: 2000
     });
-  }
-
-  openReviewDialog() {
-    this.showReviewForm = true;
-    this.reviewRating = 0;
-    this.reviewText = '';
-  }
-
-  cancelReview() {
-    this.showReviewForm = false;
-  }
-
-  setReviewRating(rating: number) {
-    this.reviewRating = rating;
-  }
-
-  submitReview() {
-    if (this.reviewRating === 0) {
-      this.snackBar.open('Please select a rating', 'Dismiss', {
-        duration: 2000,
-        panelClass: 'error-snackbar'
-      });
-      return;
-    }
-
-    // In a real app, you would submit this to your backend
-    const newReview = {
-      id: Date.now(),
-      user: 'You',
-      rating: this.reviewRating,
-      date: 'Just now',
-      text: this.reviewText
-    };
-
-    this.product.reviewsList = [newReview, ...this.product.reviewsList];
-    this.product.reviews++;
-    
-    // Update average rating (simple average for demo)
-    const totalRating = this.product.reviewsList.reduce((sum: number, review: any) => sum + review.rating, 0);
-    this.product.rating = totalRating / this.product.reviewsList.length;
-
-    this.snackBar.open('Thank you for your review!', 'Dismiss', {
-      duration: 3000,
-      panelClass: 'success-snackbar'
-    });
-
-    this.showReviewForm = false;
   }
 
   goBack() {
@@ -1228,6 +817,6 @@ export class ProductDetailComponent implements OnInit {
   }
 
   getRoundedRating(): number {
-    return Math.round(this.product?.rating || 0);
+    return this.product ? Math.round(this.product.rating.average) : 0;
   }
 }

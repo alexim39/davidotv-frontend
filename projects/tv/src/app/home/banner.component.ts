@@ -64,8 +64,8 @@ import { AuthComponent } from '../auth/auth.component';
         </div>
 
         <div class="banner-buttons">
-          <button mat-flat-button color="primary" (click)="authDialog()">Join Now</button>
-          <button mat-stroked-button color="accent" (click)="loadTrending()">Watch Trending</button>
+          <button mat-flat-button (click)="authDialog()">Join Now</button>
+          <button mat-raised-button (click)="loadVideos()">Watch Videos</button>
         </div>
       </div>
 
@@ -267,7 +267,7 @@ export class BannerComponent {
      this.dialog.open(AuthComponent);
    }
 
-  loadTrending(): void {
-    this.router.navigate(['/videos/trending']);
+  loadVideos(): void {
+    this.router.navigate(['/videos']);
   }
 }

@@ -9,7 +9,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { ProductGridComponent } from '../product-grid.component';
-import { StoreService } from '../../services/store.service';
+import { StoreService, ProductInterface } from '../../services/store.service';
+import { catchError, finalize, of } from 'rxjs';
 
 @Component({
   selector: 'app-shop-category',
@@ -40,10 +41,6 @@ import { StoreService } from '../../services/store.service';
               <mat-icon>video_library</mat-icon>
               {{ totalProducts }} products
             </span>
-            <span>
-              <mat-icon>update</mat-icon>
-              Updated daily
-            </span>
           </div>
         </div>
       </div>
@@ -53,15 +50,15 @@ import { StoreService } from '../../services/store.service';
     <div class="category-content">
       <!-- Filter/Sort Bar -->
       <mat-toolbar class="filter-bar">
-        <mat-chip-listbox class="filter-chips">
-          <mat-chip-option selected>All</mat-chip-option>
-          <mat-chip-option>Popular</mat-chip-option>
-          <mat-chip-option>Newest</mat-chip-option>
-          <mat-chip-option>Price: Low to High</mat-chip-option>
-          <mat-chip-option>Price: High to Low</mat-chip-option>
+        <mat-chip-listbox class="filter-chips" aria-label="Filter options">
+          <mat-chip-option (click)="sortProducts('')">All</mat-chip-option>
+          <mat-chip-option (click)="sortProducts('popular')">Popular</mat-chip-option>
+          <mat-chip-option (click)="sortProducts('newest')">Newest</mat-chip-option>
+          <mat-chip-option (click)="sortProducts('price-asc')">Price: Low to High</mat-chip-option>
+          <mat-chip-option (click)="sortProducts('price-desc')">Price: High to Low</mat-chip-option>
         </mat-chip-listbox>
         <span class="spacer"></span>
-        <button mat-stroked-button class="filter-btn">
+        <button mat-stroked-button class="filter-btn" (click)="openFilters()">
           <mat-icon>filter_list</mat-icon>
           Filters
         </button>
@@ -332,20 +329,21 @@ export class ShopCategoryComponent implements OnInit {
   categoryName: string = 'All Products';
   categoryDescription: string = 'Browse all official Davido merchandise';
   categoryImage: string = '';
-  totalProducts: number = 0;
-  products: any[] = [];
+  products: ProductInterface[] = [];
   isLoading: boolean = true;
   
   // Pagination
   currentPage: number = 1;
   itemsPerPage: number = 12;
+  totalProducts: number = 0;
   totalPages: number = 1;
   visiblePages: number[] = [];
   showEllipsis: boolean = false;
+  currentSort: string = '';
 
   constructor(
     private route: ActivatedRoute,
-    private productService: StoreService
+    private storeService: StoreService
   ) {}
 
   ngOnInit() {
@@ -357,37 +355,46 @@ export class ShopCategoryComponent implements OnInit {
   }
 
   loadCategoryData() {
-    // In a real app, you'd fetch this from your API
     const categories: {[key: string]: {name: string, description: string, image: string}} = {
       'all': {
         name: 'All Products',
         description: 'Browse all official Davido merchandise',
-        image: 'img/store/category/all.jpg'
+        image: '/img/store/category/all.jpg'
       },
-      'clothing': {
+      'apparel': {
         name: 'Apparel & Fashion',
         description: 'Official Davido clothing including t-shirts, hoodies, and more',
-        image: 'img/store/category/clothing.jpg'
+        image: '/img/store/category/apparel.jpg'
       },
       'accessories': {
         name: 'Accessories',
         description: 'Hats, bags, and other Davido accessories',
-        image: 'img/store/category/accessories.jpg'
+        image: '/img/store/category/accessories.jpg'
       },
-      'merch': {
+      'home': {
         name: 'Home & Lifestyle',
         description: 'Davido branded home goods and lifestyle products',
-        image: 'img/store/category/merch.jpg'
+        image: '/img/store/category/merch.jpg'
       },
       'music': {
         name: 'Music & Collectibles',
         description: 'Vinyl records, CDs, and exclusive collectibles',
-        image: 'img/store/category/music.jpg'
+        image: '/img/store/category/music.jpg'
       },
-      'limited': {
+      'limited-edition': {
         name: 'Exclusive Items',
         description: 'Limited edition Davido merchandise',
-        image: 'img/store/category/limited.jpg'
+        image: '/img/store/category/limited.jpg'
+      },
+      'featured': {
+        name: 'Featured Products',
+        description: 'Curated selection of featured Davido merchandise',
+        image: '/img/store/category/featured.jpg'
+      },
+      'new': {
+        name: 'New Arrivals',
+        description: 'The newest Davido merchandise just added to our store',
+        image: '/img/store/category/new.jpg'
       }
     };
 
@@ -397,67 +404,100 @@ export class ShopCategoryComponent implements OnInit {
     this.categoryImage = categoryData.image;
   }
 
-  loadProducts() {
+  /* loadProducts() {
     this.isLoading = true;
-    // Simulate API call
-    setTimeout(() => {
-      this.products = this.mockProducts(12, this.categoryId);
-      this.totalProducts = this.products.length;
-      this.totalPages = Math.ceil(this.totalProducts / this.itemsPerPage);
-      this.updateVisiblePages();
-      this.isLoading = false;
-    }, 1000);
-  }
+    
+    let sort = '';
+    if (this.currentSort === 'popular') {
+      sort = '-rating.average';
+    } else if (this.currentSort === 'newest') {
+      sort = '-createdAt';
+    } else if (this.currentSort === 'price-asc') {
+      sort = 'price';
+    } else if (this.currentSort === 'price-desc') {
+      sort = '-price';
+    }
 
-  mockProducts(count: number, categoryId: string): any[] {
-    const products = [];
-    const categories: {[key: string]: string[]} = {
-      'all': ['T-Shirts', 'Hoodies', 'Caps', 'Accessories', 'Posters', 'Vinyl'],
-      'clothing': ['T-Shirts', 'Hoodies', 'Jackets', 'Pants'],
-      'accessories': ['Caps', 'Bags', 'Watches', 'Jewelry'],
-      'merch': ['Posters', 'Mugs', 'Blankets', 'Towels'],
-      'music': ['Vinyl', 'CDs', 'Cassettes', 'Collector Boxes'],
-      'limited': ['Signed Merch', 'Limited Edition', 'Rare Items']
+    const params = {
+      page: this.currentPage,
+      limit: this.itemsPerPage,
+      sort: sort,
+      category: this.categoryId === 'all' ? '' : this.categoryId
     };
 
-    const categoryItems = categories[categoryId as keyof typeof categories] || categories['all'];
+    this.storeService.getProducts(params).pipe(
+      catchError(error => {
+        console.error('Error loading products:', error);
+        return of({ products: [], total: 0 });
+      }),
+      finalize(() => this.isLoading = false)
+    ).subscribe(response => {
+      this.products = response.products;
+      this.totalProducts = response.total;
+      this.totalPages = Math.ceil(this.totalProducts / this.itemsPerPage);
+      this.updateVisiblePages();
+    });
+  } */
 
-    for (let i = 1; i <= count; i++) {
-      products.push({
-        id: `${categoryId}-${i}`,
-        name: `Davido ${categoryItems[i % categoryItems.length]} ${i}`,
-        price: 29.99 + (i * 5),
-        image: this.getRandomProductImage(),
-        category: categoryItems[i % categoryItems.length],
-        type: ['Standard', 'Premium', 'Exclusive'][i % 3],
-        rating: Math.floor(Math.random() * 3) + 3, // 3-5 stars
-        reviews: Math.floor(Math.random() * 50),
-        isNew: i <= 3,
-        isLimited: categoryId === 'limited' || i % 5 === 0
-      });
+  loadProducts() {
+    this.isLoading = true;
+    
+    let sort = '';
+    if (this.currentSort === 'popular') {
+      sort = '-rating.average';
+    } else if (this.currentSort === 'newest') {
+      sort = '-createdAt';
+    } else if (this.currentSort === 'price-asc') {
+      sort = 'price';
+    } else if (this.currentSort === 'price-desc') {
+      sort = '-price';
     }
-    return products;
+
+    // Initialize params object
+    const params: any = {
+      page: this.currentPage,
+      limit: this.itemsPerPage,
+      sort: sort
+    };
+
+    // Handle special categories differently
+    if (this.categoryId === 'featured') {
+      params.isFeatured = 'true';
+    } else if (this.categoryId === 'new') {
+      params.isNewProduct = 'true';
+    } else if (this.categoryId !== 'all') {
+      params.category = this.categoryId;
+    }
+
+    this.storeService.getProducts(params).pipe(
+      catchError(error => {
+        console.error('Error loading products:', error);
+        return of({ products: [], total: 0 });
+      }),
+      finalize(() => this.isLoading = false)
+    ).subscribe(response => {
+      this.products = response.products;
+      this.totalProducts = response.total;
+      this.totalPages = Math.ceil(this.totalProducts / this.itemsPerPage);
+      this.updateVisiblePages();
+    });
   }
 
-  getRandomProductImage(): string {
-    const images = [
-      //'https://m.media-amazon.com/images/I/61-jBuhtgZL._AC_UY1100_.jpg',
-      '/img/store/clothing/shirt.png',
-      //'https://i5.walmartimages.com/asr/9a9f8f3f-5a5e-4f9b-8b8e-5e8f5b5e5e5e_1.3b9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c.jpeg',
-      '/img/store/clothing/hoodie.png',
-      '/img/store/clothing/cap.png',
-      '/img/store/clothing/brimless_cap.png',
-      '/img/store/clothing/cadigan.png',
-      '/img/store/clothing/cup.png',
-    ];
-    return images[Math.floor(Math.random() * images.length)];
+  sortProducts(sortType: string) {
+    this.currentSort = sortType;
+    this.currentPage = 1;
+    this.loadProducts();
+  }
+
+  openFilters() {
+    // In a real app, you would open a filter dialog here
+    console.log('Open filters dialog');
   }
 
   changePage(page: number) {
     if (page < 1 || page > this.totalPages) return;
     this.currentPage = page;
-    this.updateVisiblePages();
-    // In a real app, you'd fetch products for the new page
+    this.loadProducts();
   }
 
   updateVisiblePages() {

@@ -10,6 +10,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { UserInterface } from '../../common/services/user.service';
+import { ApiService } from '../../common/services/api.service';
 
 @Component({
   selector: 'async-profile-image-uploader',
@@ -152,7 +153,7 @@ import { UserInterface } from '../../common/services/user.service';
 })
 export class ProfileImageUploaderComponent {
   @Input() user!: UserInterface;
-  apiURL = 'http://localhost:8080';
+  //apiURL = 'http://localhost:8080';
 
   profileForm: FormGroup;
   isDragOver = false;
@@ -165,7 +166,8 @@ export class ProfileImageUploaderComponent {
     private fb: FormBuilder,
     private http: HttpClient,
     private snackBar: MatSnackBar,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private apiService: ApiService
   ) {
     this.profileForm = this.fb.group({});
   }
@@ -243,7 +245,7 @@ export class ProfileImageUploaderComponent {
     formData.append('profilePicture', this.selectedFile);  // Fixed field name
     formData.append('userId', this.user?._id || '');
     
-    this.http.post(this.apiURL + `/image/profile/${this.user._id}`, formData, {
+    this.http.post(this.apiService.getBaseUrl() + `/image/profile/${this.user._id}`, formData, {
       reportProgress: true,
       observe: 'events'
     }).subscribe({

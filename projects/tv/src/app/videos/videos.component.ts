@@ -90,11 +90,6 @@ import { throttleTime } from 'rxjs/operators';
 
       <!-- video content -->
       <div class="video-content">
-        <!-- Loading state -->
-        <!-- <div *ngIf="loading" class="loading-container">
-          <mat-spinner diameter="50" strokeWidth="2" color="accent"></mat-spinner>
-          <p class="loading-text">Loading Davido videos...</p>
-        </div> -->
 
         <!-- Videos grid -->
         <div *ngIf="videos.length > 0" class="video-grid">
@@ -107,7 +102,7 @@ import { throttleTime } from 'rxjs/operators';
               <div class="video-info">
                 <img src="./img/ytch.jpeg" alt="Channel" class="channel-icon" loading="lazy">
                 <div class="video-meta">
-                  <h3>{{ video.title }}</h3>
+                  <h3 title="{{video.title}}">{{ video.title }}</h3>
                   <p class="channel-name">{{ video.channel }}</p>
                   <div class="video-stats">
                     <span class="stat-item">

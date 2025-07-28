@@ -7,17 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ProductInterface } from '../services/store.service';
 
-interface Product {
-  id: string;
-  name: string;
-  image: string;
-  isNew: boolean;
-  isLimited: boolean;
-  rating: number;
-  reviews: number;
-  price: number;
-}
 
 @Component({
   selector: 'app-product-grid',
@@ -41,15 +32,15 @@ interface Product {
         </div>
       } @else {
         <div class="product-grid">
-          @for (product of products; track product.id) {
-            <mat-card class="product-card" [routerLink]="['/store/product', product.id]">
+          @for (product of products; track product._id) {
+            <mat-card class="product-card" [routerLink]="['/store/product', product._id]">
               <!-- Product Image with Badges -->
               <div class="product-image-container">
-                <img [src]="product.image" [alt]="product.name" class="product-image">
-                @if (product.isNew) {
+                <img [src]="product.images[0].url" [alt]="product.name" class="product-image">
+                @if (product.isNewProduct) {
                   <mat-chip class="new-badge" color="accent" selected>NEW</mat-chip>
                 }
-                @if (product.isLimited) {
+                @if (product.isLimitedEdition) {
                   <mat-chip class="limited-badge" color="warn" selected>
                     <mat-icon>whatshot</mat-icon>
                     LIMITED
@@ -71,9 +62,9 @@ interface Product {
                 <div class="product-meta">
                   <div class="product-rating">
                     @for (star of [1,2,3,4,5]; track star) {
-                      <mat-icon [class.filled]="star <= product.rating">star</mat-icon>
+                      <mat-icon [class.filled]="star <= product.rating.average">star</mat-icon>
                     }
-                    <span>({{product.reviews}})</span>
+                    <span>({{product.rating.count}})</span>
                   </div>
                   <span class="product-price">N{{formatPrice(product.price)}}</span>
                 </div>
@@ -158,6 +149,7 @@ styles: [`
         font-size: 12px;
         font-weight: 600;
         letter-spacing: 0.5px;
+        background: rgba(0, 0, 0, 0.8);
 
         &.new-badge {
           left: 12px;
@@ -296,7 +288,7 @@ styles: [`
   `]
 })
 export class ProductGridComponent {
-  @Input() products: Product[] = [];
+  @Input() products: ProductInterface[] = [];
   @Output() quickView = new EventEmitter<any>();
 
   truncateName(name: string, limit: number = 24): string {
@@ -307,17 +299,17 @@ export class ProductGridComponent {
     return price.toFixed(2);
   }
 
-  addToCart(event: Event, product: Product) {
+  addToCart(event: Event, product: ProductInterface) {
     event.stopPropagation();
     console.log('Added to cart:', product);
   }
 
-  addToWishlist(event: Event, product: Product) {
+  addToWishlist(event: Event, product: ProductInterface) {
     event.stopPropagation();
     console.log('Added to wishlist:', product);
   }
 
-  onQuickView(event: Event, product: Product) {
+  onQuickView(event: Event, product: ProductInterface) {
     event.stopPropagation();
     console.log('Quick view:', product, this.quickView);
   }

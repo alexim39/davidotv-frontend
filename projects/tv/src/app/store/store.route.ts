@@ -4,7 +4,7 @@ import { ShopCategoryComponent } from "./pages/category/category.component";
 import { ProductDetailComponent } from "./pages/product/product-detail";
 import { CartPageComponent } from "./pages/cart/cart.component";
 import { CheckoutPageComponent } from "./pages/cart/checkout.component";
-import { ShopHomeContainerComponent } from "./pages/home-container.component";
+import { ShopHomeComponent } from "./pages/home.component";
 
 export const StoreRoutes: Routes = [
   { 
@@ -13,7 +13,7 @@ export const StoreRoutes: Routes = [
     children: [
       {
         path: '', 
-        component: ShopHomeContainerComponent, 
+        component: ShopHomeComponent, 
       },
       {
         path: 'category/:id',

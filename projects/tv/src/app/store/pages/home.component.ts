@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProductInterface, StoreService } from '../services/store.service';
@@ -10,6 +10,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ProductGridComponent } from './product-grid.component';
+import { catchError, finalize, of } from 'rxjs';
 
 @Component({
   selector: 'app-shop-home',
@@ -36,7 +37,7 @@ import { ProductGridComponent } from './product-grid.component';
         <mat-toolbar class="section-header">
           <h2>Featured Products</h2>
           <span class="spacer"></span>
-          <a mat-button color="primary" routerLink="/shop/category/featured" class="view-all">
+          <a mat-button color="primary" routerLink="/store/category/featured" class="view-all">
             View All
             <mat-icon>chevron_right</mat-icon>
           </a>
@@ -44,10 +45,28 @@ import { ProductGridComponent } from './product-grid.component';
         <mat-divider></mat-divider>
         @if (isLoading) {
           <div class="loading-spinner">
-            <mat-spinner diameter="50"></mat-spinner>
+            <mat-spinner diameter="50" strokeWidth="2" color="accent"/>
+            <p class="loading-text">Loading featured products...</p>
           </div>
+        } @else if (featuredProducts.length > 0) {
+          <app-product-grid [products]="featuredProducts"/>
         } @else {
-          <app-product-grid [products]="featuredProducts"></app-product-grid>
+          
+
+           <div class="no-results">
+            <mat-icon class="no-results-icon" aria-hidden="false" aria-label="No product found">search_off</mat-icon>
+            <h3>No Product found</h3>
+            <p>No featured products available.</p>
+            <button 
+              mat-flat-button 
+              color="primary" 
+              (click)="retry()"
+              aria-label="Retry loading product"
+            >
+              <mat-icon>refresh</mat-icon>
+              Try Again
+            </button>
+          </div>
         }
       </section>
 
@@ -56,7 +75,7 @@ import { ProductGridComponent } from './product-grid.component';
         <mat-toolbar class="section-header">
           <h2>New Arrivals</h2>
           <span class="spacer"></span>
-          <a mat-button color="primary" routerLink="/shop/category/new" class="view-all">
+          <a mat-button color="primary" routerLink="/store/category/new" class="view-all">
             View All
             <mat-icon>chevron_right</mat-icon>
           </a>
@@ -64,19 +83,36 @@ import { ProductGridComponent } from './product-grid.component';
         <mat-divider></mat-divider>
         @if (isLoading) {
           <div class="loading-spinner">
-            <mat-spinner diameter="50"></mat-spinner>
+            <mat-spinner diameter="50" strokeWidth="2" color="accent"/>
+            <p class="loading-text">Loading new arrivals...</p>
           </div>
+        } @else if (newArrivals.length > 0) {
+          <app-product-grid [products]="newArrivals"/>
         } @else {
-          <app-product-grid [products]="newArrivals"></app-product-grid>
+
+          <div class="no-results">
+            <mat-icon class="no-results-icon" aria-hidden="false" aria-label="No product found">search_off</mat-icon>
+            <h3>No Product found</h3>
+            <p>No new arrivals available.</p>
+            <button 
+              mat-flat-button 
+              color="primary" 
+              (click)="retry()"
+              aria-label="Retry loading product"
+            >
+              <mat-icon>refresh</mat-icon>
+              Try Again
+            </button>
+          </div>
         }
       </section>
 
       <!-- Category Promos -->
       <mat-grid-list cols="2" rowHeight="300px" gutterSize="16px" class="category-promos">
         <mat-grid-tile>
-          <mat-card class="promo-banner clothing-promo" routerLink="/shop/category/clothing">
+          <mat-card class="promo-banner clothing-promo" routerLink="/shop/category/apparel">
             <div class="promo-content">
-              <h3>Davido Clothing</h3>
+              <h3>Davido Branded Apparel</h3>
               <button mat-stroked-button color="primary" class="promo-link">
                 Shop Now
                 <mat-icon>arrow_forward</mat-icon>
@@ -87,7 +123,7 @@ import { ProductGridComponent } from './product-grid.component';
         <mat-grid-tile>
           <mat-card class="promo-banner accessories-promo" routerLink="/shop/category/accessories">
             <div class="promo-content">
-              <h3>Accessories</h3>
+              <h3>Davido Branded Accessories</h3>
               <button mat-stroked-button color="primary" class="promo-link">
                 Shop Now
                 <mat-icon>arrow_forward</mat-icon>
@@ -107,190 +143,284 @@ import { ProductGridComponent } from './product-grid.component';
         <mat-divider></mat-divider>
         @if (isLoading) {
           <div class="loading-spinner">
-            <mat-spinner diameter="50"></mat-spinner>
+            <mat-spinner diameter="50" strokeWidth="2" color="accent"/>
+            <p class="loading-text">Loading limited...</p>
           </div>
+        } @else if (limitedEdition.length > 0) {
+          <app-product-grid [products]="limitedEdition"/>
         } @else {
-          <app-product-grid [products]="limitedEdition"></app-product-grid>
+        <div class="no-results">
+          <mat-icon class="no-results-icon" aria-hidden="false" aria-label="No product found">search_off</mat-icon>
+          <h3>No Product found</h3>
+           <p>No limited edition products available.</p>
+          <button 
+            mat-flat-button 
+            color="primary" 
+            (click)="retry()"
+            aria-label="Retry loading product"
+          >
+            <mat-icon>refresh</mat-icon>
+            Try Again
+          </button>
+        </div>
         }
       </section>
     </div>
   `,
-styles: [`
-  .section-container {
-    margin-bottom: 40px;
-  }
-
-  .section-header {
-    background: transparent !important;
-    padding: 0 !important;
-    margin-bottom: 16px;
-
-    h2 {
-      font-size: 1.5rem;
-      font-weight: 500;
-      margin: 0;
+  styles: [`
+    /* Your existing styles remain unchanged */
+    .section-container {
+      margin-bottom: 40px;
     }
 
-    p {
-      color: #666;
-      margin: 0;
-      font-size: 0.9rem;
-    }
+    .section-header {
+      background: transparent !important;
+      padding: 0 !important;
+      margin-bottom: 16px;
 
-    .spacer {
-      flex: 1 1 auto;
-    }
-
-    .view-all {
-      font-weight: 500;
-
-      mat-icon {
-        font-size: 20px;
-        height: 20px;
-        width: 20px;
-      }
-    }
-  }
-
-  .category-promos {
-    margin: 40px 0;
-
-    .promo-banner {
-      height: 100%;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      background-size: cover;
-      background-position: center;
-      border-radius: 8px !important;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-
-      &:hover {
-        transform: scale(1.02);
-      }
-
-      &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.3);
-        transition: background 0.3s ease;
-      }
-
-      &:hover::after {
-        background: rgba(0, 0, 0, 0.1);
-      }
-
-      .promo-content {
-        z-index: 1;
-        text-align: center;
-        color: white;
-
-        h3 {
-          font-size: 2rem;
-          margin-bottom: 15px;
-          text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-          font-weight: 600;
-        }
-      }
-
-      .promo-link {
+      h2 {
+        font-size: 1.5rem;
         font-weight: 500;
-        border-width: 2px;
+        margin: 0;
+      }
+
+      p {
+        color: #666;
+        margin: 0;
+        font-size: 0.9rem;
+      }
+
+      .spacer {
+        flex: 1 1 auto;
+      }
+
+      .view-all {
+        font-weight: 500;
 
         mat-icon {
-          margin-left: 8px;
+          font-size: 20px;
+          height: 20px;
+          width: 20px;
         }
       }
     }
 
-    .clothing-promo {
-      background-image: url('/img/store/category/clothing.jpg');
-    }
-
-    .accessories-promo {
-      background-image: url('/img/store/category/accessories.jpg');
-    }
-  }
-
-  .loading-spinner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 200px;
-  }
-
-  @media (max-width: 768px) {
     .category-promos {
-      mat-grid-list {
-        grid-template-columns: 1fr;
+      margin: 40px 0;
+
+      .promo-banner {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        background-size: cover;
+        background-position: center;
+        border-radius: 8px !important;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.02);
+        }
+
+        &::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.3);
+          transition: background 0.3s ease;
+        }
+
+        &:hover::after {
+          background: rgba(0, 0, 0, 0.1);
+        }
+
+        .promo-content {
+          z-index: 1;
+          text-align: center;
+          color: white;
+
+          h3 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            font-weight: 600;
+          }
+        }
+
+        .promo-link {
+          font-weight: 500;
+          border-width: 2px;
+
+          mat-icon {
+            margin-left: 8px;
+          }
+        }
+      }
+
+      .clothing-promo {
+        background-image: url('/img/store/category/apparel.jpg');
+      }
+
+      .accessories-promo {
+        background-image: url('/img/store/category/accessories.jpg');
       }
     }
 
-    .hero-banner {
-      height: 350px;
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      .loading-text {
+        font-size: 0.875rem;
+        color: #666;
+        font-weight: 500;
+        margin-left: 10px;
+      }
     }
-  }
-`]
+
+    @media (max-width: 768px) {
+      .category-promos {
+        mat-grid-list {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .hero-banner {
+        height: 350px;
+      }
+    }
+    .no-results {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 0;
+      gap: 16px;
+
+      .no-results-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        //color: #AAA;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+        font-weight: 500;
+        //color: #333;
+        margin: 0;
+      }
+
+      p {
+        font-size: 0.875rem;
+        color: #666;
+        margin: 0;
+        max-width: 300px;
+      }
+
+      button {
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 0;
+      gap: 16px;
+      .loading-text {
+        font-size: 0.875rem;
+        color: #666;
+        font-weight: 500;
+      }
+    }
+
+    
+  `]
 })
-export class ShopHomeComponent {
+export class ShopHomeComponent implements OnInit {
   featuredProducts: ProductInterface[] = [];
   newArrivals: ProductInterface[] = [];
   limitedEdition: ProductInterface[] = [];
   isLoading = true;
 
-  constructor(public productService: StoreService) {}
+  constructor(private storeService: StoreService) {}
 
   ngOnInit() {
-    // Simulate API loading
-    setTimeout(() => {
-      this.featuredProducts = this.mockProducts(4, 'featured');
-      this.newArrivals = this.mockProducts(4, 'new');
-      this.limitedEdition = this.mockProducts(4, 'limited');
-      this.isLoading = false;
-    }, 1500);
+    this.loadProducts();
   }
 
-  mockProducts(count: number, type: string): any[] {
-    const products = [];
-    const categories = ['T-Shirts', 'Hoodies', 'Caps', 'Accessories'];
-    const types = {
-      featured: ['Exclusive', 'Best Seller', 'Popular'],
-      new: ['New Release', 'Just Added'],
-      limited: ['Limited Edition', 'Collector\'s Item']
+  loadProducts() {
+    this.isLoading = true;
+    
+    // Track completed requests
+    let completedRequests = 0;
+    const totalRequests = 3;
+    
+    const checkCompletion = () => {
+      completedRequests++;
+      if (completedRequests === totalRequests) {
+        this.isLoading = false;
+      }
     };
 
-    for (let i = 1; i <= count; i++) {
-      products.push({
-        id: i,
-        name: `Davido ${categories[i % categories.length]} ${i}`,
-        price: 29.99 + (i * 5),
-        image: this.getRandomProductImage(),
-        category: categories[i % categories.length],
-        type: types[type as keyof typeof types][i % types[type as keyof typeof types].length],
-        rating: Math.floor(Math.random() * 3) + 3, // 3-5 stars
-        reviews: Math.floor(Math.random() * 50),
-        isNew: type === 'new',
-        isLimited: type === 'limited'
+    // Fetch featured products
+    this.storeService.getFeaturedProducts()
+      .pipe(
+        catchError(error => {
+          console.error('Error fetching featured products:', error);
+          return of([]);
+        }),
+        finalize(checkCompletion)
+      )
+      .subscribe(products => {
+        console.log('products ',products)
+        this.featuredProducts = products;
       });
-    }
-    return products;
+
+    // Fetch new arrivals
+    this.storeService.getNewArrivals()
+      .pipe(
+        catchError(error => {
+          console.error('Error fetching new arrivals:', error);
+          return of([]);
+        }),
+        finalize(checkCompletion)
+      )
+      .subscribe(products => {
+        this.newArrivals = products;
+      });
+
+    // Fetch limited edition products
+    this.storeService.getLimitedEdition()
+      .pipe(
+        catchError(error => {
+          console.error('Error fetching limited edition products:', error);
+          return of([]);
+        }),
+        finalize(checkCompletion)
+      )
+      .subscribe(products => {
+        this.limitedEdition = products;
+      });
   }
 
-  getRandomProductImage(): string {
-    const images = [
-      'https://m.media-amazon.com/images/I/61-jBuhtgZL._AC_UY1100_.jpg',
-      'https://i.ebayimg.com/images/g/9~AAAOSwPc9V2H6~/s-l1600.jpg',
-      'https://i5.walmartimages.com/asr/9a9f8f3f-5a5e-4f9b-8b8e-5e8f5b5e5e5e_1.3b9c9c9c9c9c9c9c9c9c9c9c9c9c9c9c.jpeg',
-      'https://static-01.daraz.com.np/p/7a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a.jpg'
-    ];
-    return images[Math.floor(Math.random() * images.length)];
+   retry(): void {
+    this.isLoading = true;
+    this.loadProducts();
   }
 }

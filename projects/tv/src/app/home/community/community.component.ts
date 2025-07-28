@@ -40,24 +40,21 @@ import { UserInterface, UserService } from '../../common/services/user.service';
         </mat-tab>
 
         <mat-tab label="Upcoming Events">
-          <div class="events-container">
+          <div class="posts-container">
             <!-- <p>No upcoming events at this time. Check back later!</p> -->
              <app-events-carousel/>
           </div>
         </mat-tab>
 
         <mat-tab label="Top Fans">
-          <div class="fans-container">
+          <div class="posts-container">
             <p>Top fans leaderboard coming soon!</p>
           </div>
         </mat-tab>
 
         <mat-tab label="App Reviews">
-          <div class="fans-container">
-
+          <div class="posts-container">
           <community-testimonial *ngIf="testimonials" [testimonials]="testimonials" [user]="user"/>
-            
-
           </div>
         </mat-tab>
         
@@ -99,6 +96,8 @@ import { UserInterface, UserService } from '../../common/services/user.service';
       flex-direction: column;
       gap: 1rem;
       margin-top: 1rem;
+      height: 900px;              /* Fixed height */
+      overflow-y: auto;  
     }
 
     .post-card {

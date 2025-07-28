@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -8,12 +8,15 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatBadgeModule } from '@angular/material/badge';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of, Subscription } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { MatDividerModule } from '@angular/material/divider';
+import { UserInterface, UserService } from '../../common/services/user.service';
+import { CartInterface, CartService } from './cart/cart.service';
 
 @Component({
   selector: 'app-category-nav',
+  providers: [CartService],
   standalone: true,
   imports: [
     CommonModule,
@@ -28,66 +31,64 @@ import { MatDividerModule } from '@angular/material/divider';
   ],
   template: `
     <mat-toolbar class="nav-container" color="primary">
-      <!-- Logo/Branding -->
-      <!-- <div class="branding" routerLink="/">
-        <mat-icon class="brand-icon">play_circle_filled</mat-icon>
-        <span class="brand-name">DavidoTV</span>
-      </div> -->
+  <!-- Desktop Navigation -->
+  <nav class="desktop-nav" *ngIf="!(isHandset$ | async)">
+    <a
+      *ngFor="let category of categories"
+      mat-button
+      [routerLink]="['/store/category', category.id]"
+      routerLinkActive #rla="routerLinkActive"
+      [class.active]="rla.isActive"
+      class="nav-item">
+      <span class="nav-text">{{ category.name }}</span>
+      <mat-icon *ngIf="category.id === 'limited-edition'" class="limited-badge">whatshot</mat-icon>
+      <div class="active-indicator" *ngIf="rla.isActive"></div>
+    </a>
+  </nav>
 
-      <!-- Desktop Navigation -->
-      <nav class="desktop-nav" *ngIf="!(isHandset$ | async)">
-        <a
-          *ngFor="let category of categories"
-          mat-button
-          [routerLink]="['/store/category', category.id]"
-          routerLinkActive #rla="routerLinkActive"
-          [class.active]="rla.isActive"
-          class="nav-item">
-          <span class="nav-text">{{ category.name }}</span>
-          <mat-icon *ngIf="category.id === 'limited'" class="limited-badge">whatshot</mat-icon>
-          <div class="active-indicator" *ngIf="rla.isActive"></div>
-        </a>
-      </nav>
+  <!-- Mobile Menu Trigger -->
+  <div class="mobile-actions" *ngIf="isHandset$ | async">
+    <button mat-icon-button [matMenuTriggerFor]="mobileMenu" aria-label="Menu">
+      <mat-icon>menu</mat-icon>
+    </button>
+  </div>
 
-      <!-- Mobile Menu Trigger -->
-      <div class="mobile-actions" *ngIf="isHandset$ | async">
-        <button mat-icon-button [matMenuTriggerFor]="mobileMenu" aria-label="Menu">
-          <mat-icon>menu</mat-icon>
-        </button>
-      </div>
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button mat-icon-button class="search-btn" aria-label="Search">
+      <mat-icon>search</mat-icon>
+    </button>
+    <button 
+      mat-icon-button 
+      class="cart-btn" 
+      aria-label="Cart" 
+      [matBadge]="cartItemCount" 
+      matBadgeColor="accent"
+      [matBadgeHidden]="cartItemCount === 0"
+      routerLink="/store/cart">
+      <mat-icon>shopping_cart</mat-icon>
+    </button>
+  </div>
 
-      <!-- Action Buttons -->
-      <div class="action-buttons">
-        <button mat-icon-button class="search-btn" aria-label="Search">
-          <mat-icon>search</mat-icon>
-        </button>
-        <button mat-icon-button class="cart-btn" aria-label="Cart" [matBadge]="cartItems" matBadgeColor="accent">
-          <mat-icon>shopping_cart</mat-icon>
-        </button>
-       <!--  <button mat-icon-button class="user-btn" aria-label="User Profile">
-          <mat-icon>account_circle</mat-icon>
-        </button> -->
-      </div>
-
-      <!-- Mobile Menu -->
-      <mat-menu #mobileMenu="matMenu" class="mobile-menu">
-        <div class="mobile-menu-header">
-          <h3 style="text-align: center; color: gray;">Browse Categories</h3>
-        </div>
-        <mat-divider></mat-divider>
-        <button
-          *ngFor="let category of categories"
-          mat-menu-item
-          [routerLink]="['/store/category', category.id]"
-          routerLinkActive #rla="routerLinkActive"
-          [class.active]="rla.isActive">
-          <mat-icon *ngIf="rla.isActive" class="menu-active-icon">chevron_right</mat-icon>
-          {{ category.name }}
-          <span class="spacer"></span>
-          <mat-icon *ngIf="category.id === 'limited'" class="limited-badge">whatshot</mat-icon>
-        </button>
-      </mat-menu>
-    </mat-toolbar>
+  <!-- Mobile Menu -->
+  <mat-menu #mobileMenu="matMenu" class="mobile-menu">
+    <div class="mobile-menu-header">
+      <h3 style="text-align: center; color: gray;">Browse Categories</h3>
+    </div>
+    <mat-divider></mat-divider>
+    <button
+      *ngFor="let category of categories"
+      mat-menu-item
+      [routerLink]="['/store/category', category.id]"
+      routerLinkActive #rla="routerLinkActive"
+      [class.active]="rla.isActive">
+      <mat-icon *ngIf="rla.isActive" class="menu-active-icon">chevron_right</mat-icon>
+      {{ category.name }}
+      <span class="spacer"></span>
+      <mat-icon *ngIf="category.id === 'limited-edition'" class="limited-badge">whatshot</mat-icon>
+    </button>
+  </mat-menu>
+</mat-toolbar>
   `,
   styles: [`
     .nav-container {
@@ -299,23 +300,23 @@ import { MatDividerModule } from '@angular/material/divider';
     }
   `]
 })
-export class CategoryNavComponent {
+export class CategoryNavComponent implements OnInit, OnDestroy {
   categories = [
     { id: 'all', name: 'All' },
-
-    { id: 'clothing', name: 'Apparel & Fashion' },
-
+    { id: 'apparel', name: 'Apparel & Fashion' },
     { id: 'accessories', name: 'Accessories' },
-    
-    { id: 'merch', name: 'Home & Lifestyle' },
-
+    { id: 'home', name: 'Home & Lifestyle' },
     { id: 'music', name: 'Music & Collectibles' },
-
-    { id: 'limited', name: 'Exclusive' }
+    { id: 'limited-edition', name: 'Exclusive' }
   ];
 
-  cartItems = 3;
+  cartItemCount = 0;
   isHandset$: Observable<boolean>;
+
+  private subscriptions: Subscription[] = [];
+  private userService = inject(UserService);
+  private cartService = inject(CartService);
+  user: UserInterface | null = null;
 
   constructor(private breakpointObserver: BreakpointObserver) {
     this.isHandset$ = this.breakpointObserver.observe([
@@ -324,5 +325,44 @@ export class CategoryNavComponent {
     ]).pipe(
       map(result => result.matches)
     );
+  }
+
+  ngOnInit() {
+    this.subscriptions.push(
+      this.userService.getCurrentUser$.subscribe({
+        next: (user) => {
+          this.user = user;
+          this.loadCartCount();
+        }
+      })
+    );
+
+    // Subscribe to cart updates
+    this.subscriptions.push(
+      this.cartService.cartUpdates$.subscribe(() => {
+        this.loadCartCount();
+      })
+    );
+  }
+
+  loadCartCount(): void {
+    if (!this.user) {
+      this.cartItemCount = 0;
+      return;
+    }
+
+    this.cartService.getCart().pipe(
+      map(cart => {
+        if (!cart || !cart.items) return 0;
+        return cart.items.reduce((sum: number, item: CartInterface) => sum + item.quantity, 0);
+      }),
+      catchError(() => of(0))
+    ).subscribe(count => {
+      this.cartItemCount = count;
+    });
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 }
