@@ -182,29 +182,22 @@
   z-index: 2;
   
   mat-chip {
-    font-size: 0.7rem;
-    font-weight: 600;
-    height: 24px;
+    font-size: 0.5rem;
+    //font-weight: 600;
+    //height: 24px;
     border-radius: 12px;
-    padding: 0 10px;
+    padding: 0 2px;
+    background: rgba(0, 0, 0, 0.8);
     
     mat-icon {
-      font-size: 16px;
-      height: 16px;
-      width: 16px;
+      font-size: 18px;
+      height: 15px;
+      width: 15px;
       margin-right: 4px;
     }
   }
   
-  .trending-chip {
-    background-color: #FF4D4D !important;
-    color: white;
-  }
-  
-  .limited-chip {
-    background-color: #FFC107 !important;
-    //color: #222;
-  }
+ 
 }
 
 .card-image-container {
@@ -516,6 +509,21 @@
     }
   }
 }
+
+
+ .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 0;
+      gap: 16px;
+      .loading-text {
+        font-size: 0.875rem;
+        color: #666;
+        font-weight: 500;
+      }
+    }
 
 /* Responsive styles */
 @media (max-width: 1920px) {

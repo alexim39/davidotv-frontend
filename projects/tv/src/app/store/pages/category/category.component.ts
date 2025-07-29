@@ -190,7 +190,7 @@ import { catchError, finalize, of } from 'rxjs';
       background: transparent !important;
       padding: 0 0 16px !important;
       border-bottom: 1px solid #e0e0e0;
-      margin-bottom: 24px;
+      //margin-bottom: 24px;
     }
 
     .filter-chips {
@@ -291,7 +291,8 @@ import { catchError, finalize, of } from 'rxjs';
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
-        padding-bottom: 8px !important;
+        //padding-bottom: 8px !important;
+        height: auto;
 
         .filter-chips {
           width: 100%;
@@ -403,41 +404,6 @@ export class ShopCategoryComponent implements OnInit {
     this.categoryDescription = categoryData.description;
     this.categoryImage = categoryData.image;
   }
-
-  /* loadProducts() {
-    this.isLoading = true;
-    
-    let sort = '';
-    if (this.currentSort === 'popular') {
-      sort = '-rating.average';
-    } else if (this.currentSort === 'newest') {
-      sort = '-createdAt';
-    } else if (this.currentSort === 'price-asc') {
-      sort = 'price';
-    } else if (this.currentSort === 'price-desc') {
-      sort = '-price';
-    }
-
-    const params = {
-      page: this.currentPage,
-      limit: this.itemsPerPage,
-      sort: sort,
-      category: this.categoryId === 'all' ? '' : this.categoryId
-    };
-
-    this.storeService.getProducts(params).pipe(
-      catchError(error => {
-        console.error('Error loading products:', error);
-        return of({ products: [], total: 0 });
-      }),
-      finalize(() => this.isLoading = false)
-    ).subscribe(response => {
-      this.products = response.products;
-      this.totalProducts = response.total;
-      this.totalPages = Math.ceil(this.totalProducts / this.itemsPerPage);
-      this.updateVisiblePages();
-    });
-  } */
 
   loadProducts() {
     this.isLoading = true;

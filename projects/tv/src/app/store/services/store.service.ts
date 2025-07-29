@@ -48,6 +48,7 @@ export interface ProductInterface {
   createdAt: Date;
   updatedAt: Date;
   __v: number;
+  discountPercent?: number; // Optional field for discount percentage
 }
 
 @Injectable()

@@ -5,12 +5,12 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { ForumPageComponent } from '../../forum/forum-page.component';
-import { EventsCarouselComponent } from '../../event/events-carousel.component';
 import { HomeService, TestimonialInterface } from '../home.service';
 import { Subscription } from 'rxjs';
 import { CommunityTestimonialComponent } from './testimonial.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserInterface, UserService } from '../../common/services/user.service';
+import { UpcomingEventComponent } from './upcoming-event.component';
 
 @Component({
   selector: 'async-community',
@@ -22,7 +22,7 @@ import { UserInterface, UserService } from '../../common/services/user.service';
     MatCardModule,
     MatButtonModule,
     ForumPageComponent,
-    EventsCarouselComponent,
+    UpcomingEventComponent,
     CommunityTestimonialComponent
   ],
   template: `
@@ -40,9 +40,9 @@ import { UserInterface, UserService } from '../../common/services/user.service';
         </mat-tab>
 
         <mat-tab label="Upcoming Events">
-          <div class="posts-container">
+          <div class="posts-containerXX">
             <!-- <p>No upcoming events at this time. Check back later!</p> -->
-             <app-events-carousel/>
+             <community-upcoming-event/>
           </div>
         </mat-tab>
 

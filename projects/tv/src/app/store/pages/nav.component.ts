@@ -265,8 +265,9 @@ import { CartInterface, CartService } from './cart/cart.service';
 
         .mobile-actions {
           display: block;
-          margin-left: auto;
-          margin-right: 16px;
+          margin-left: 0;      // Align to left
+          margin-right: 0;     // Remove right margin
+          order: -1;           // Move to the start of flex container
         }
 
         .branding {

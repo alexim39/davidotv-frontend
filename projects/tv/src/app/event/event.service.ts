@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Event } from './event.model'
 import { ApiService } from '../common/services/api.service';
 import { Observable } from 'rxjs';
 @Injectable()
@@ -8,7 +7,7 @@ export class EventService {
   
   getEventsByCategory(category: string){
     // In a real app, this would be an HTTP request
-     return this.apiService.get<any>(`event/${category}`, undefined, undefined, true);
+    return this.apiService.get<any>(`event/${category}`, undefined, undefined, true);
   }
   
   getFeaturedEvents(): Observable<any>{
