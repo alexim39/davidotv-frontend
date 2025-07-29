@@ -32,7 +32,23 @@ import { ProductInterface } from '../../store/services/store.service';
       <div class="dialog-content">
         <div class="product-image-container">
           <img [src]="data.images[0].url || './assets/images/placeholder-product.jpg'" [alt]="data.name" class="product-image">
-          <div class="badge-container">
+         
+        </div>
+
+        <div class="product-details">
+          <div class="price-section">
+            @if (data.discountedPrice) {
+              <div class="discount-price">
+                <span class="original-price">{{data.price | currency:'NGN':'symbol':'1.2-2'}}</span>
+                <span class="current-price">{{data.discountedPrice | currency:'NGN':'symbol':'1.2-2'}}</span>
+                <span class="discount-percent">-{{calculateDiscountPercent(data.price, data.discountedPrice)}}%</span>
+              </div>
+            } @else {
+              <div class="price">{{data.price | currency:'NGN':'symbol':'1.2-2'}}</div>
+            }
+          </div>
+
+           <div class="badge-container">
             @if (data.isNewProduct) {
               <mat-chip class="new-chip" color="primary" selected>
                 <mat-icon>fiber_new</mat-icon>
@@ -50,20 +66,6 @@ import { ProductInterface } from '../../store/services/store.service';
                 <mat-icon>star</mat-icon>
                 LIMITED
               </mat-chip>
-            }
-          </div>
-        </div>
-
-        <div class="product-details">
-          <div class="price-section">
-            @if (data.discountedPrice) {
-              <div class="discount-price">
-                <span class="original-price">{{data.price | currency:'NGN':'symbol':'1.2-2'}}</span>
-                <span class="current-price">{{data.discountedPrice | currency:'NGN':'symbol':'1.2-2'}}</span>
-                <span class="discount-percent">-{{calculateDiscountPercent(data.price, data.discountedPrice)}}%</span>
-              </div>
-            } @else {
-              <div class="price">{{data.price | currency:'NGN':'symbol':'1.2-2'}}</div>
             }
           </div>
 
@@ -158,32 +160,7 @@ import { ProductInterface } from '../../store/services/store.service';
           display: block;
         }
 
-        .badge-container {
-          position: absolute;
-          top: 12px;
-          left: 120px;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          z-index: 2;
-          
-          mat-chip {
-            font-size: 0.5rem;
-            //font-weight: 600;
-            //height: 24px;
-            border-radius: 12px;
-            padding: 0 2px;
-            background: rgba(0, 0, 0, 0.8);
-            
-            mat-icon {
-              font-size: 18px;
-              height: 15px;
-              width: 15px;
-              margin-right: 4px;
-            }
-          }
-
-        }
+      
       }
 
       .product-details {
@@ -228,6 +205,30 @@ import { ProductInterface } from '../../store/services/store.service';
           }
         }
       }
+
+        .badge-container {
+          display: flex;
+          flex-direction: wrap;
+          flex-wrap: wrap;  
+          align-items: flex-start;
+          gap: 8px;
+          margin-bottom: 16px;
+
+          mat-chip {
+            font-size: 0.85rem;
+            border-radius: 12px;
+            padding: 0 8px;
+            background: rgba(0, 0, 0, 0.8);
+
+            mat-icon {
+              font-size: 18px;
+              height: 18px;
+              width: 18px;
+              margin-right: 4px;
+              vertical-align: middle;
+            }
+          }
+        }
 
       .product-meta {
         display: flex;

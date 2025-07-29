@@ -17,9 +17,14 @@ template: `
 
 @if(testimonials.length === 0) {
 
-  <p style="text-align: center; color: orange; padding: 1em 0; font-weight: bold;">
-    No testimonials available yet
-  </p>
+
+  <div class="no-events">
+      <mat-icon>reviews</mat-icon>
+      <p>No Review Submitted</p>
+      <p class="subtext">
+        No testimonials available yet
+      </p>
+    </div>
 
 } @else {
 
@@ -275,6 +280,26 @@ template: `
     font-weight: 500;
   }
 }
+
+.no-events {
+    text-align: center;
+    padding: 2rem;
+    mat-icon {
+      font-size: 3rem;
+      width: 3rem;
+      height: 3rem;
+      margin-bottom: 1rem;
+      //color:
+    }
+    p {
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+    }
+    .subtext {
+      font-size: 0.9rem;
+      //color: #999;
+    }
+  }
 
 /* Responsive adjustments */
 @media (max-width: 600px) {

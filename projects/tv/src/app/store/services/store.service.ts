@@ -53,7 +53,7 @@ export interface ProductInterface {
 
 @Injectable()
 export class StoreService {
-  private readonly productEndpoint = 'store'; // API endpoint for products
+  private readonly baseEndpoint = 'store'; // API endpoint for products
 
   constructor(private apiService: ApiService) {}
 
@@ -69,7 +69,7 @@ export class StoreService {
     }
 
     return this.apiService.get<{ data: ProductInterface[]; total: number }>(
-      this.productEndpoint,
+      this.baseEndpoint,
       httpParams, undefined, true
     ).pipe(
       map(response => ({
@@ -131,27 +131,12 @@ export class StoreService {
   // Get a single product by ID
   getProductById(id: string): Observable<ProductInterface | null> {
     return this.apiService.get<{ data: ProductInterface }>(
-      `${this.productEndpoint}/${id}`
+      `${this.baseEndpoint}/${id}`
     ).pipe(
       map(response => response.data),
       catchError(error => {
         console.error(`Error fetching product with ID ${id}:`, error);
         return of(null);
-      })
-    );
-  }
-
-
-  // Get multiple products by IDs
-  getProductsByIds(ids: string[]): Observable<ProductInterface[]> {
-    return this.apiService.post<{ data: ProductInterface[] }>(
-      `${this.productEndpoint}/batch`,
-      { ids }
-    ).pipe(
-      map(response => response.data),
-      catchError(error => {
-        console.error('Error fetching products:', error);
-        return of([]);
       })
     );
   }
@@ -170,7 +155,7 @@ export class StoreService {
     const params = new HttpParams().set('limit', limit.toString());
 
     return this.apiService.get<{ data: ProductInterface[] }>(
-      `${this.productEndpoint}/${productId}/related`,
+      `${this.baseEndpoint}/${productId}/related`,
       params
     ).pipe(
       map(response => response.data),
@@ -180,4 +165,41 @@ export class StoreService {
       })
     );
   }
+
+
+
+
+
+
+  
+  
+  
+  // Get multiple products by IDs
+  getProductsByIds(ids: string[]): Observable<ProductInterface[]> {
+    return this.apiService.post<{ data: ProductInterface[] }>(`${this.baseEndpoint}/batch`, { ids }  ).pipe(
+      map(response => response.data),
+      catchError(error => {
+        console.error('Error fetching products:', error);
+        return of([]);
+      })
+    );
+  }
+
+
+
+
+
+   // Add to cart
+  addToCart(productId: string, userId: string, quantity: number = 1, selectedVariant?: { name: string, option: string }): Observable<any> {
+    const payload = { productId, quantity, selectedVariant,  userId  };
+    
+    return this.apiService.post<any>(`${this.baseEndpoint}/cart/add`, payload)
+  }
+
+  // Add to wishlist
+  addToWishlist(productId: string, userId: string): Observable<any> {
+    return this.apiService.post<any>(`${this.baseEndpoint}/wishlist/add`, { productId, userId })
+  }
+
+
 }

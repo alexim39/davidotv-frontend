@@ -47,7 +47,7 @@ import { UpcomingEventComponent } from './upcoming-event.component';
         </mat-tab>
 
         <mat-tab label="Top Fans">
-          <div class="posts-container">
+          <div class="posts-containerXX">
             <p>Top fans leaderboard coming soon!</p>
           </div>
         </mat-tab>

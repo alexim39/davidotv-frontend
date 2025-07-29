@@ -7,12 +7,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ProductInterface } from '../services/store.service';
+import { ProductInterface, StoreService } from '../services/store.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { UserInterface } from '../../common/services/user.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
   selector: 'app-product-grid',
   standalone: true,
+  providers: [StoreService],
   imports: [
     CommonModule,
     RouterModule,
@@ -50,9 +54,9 @@ import { ProductInterface } from '../services/store.service';
                   <button mat-icon-button class="quick-action-btn" (click)="addToWishlist($event, product)" aria-label="Add to wishlist">
                     <mat-icon>favorite_border</mat-icon>
                   </button>
-                  <button mat-icon-button class="quick-action-btn" (click)="onQuickView($event, product)" aria-label="Quick view">
+                 <!--  <button mat-icon-button class="quick-action-btn" (click)="onQuickView($event, product)" aria-label="Quick view">
                     <mat-icon>visibility</mat-icon>
-                  </button>
+                  </button> -->
                 </div>
               </div>
 
@@ -71,10 +75,28 @@ import { ProductInterface } from '../services/store.service';
               </div>
 
               <!-- Add to Cart -->
-              <div class="product-actions">
+              <!-- <div class="product-actions">
                 <button mat-raised-button color="primary" class="add-to-cart" (click)="addToCart($event, product)">
                   <mat-icon>add_shopping_cart</mat-icon>
                   Add to Cart
+                </button>
+              </div> -->
+              <div class="product-actions">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  class="add-to-cart"
+                  [disabled]="loadingProductId === product._id"
+                  (click)="addToCart($event, product)">
+                  <mat-icon *ngIf="loadingProductId !== product._id">add_shopping_cart</mat-icon>
+                  <mat-progress-spinner
+                    *ngIf="loadingProductId === product._id"
+                    diameter="20"
+                    mode="indeterminate"
+                    color="accent"
+                    style="vertical-align: middle; margin-right: 8px;">
+                  </mat-progress-spinner>
+                  <span *ngIf="loadingProductId !== product._id">Add to Cart</span>
                 </button>
               </div>
             </mat-card>
@@ -242,7 +264,7 @@ styles: [`
       .product-price {
         font-size: 18px;
         font-weight: 600;
-        color: #333;
+        color: #666;
       }
     }
 
@@ -289,7 +311,13 @@ styles: [`
 })
 export class ProductGridComponent {
   @Input() products: ProductInterface[] = [];
-  @Output() quickView = new EventEmitter<any>();
+  @Input() user: UserInterface | null = null;
+  @Output() cartUpdated = new EventEmitter<void>();
+  @Output() wishlistUpdated = new EventEmitter<void>();
+
+   loadingProductId: string | null = null;
+
+  constructor(private storeService: StoreService, private snackBar: MatSnackBar) {}
 
   truncateName(name: string, limit: number = 24): string {
     return name.length > limit ? `${name.substring(0, limit)}...` : name;
@@ -299,18 +327,76 @@ export class ProductGridComponent {
     return price.toFixed(2);
   }
 
+ /*  addToCart(event: Event, product: ProductInterface) {
+    event.stopPropagation();
+    if (!this.user) {
+      this.snackBar.open('Please log in to add items to your cart', 'Close', { duration: 3000 });
+      return;
+    }
+    
+    this.storeService.addToCart(product._id, this.user._id).subscribe({
+      next: (response) => {
+        if (response) {
+         this.snackBar.open(response.message, 'Close', { duration: 3000 });
+          this.cartUpdated.emit();
+        }
+      },
+      error: (err) => {
+        this.snackBar.open('Failed to add to cart', 'Close', { duration: 3000 });
+      }
+    });
+  } */
+
   addToCart(event: Event, product: ProductInterface) {
     event.stopPropagation();
-    console.log('Added to cart:', product);
+    if (!this.user) {
+      this.snackBar.open('Please log in to add items to your cart', 'Close', { duration: 3000 });
+      return;
+    }
+    this.loadingProductId = product._id;
+    this.storeService.addToCart(product._id, this.user._id).subscribe({
+      next: (response) => {
+        if (response) {
+          this.snackBar.open(response.message, 'Close', { duration: 3000 });
+          this.cartUpdated.emit();
+        }
+        this.loadingProductId = null;
+      },
+      error: (err) => {
+        this.snackBar.open('Failed to add to cart', 'Close', { duration: 3000 });
+        this.loadingProductId = null;
+      }
+    });
   }
 
   addToWishlist(event: Event, product: ProductInterface) {
     event.stopPropagation();
-    console.log('Added to wishlist:', product);
+    if (!this.user) {
+      this.snackBar.open('Please log in to add to wishlist', 'Close', { duration: 3000 });
+      return;
+    }
+    
+    this.storeService.addToWishlist(product._id, this.user._id).subscribe({
+      next: (response) => {
+        if (response) {
+          this.snackBar.open(response.message, 'Close', { duration: 3000 });
+          //this.wishlistUpdated.emit();
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+          //this.subscriptionSuccess = false;
+
+          let errorMessage = 'Server error occurred, please try again.'; // default error message.
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message; // Use backend's error message if available.
+          }  
+          this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
+          //this.isSubmitting = false;
+
+        }
+    });
   }
 
-  onQuickView(event: Event, product: ProductInterface) {
-    event.stopPropagation();
-    console.log('Quick view:', product, this.quickView);
-  }
+ 
 }

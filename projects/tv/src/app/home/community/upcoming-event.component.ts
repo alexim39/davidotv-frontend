@@ -327,26 +327,23 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
     .no-events {
       text-align: center;
       padding: 2rem;
-      //color: #666;
+      mat-icon {
+        font-size: 3rem;
+        width: 3rem;
+        height: 3rem;
+        margin-bottom: 1rem;
+        //color:
+      }
+      p {
+        margin: 0.5rem 0;
+        font-size: 1.1rem;
+      }
+      .subtext {
+        font-size: 0.9rem;
+        //color: #999;
+      }
     }
-
-    .no-events mat-icon {
-      font-size: 3rem;
-      width: 3rem;
-      height: 3rem;
-      margin-bottom: 1rem;
-      //color: #bbb;
-    }
-
-    .no-events p {
-      margin: 0.5rem 0;
-      font-size: 1.1rem;
-    }
-
-    .no-events .subtext {
-      font-size: 0.9rem;
-      //color: #999;
-    }
+    
 
     mat-spinner {
       margin: 2rem auto;

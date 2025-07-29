@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProductInterface, StoreService } from '../services/store.service';
@@ -10,7 +10,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ProductGridComponent } from './product-grid.component';
-import { catchError, finalize, of } from 'rxjs';
+import { catchError, finalize, of, Subscription } from 'rxjs';
+import { UserInterface, UserService } from '../../common/services/user.service';
 
 @Component({
   selector: 'app-shop-home',
@@ -49,7 +50,7 @@ import { catchError, finalize, of } from 'rxjs';
             <p class="loading-text">Loading featured products...</p>
           </div>
         } @else if (featuredProducts.length > 0) {
-          <app-product-grid [products]="featuredProducts"/>
+          <app-product-grid [products]="featuredProducts" [user]="user"/>
         } @else {
           
 
@@ -87,7 +88,7 @@ import { catchError, finalize, of } from 'rxjs';
             <p class="loading-text">Loading new arrivals...</p>
           </div>
         } @else if (newArrivals.length > 0) {
-          <app-product-grid [products]="newArrivals"/>
+          <app-product-grid [products]="newArrivals" [user]="user"/>
         } @else {
 
           <div class="no-results">
@@ -147,7 +148,7 @@ import { catchError, finalize, of } from 'rxjs';
             <p class="loading-text">Loading limited...</p>
           </div>
         } @else if (limitedEdition.length > 0) {
-          <app-product-grid [products]="limitedEdition"/>
+          <app-product-grid [products]="limitedEdition" [user]="user"/>
         } @else {
         <div class="no-results">
           <mat-icon class="no-results-icon" aria-hidden="false" aria-label="No product found">search_off</mat-icon>
@@ -358,10 +359,27 @@ export class ShopHomeComponent implements OnInit {
   limitedEdition: ProductInterface[] = [];
   isLoading = true;
 
+  subscriptionSuccess = false;
+  subscriptions: Subscription[] = [];
+  private userService = inject(UserService);
+  user: UserInterface | null = null;
+
   constructor(private storeService: StoreService) {}
 
   ngOnInit() {
     this.loadProducts();
+    this.getCurrentUser()
+  }
+
+  private getCurrentUser() {
+    this.subscriptions.push(
+      this.userService.getCurrentUser$.subscribe({
+        next: (user) => {
+          this.user = user;
+          //console.log('current user ',this.user)
+        }
+      })
+    )
   }
 
   loadProducts() {
@@ -388,7 +406,7 @@ export class ShopHomeComponent implements OnInit {
         finalize(checkCompletion)
       )
       .subscribe(products => {
-        console.log('products ',products)
+        //console.log('products ',products)
         this.featuredProducts = products;
       });
 
@@ -423,4 +441,9 @@ export class ShopHomeComponent implements OnInit {
     this.isLoading = true;
     this.loadProducts();
   }
+
+  ngOnDestroy() {
+    // unsubscribe list
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  } 
 }

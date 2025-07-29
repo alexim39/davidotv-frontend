@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -15,8 +15,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { ProductGridComponent } from '../product-grid.component';
 import { StoreService, ProductInterface } from '../../services/store.service';
-import { catchError, finalize, of } from 'rxjs';
+import { catchError, finalize, of, Subscription } from 'rxjs';
 import { CartService } from '../cart/cart.service';
+import { UserInterface, UserService } from '../../../common/services/user.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-product-detail',
@@ -37,7 +40,8 @@ import { CartService } from '../cart/cart.service';
     MatInputModule,
     MatFormFieldModule,
     FormsModule,
-    ProductGridComponent
+    ProductGridComponent,
+    MatProgressBarModule
   ],
   template: `
     <!-- Main Product Container -->
@@ -141,15 +145,17 @@ import { CartService } from '../cart/cart.service';
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-              <button mat-raised-button color="primary" class="add-to-cart" (click)="addToCart()">
+              <button mat-flat-button color="primary" class="add-to-cart" (click)="addToCart()">
                 <mat-icon>add_shopping_cart</mat-icon>
                 Add to Cart
               </button>
-              <button mat-stroked-button class="wishlist-btn" (click)="toggleWishlist()">
+              <button mat-stroked-button class="wishlist-btn" (click)="addToWishlist($event, product)">
                 <mat-icon>{{isInWishlist ? 'favorite' : 'favorite_border'}}</mat-icon>
                 Wishlist
               </button>
             </div>
+            <mat-progress-bar mode="indeterminate" *ngIf="isLoading"/>
+            <br>
 
             <!-- Delivery Info -->
             <div class="delivery-info">
@@ -235,7 +241,7 @@ import { CartService } from '../cart/cart.service';
               <p>Loading related products...</p>
             </div>
           } @else {
-            <app-product-grid [products]="relatedProducts"></app-product-grid>
+            <app-product-grid [products]="relatedProducts"/>
           }
         </div>
       } @else if (!isLoading) {
@@ -677,13 +683,17 @@ import { CartService } from '../cart/cart.service';
 export class ProductDetailComponent implements OnInit {
  product: ProductInterface | null = null;
   relatedProducts: ProductInterface[] = [];
-  isLoading = true;
+  isLoading = false;
   relatedProductsLoading = false;
   selectedImage: string | null = null;
   selectedVariant: any = null;
   quantity = 1;
   isInWishlist = false;
   isAddingToCart = false;
+
+  subscriptions: Subscription[] = [];
+  private userService = inject(UserService);
+  user: UserInterface | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -698,6 +708,19 @@ export class ProductDetailComponent implements OnInit {
       const productId = params['id'];
       this.loadProduct(productId);
     });
+
+    this.getCurrentUser();
+  }
+
+   private getCurrentUser() {
+    this.subscriptions.push(
+      this.userService.getCurrentUser$.subscribe({
+        next: (user) => {
+          this.user = user;
+          console.log('current user ',this.user)
+        }
+      })
+    )
   }
 
   loadProduct(productId: string) {
@@ -763,6 +786,11 @@ export class ProductDetailComponent implements OnInit {
   addToCart() {
     if (!this.product || this.isAddingToCart) return;
 
+    if (!this.user) {
+      this.snackBar.open('Please log in to add items to your cart', 'Close', { duration: 3000 });
+      return;
+    }
+
     this.isAddingToCart = true;
 
     const cartItem = {
@@ -796,15 +824,32 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  toggleWishlist() {
-    if (!this.product) return;
+  addToWishlist(event: Event, product: ProductInterface) {
+    event.stopPropagation();
+    if (!this.user) {
+      this.snackBar.open('Please log in to add to wishlist', 'Close', { duration: 3000 });
+      return;
+    }
+    
+    this.storeService.addToWishlist(product._id, this.user._id).subscribe({
+      next: (response) => {
+        if (response) {
+          this.snackBar.open(response.message, 'Close', { duration: 3000 });
+          //this.wishlistUpdated.emit();
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        console.log(error);
+          //this.subscriptionSuccess = false;
 
-    const productId = this.product._id;
-    // In a real app, you would call a wishlist service here
-    this.isInWishlist = !this.isInWishlist;
-    const message = this.isInWishlist ? 'Added to wishlist' : 'Removed from wishlist';
-    this.snackBar.open(message, 'Dismiss', {
-      duration: 2000
+          let errorMessage = 'Server error occurred, please try again.'; // default error message.
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message; // Use backend's error message if available.
+          }  
+          this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
+          //this.isSubmitting = false;
+
+        }
     });
   }
 
@@ -819,4 +864,9 @@ export class ProductDetailComponent implements OnInit {
   getRoundedRating(): number {
     return this.product ? Math.round(this.product.rating.average) : 0;
   }
+
+  ngOnDestroy() {
+    // unsubscribe list
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  } 
 }
