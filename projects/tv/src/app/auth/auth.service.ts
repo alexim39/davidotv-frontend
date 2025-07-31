@@ -26,6 +26,15 @@ export class AuthService {
     return this.apiService.post<SignInInterface>(`auth/signin`, formObject, undefined, true);
   }
 
+   /**
+   * Submits the user signInWithGoogle data to the backend API.
+   * @param formObject The signin data to be submitted.
+   * @returns An Observable that emits the API response or an error.
+   */
+  signInWithGoogle(googleUser: any): Observable<any> {
+    return this.apiService.post<SignInInterface>(`auth/google-signin`, googleUser, undefined, true);
+  }
+
   /**
    * Submits the user sing up data to the backend API.
    * @param formObject The sing up data to be submitted.

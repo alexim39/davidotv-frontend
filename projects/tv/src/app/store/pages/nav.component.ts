@@ -643,6 +643,7 @@ import { CartInterface, CartService } from './cart/cart.service';
             text-align: center;
             //background: #f9f9fb;
             height: 100%;
+            cursor: pointer;
 
             mat-icon {
               color: #8f0045;
