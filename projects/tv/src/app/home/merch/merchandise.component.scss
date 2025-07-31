@@ -180,22 +180,33 @@
   flex-direction: column;
   gap: 8px;
   z-index: 2;
-  
-  mat-chip {
-    font-size: 0.5rem;
-    //font-weight: 600;
-    //height: 24px;
-    border-radius: 12px;
-    padding: 0 2px;
-    background: rgba(0, 0, 0, 0.8);
-    
-    mat-icon {
-      font-size: 18px;
-      height: 15px;
-      width: 15px;
-      margin-right: 4px;
+
+   .product-badges {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      gap: 8px;
+      z-index: 1;
+      .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+
+        &.new {
+            background-color: #4caf50;
+        }
+
+        &.limited {
+            background-color: #ff9800;
+        }
+        &.trending {
+            background-color: #034276;
+        }
+      }
     }
-  }
   
  
 }

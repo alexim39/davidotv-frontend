@@ -106,22 +106,25 @@ import { catchError, finalize, of } from 'rxjs';
             >
               <div class="card-badge-container">
                 @if (item.isNewProduct) {
-                  <mat-chip class="new-chip" selected>
-                    <mat-icon>fiber_new</mat-icon>
-                    NEW
-                  </mat-chip>
+                  <div class="product-badges">
+                    <span class="badge new">New</span>
+                  </div>
                 }
                 @if (item.isFeatured) {
-                  <mat-chip class="trending-chip" selected>
-                    <mat-icon>whatshot</mat-icon>
-                    TRENDING
-                  </mat-chip>
+                  <div class="product-badges">
+                    <span class="badge trending">Trending</span>
+                  </div>
                 }
                 @if (item.isLimitedEdition) {
-                  <mat-chip class="limited-chip" selected>
-                    <mat-icon>star</mat-icon>
-                    LIMITED
-                  </mat-chip>
+                  <div class="product-badges">
+                    <span class="badge limited">Limited</span>
+                  </div>
+                }
+                @if (item.isLimitedEdition && item.isFeatured) {
+                  <div class="product-badges">
+                    <span class="badge trending">Trending</span>
+                    <span class="badge limited">Limited</span>
+                  </div>
                 }
               </div>
               

@@ -50,7 +50,7 @@ import { UserInterface, UserService } from '../../common/services/user.service';
             <p class="loading-text">Loading featured products...</p>
           </div>
         } @else if (featuredProducts.length > 0) {
-          <app-product-grid [products]="featuredProducts" [user]="user"/>
+          <app-product-grid [products]="featuredProducts"/>
         } @else {
           
 
@@ -88,7 +88,7 @@ import { UserInterface, UserService } from '../../common/services/user.service';
             <p class="loading-text">Loading new arrivals...</p>
           </div>
         } @else if (newArrivals.length > 0) {
-          <app-product-grid [products]="newArrivals" [user]="user"/>
+          <app-product-grid [products]="newArrivals"/>
         } @else {
 
           <div class="no-results">
@@ -148,7 +148,7 @@ import { UserInterface, UserService } from '../../common/services/user.service';
             <p class="loading-text">Loading limited...</p>
           </div>
         } @else if (limitedEdition.length > 0) {
-          <app-product-grid [products]="limitedEdition" [user]="user"/>
+          <app-product-grid [products]="limitedEdition"/>
         } @else {
         <div class="no-results">
           <mat-icon class="no-results-icon" aria-hidden="false" aria-label="No product found">search_off</mat-icon>

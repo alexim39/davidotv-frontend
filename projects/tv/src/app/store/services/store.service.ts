@@ -189,17 +189,31 @@ export class StoreService {
 
 
 
-   // Add to cart
+ /*   // Add to cart
   addToCart(productId: string, userId: string, quantity: number = 1, selectedVariant?: { name: string, option: string }): Observable<any> {
     const payload = { productId, quantity, selectedVariant,  userId  };
     
     return this.apiService.post<any>(`${this.baseEndpoint}/cart/add`, payload)
   }
+ */
+
 
   // Add to wishlist
   addToWishlist(productId: string, userId: string): Observable<any> {
     return this.apiService.post<any>(`${this.baseEndpoint}/wishlist/add`, { productId, userId })
   }
 
+
+  // Get user wishlist
+  getUserWishlist(userId: string): Observable<ProductInterface[]> {
+    return this.apiService.get<{ data: ProductInterface[] }>(`${this.baseEndpoint}/wishlist/${userId}`).pipe(
+      map(response => response.data),
+    );
+  }
+
+  // Remove from wishlist
+  removeFromWishlist(productId: string, userId: string): Observable<any> {
+    return this.apiService.post<any>(`${this.baseEndpoint}/wishlist/remove`, { productId, userId });
+  }
 
 }

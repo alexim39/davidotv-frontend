@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -69,13 +69,19 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
             <div class="main-image-container">
               <img [src]="selectedImage || product.images[0].url" [alt]="product.name" class="main-image">
               @if (product.isNewProduct) {
-                <mat-chip class="new-badge new" selected>NEW</mat-chip>
+                <!-- <mat-chip class="new-badge new" selected>NEW</mat-chip> -->
+                <div class="product-badges">
+                  <span class="badge new">New</span>
+                </div>
               }
               @if (product.isLimitedEdition) {
-                <mat-chip class="limited-badge limited" selected>
+                <!-- <mat-chip class="limited-badge limited" selected>
                   <mat-icon>whatshot</mat-icon>
                   LIMITED
-                </mat-chip>
+                </mat-chip> -->
+                <div class="product-badges">
+                  <span class="badge limited">Limited</span>
+                </div>
               }
             </div>
             
@@ -154,7 +160,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
                 Wishlist
               </button>
             </div>
-            <mat-progress-bar mode="indeterminate" *ngIf="isLoading"/>
+            <mat-progress-bar mode="indeterminate" *ngIf="isSubmitting"/>
             <br>
 
             <!-- Delivery Info -->
@@ -319,13 +325,13 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
           object-fit: contain;
         }
 
-        mat-chip {
+        /* mat-chip {
           position: absolute;
           top: 12px;
           font-size: 12px;
           font-weight: 600;
           letter-spacing: 0.5px;
-          background: rgba(0, 0, 0, 0.8);
+          background: rgba(0, 0, 0,);
 
           &.new-badge {
             left: 12px;
@@ -338,6 +344,29 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
               height: 16px;
               width: 16px;
               margin-right: 4px;
+            }
+          }
+        } */
+        .product-badges {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          display: flex;
+          gap: 8px;
+          z-index: 1;
+          .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+
+            &.new {
+                background-color: #4caf50;
+            }
+
+            &.limited {
+                background-color: #ff9800;
             }
           }
         }
@@ -694,13 +723,15 @@ export class ProductDetailComponent implements OnInit {
   subscriptions: Subscription[] = [];
   private userService = inject(UserService);
   user: UserInterface | null = null;
+  isSubmitting = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private storeService: StoreService,
     private cartService: CartService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
@@ -717,7 +748,7 @@ export class ProductDetailComponent implements OnInit {
       this.userService.getCurrentUser$.subscribe({
         next: (user) => {
           this.user = user;
-          console.log('current user ',this.user)
+          //console.log('current user ',this.user)
         }
       })
     )
@@ -792,9 +823,12 @@ export class ProductDetailComponent implements OnInit {
     }
 
     this.isAddingToCart = true;
+    this.isSubmitting = true;
+    this.cdr.markForCheck();
 
     const cartItem = {
-      product: this.product._id,
+      userId: this.user._id,
+      productId: this.product._id,
       quantity: this.quantity,
       priceAtAddition: this.product.discountedPrice || this.product.price,
       ...(this.selectedVariant && { 
@@ -808,18 +842,24 @@ export class ProductDetailComponent implements OnInit {
     this.cartService.addToCart(cartItem).pipe(
       finalize(() => this.isAddingToCart = false)
     ).subscribe({
-      next: () => {
-        this.snackBar.open('Added to cart', 'Dismiss', {
+      next: (response) => {
+        this.snackBar.open(response.message, 'Dismiss', {
           duration: 3000,
           panelClass: 'success-snackbar'
         });
+        this.isSubmitting = false;
+        this.cdr.markForCheck();
       },
-      error: (error) => {
-        console.error('Error adding to cart:', error);
-        this.snackBar.open('Failed to add to cart', 'Dismiss', {
-          duration: 3000,
-          panelClass: 'error-snackbar'
-        });
+       error: (error: HttpErrorResponse) => {
+        //this.cdr.markForCheck();
+        let errorMessage = 'Server error occurred, please try again.'; // default error message.
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message; // Use backend's error message if available.
+        }  
+        this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
+        this.isSubmitting = false;
+        this.cdr.markForCheck();
+        
       }
     });
   }
@@ -830,24 +870,32 @@ export class ProductDetailComponent implements OnInit {
       this.snackBar.open('Please log in to add to wishlist', 'Close', { duration: 3000 });
       return;
     }
+
+    this.isSubmitting = true;
+    this.isInWishlist = !this.isInWishlist; // Toggle wishlist status
+    this.cdr.markForCheck();
     
     this.storeService.addToWishlist(product._id, this.user._id).subscribe({
       next: (response) => {
         if (response) {
           this.snackBar.open(response.message, 'Close', { duration: 3000 });
           //this.wishlistUpdated.emit();
+
+          this.isSubmitting = false;
+          this.isInWishlist = true; // Set to true if successfully added
+          this.cdr.markForCheck();
         }
       },
       error: (error: HttpErrorResponse) => {
-        console.log(error);
-          //this.subscriptionSuccess = false;
+          this.isSubmitting = false;
+          this.isInWishlist = false; // Reset to false if error occurs
+          this.cdr.markForCheck();
 
           let errorMessage = 'Server error occurred, please try again.'; // default error message.
           if (error.error && error.error.message) {
             errorMessage = error.error.message; // Use backend's error message if available.
           }  
           this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
-          //this.isSubmitting = false;
 
         }
     });
@@ -861,9 +909,9 @@ export class ProductDetailComponent implements OnInit {
     return price.toFixed(2);
   }
 
-  getRoundedRating(): number {
-    return this.product ? Math.round(this.product.rating.average) : 0;
-  }
+  // getRoundedRating(): number {
+  //   return this.product ? Math.round(this.product.rating.average) : 0;
+  // }
 
   ngOnDestroy() {
     // unsubscribe list

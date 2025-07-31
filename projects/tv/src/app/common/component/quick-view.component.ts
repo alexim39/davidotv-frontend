@@ -50,23 +50,26 @@ import { ProductInterface } from '../../store/services/store.service';
 
            <div class="badge-container">
             @if (data.isNewProduct) {
-              <mat-chip class="new-chip" color="primary" selected>
-                <mat-icon>fiber_new</mat-icon>
-                NEW
-              </mat-chip>
+              <div class="product-badges">
+                <span class="badge new">New</span>
+              </div>
             }
             @if (data.isFeatured) {
-              <mat-chip class="trending-chip" selected>
-                <mat-icon>whatshot</mat-icon>
-                TRENDING
-              </mat-chip>
+              <div class="product-badges">
+                <span class="badge trending">Trending</span>
+              </div>
             }
             @if (data.isLimitedEdition) {
-              <mat-chip class="limited-chip" selected>
-                <mat-icon>star</mat-icon>
-                LIMITED
-              </mat-chip>
+              <div class="product-badges">
+                <span class="badge limited">Limited</span>
+              </div>
             }
+           <!--  @if (data.isLimitedEdition && data.isFeatured) {
+              <div class="product-badges">
+                <span class="badge trending">Trending</span>
+                <span class="badge limited">Limited</span>
+              </div>
+            } -->
           </div>
 
           <div class="product-meta">
@@ -214,20 +217,29 @@ import { ProductInterface } from '../../store/services/store.service';
           gap: 8px;
           margin-bottom: 16px;
 
-          mat-chip {
-            font-size: 0.85rem;
-            border-radius: 12px;
-            padding: 0 8px;
-            background: rgba(0, 0, 0, 0.8);
+            .product-badges {
+              display: flex;
+              gap: 8px;
+              z-index: 1;
+              .badge {
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: 600;
+                color: white;
 
-            mat-icon {
-              font-size: 18px;
-              height: 18px;
-              width: 18px;
-              margin-right: 4px;
-              vertical-align: middle;
+                &.new {
+                    background-color: #4caf50;
+                }
+
+                &.limited {
+                    background-color: #ff9800;
+                }
+                &.trending {
+                    background-color: #034276;
+                }
+              }
             }
-          }
         }
 
       .product-meta {

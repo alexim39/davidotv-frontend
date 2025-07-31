@@ -32,45 +32,48 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
       <br>
       @if (currentUser) {
        <mat-card class="sidebar-section">
-  <mat-card-header>
-    <!-- <mat-card-title>
-      <mat-icon color="primary" style="vertical-align: middle;">star</mat-icon>
-      <span class="interest-title">Interested Events</span>
-    </mat-card-title> -->
-  </mat-card-header>
-  <mat-card-content>
-    <ng-container *ngIf="interestedEventloader; else interestedList">
-      <div class="interested-loader">
-        <mat-spinner diameter="28"></mat-spinner>
-        <span>Loading your interested events...</span>
-      </div>
-    </ng-container>
-    <ng-template #interestedList>
-      <mat-list class="scroll-list" *ngIf="interestedEvents.length > 0; else noInterested">
-        <mat-list-item *ngFor="let event of interestedEvents">
-          <!-- <mat-icon mat-list-icon color="accent">event</mat-icon> -->
-          <div class="event-info">
-            <div class="event-title">{{ event.title }}</div>
-            <div class="event-location" *ngIf="event.location">
-              <mat-icon inline fontSize="5" color="primary">location_on</mat-icon>
-              <span>{{ event.location }}</span>
+      <mat-card-header>
+        <!-- <mat-card-title>
+          <mat-icon color="primary" style="vertical-align: middle;">star</mat-icon>
+          <span class="interest-title">Interested Events</span>
+        </mat-card-title> -->
+      </mat-card-header>
+        <mat-card-content>
+          <ng-container *ngIf="interestedEventloader; else interestedList">
+            <div class="interested-loader">
+              <mat-spinner diameter="28"></mat-spinner>
+              <span>Loading your interested events...</span>
             </div>
-          </div>
-        </mat-list-item>
-      </mat-list>
-      <ng-template #noInterested>
-        <div class="no-interested-message">
-          <mat-icon color="warn">info</mat-icon>
-          You have not shown interest in any event yet.
-        </div>
-      </ng-template>
-    </ng-template>
-  </mat-card-content>
-</mat-card>
+          </ng-container>
+          <ng-template #interestedList>
+            <mat-list class="scroll-list" *ngIf="interestedEvents.length > 0; else noInterested">
+              <mat-list-item *ngFor="let event of interestedEvents">
+                <!-- <mat-icon mat-list-icon color="accent">event</mat-icon> -->
+                <div class="event-info">
+                  <div class="event-title">{{ event.title }}</div>
+                  <div class="event-location" *ngIf="event.location">
+                    <mat-icon inline fontSize="5" color="primary">location_on</mat-icon>
+                    <span>{{ event.location }}</span>
+                  </div>
+                </div>
+              </mat-list-item>
+            </mat-list>
+            <ng-template #noInterested>
+              <div class="no-interested-message">
+                <mat-icon color="warn">info</mat-icon>
+                You have not shown interest in any event yet.
+              </div>
+            </ng-template>
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
       } @else {
+
          <div class="not-signed-in-message">
-          <mat-icon color="warn">info</mat-icon>
-          Sign in to view your events.
+          <mat-icon class="not-signed-in-message-icon">info</mat-icon>
+          <h3>No Message found</h3>
+          <p>We couldn't load message at this time. Please sign in to see message.</p>
+          
         </div>
       }
     </mat-card-content>
@@ -119,7 +122,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
           mat-card-title {
             font-size: 1.1rem;
             font-weight: 500;
-            color: #8f0045; /* Primary color */
+            //color: #8f0045; /* Primary color */
           }
         }
         
@@ -199,45 +202,70 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     }
 
   .not-signed-in-message {
-    text-align: center;
-    margin: 1rem 0;
-    font-size: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
+    text-align: center;
+    padding: 30px 0;
+    gap: 16px;
+
+    .not-signed-in-message-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      //color: #AAA;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    p {
+      font-size: 0.875rem;
+      color: #666;
+      margin: 0;
+      max-width: 300px;
+    }
+
+    button {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
   }
 
   .interested-list {
-  list-style: none;
-  margin: 0;
-  padding-left: 0;
-  li {
-    display: flex;
-   // align-items: center;
-    padding: 0.2em 0;
-    font-size: 0.8em;
-    .event-dot {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+    li {
+      display: flex;
+    // align-items: center;
+      padding: 0.2em 0;
       font-size: 0.8em;
-      margin-right: 0.5em;
-      //vertical-align: middle;
-    }
-    .event-title {
-      //font-weight: 500;
-      color: #8f0045;
-      margin-right: 0.3em;
-    }
-    .event-location {
-      color: #666;
-      font-size: 0.75em;
+      .event-dot {
+        font-size: 0.8em;
+        margin-right: 0.5em;
+        //vertical-align: middle;
+      }
+      .event-title {
+        //color: #8f0045;
+        margin-right: 0.3em;
+      }
+      .event-location {
+        color: #666;
+        font-size: 0.75em;
+      }
     }
   }
-}
 
 .interest-title {
   font-size: 1.08rem;
   font-weight: 600;
-  //color: #8f0045;
   margin-left: 0.5em;
   vertical-align: middle;
 }
