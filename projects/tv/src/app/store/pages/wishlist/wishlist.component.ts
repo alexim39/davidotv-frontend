@@ -266,23 +266,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       position: relative;
     }
 
-    /* .wishlist-title {
-      display: flex;
-      align-items: center;
-      font-size: 28px;
-      font-weight: 600;
-      margin: 0 0 8px 0;
-      color: #3a2b63;
-    }
-
-    .title-icon {
-      color: #8f0045;
-      margin-right: 12px;
-      font-size: 32px;
-      width: 32px;
-      height: 32px;
-    } */
-
     .wishlist-subtitle {
       font-size: 16px;
       color: #666;
@@ -314,7 +297,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       justify-content: center;
       text-align: center;
       padding: 60px 20px;
-      background-color: #fafafa;
+      //background-color: #fafafa;
       border-radius: 8px;
       margin-top: 40px;
 
@@ -322,7 +305,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
         width: 80px;
         height: 80px;
         border-radius: 50%;
-        background-color: #f0e6f0;
+        //background-color: #f0e6f0;
         display: flex;
         align-items: center;
         justify-content: center;

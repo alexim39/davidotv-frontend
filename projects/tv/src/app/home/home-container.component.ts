@@ -86,10 +86,10 @@ import { MatDialog } from '@angular/material/dialog';
               <mat-icon>computer_arrow_up</mat-icon>
               <span>Upload</span>
             </a>
-            <a mat-list-item (click)="chatRoom()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+           <!--  <a mat-list-item (click)="chatRoom()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>chat</mat-icon>
               <span>chat rooms</span>
-            </a>
+            </a> -->
             <a mat-list-item routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>storefront</mat-icon>
               <span>Store</span>
