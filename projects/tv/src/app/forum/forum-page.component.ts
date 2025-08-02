@@ -71,21 +71,6 @@ import { ChangeDetectorRef } from '@angular/core';
             </button>
           </div>
         </div>
-
-        <!-- <div *ngIf="currentView === 'detail'">
-          <app-thread-detail 
-            *ngIf="!isLoading && selectedThread" 
-            >
-          </app-thread-detail>
-
-          <div *ngIf="!isLoading && !selectedThread" class="thread-not-found">
-            <mat-icon>error_outline</mat-icon>
-            <h3>Discussion not found</h3>
-            <button mat-raised-button color="primary" (click)="backToList()">
-              Back to discussions
-            </button>
-          </div>
-        </div> -->
       </div>
     </div>
   `,

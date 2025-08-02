@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { ForumService } from './forum.service';
@@ -12,6 +12,7 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { map, Observable, startWith, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserInterface, UserService } from '../common/services/user.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-create-thread',
@@ -26,13 +27,15 @@ import { UserInterface, UserService } from '../common/services/user.service';
     MatChipsModule, 
     CommonModule,
     MatAutocompleteModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule 
   ],
-template: `
+  template: `
     <h2 mat-dialog-title>Create New Thread</h2>
 
     <mat-dialog-content>
       <form [formGroup]="threadForm">
+        <!-- Existing form fields remain the same -->
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Thread Title</mat-label>
           <input matInput formControlName="title" required>
@@ -54,6 +57,28 @@ template: `
             Content must be less than 5000 characters
           </mat-error>
         </mat-form-field>
+       
+        <div class="media-section">
+          <h4>Media Attachment (Optional)</h4>
+          <div class="media-preview" *ngIf="mediaPreview">
+            <img *ngIf="mediaType === 'image'" [src]="mediaPreview" alt="Preview" class="preview-image">
+            <video *ngIf="mediaType === 'video'" controls class="preview-video">
+              <source [src]="mediaPreview" [type]="mediaFileType">
+            </video>
+            <audio *ngIf="mediaType === 'audio'" controls class="preview-audio">
+              <source [src]="mediaPreview" [type]="mediaFileType">
+            </audio>
+            <button mat-icon-button (click)="removeMedia()" class="remove-media-btn">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          <input type="file" #mediaInput (change)="onMediaSelected($event)" accept="image/*, video/*, audio/*" hidden>
+          <button mat-stroked-button type="button" (click)="mediaInput.click()" class="media-upload-btn">
+            <mat-icon>attach_file</mat-icon>
+            {{ mediaPreview ? 'Change Media' : 'Attach Media' }}
+          </button>
+          <small class="hint">Supported formats: JPG, PNG, GIF, MP4, WEBM, MP3, WAV</small>
+        </div>
        
         <div class="tags-section">
           <h4>Tags</h4>
@@ -86,74 +111,149 @@ template: `
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-button mat-dialog-close [disabled]="isSubmitting">Cancel</button>
       <button mat-raised-button
               color="primary"
               (click)="onSubmit()"
-              [disabled]="threadForm.invalid || !user">
-        Create Thread
+              [disabled]="threadForm.invalid || !user || isSubmitting">
+        <div class="submit-button-content">
+          <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+          <span *ngIf="!isSubmitting">Create Thread</span>
+          <span *ngIf="isSubmitting">Creating...</span>
+        </div>
       </button>
     </mat-dialog-actions>
-`,
-styles: [`
-mat-dialog-content {
-  height: auto;
-  overflow-y: hidden;
-  form {
-    height: 100%;
-  }
-}
-.full-width {
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.tags-section {
-  margin-top: 20px;
-  
-  h4 {
-    margin-bottom: 10px;
-    font-weight: 500;
-  }
-  
-  mat-chip-list {
-    margin-bottom: 15px;
-    
-    input {
-      width: 150px;
+  `,
+  styles: [`
+    mat-dialog-content {
+      height: auto;
+      overflow-y: auto;
+      form {
+        height: 100%;
+      }
     }
-  }
-  
-  .available-tags {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: #666;
-    
-    button {
-      min-width: auto;
-      padding: 0 8px;
-      line-height: 24px;
-      font-size: 12px;
+    .full-width {
+      width: 100%;
+      margin-bottom: 20px;
     }
-  }
-}
 
-mat-dialog-actions {
-  padding: 20px 24px;
-  border-top: 1px solid #eee;
-}
- .mat-mdc-form-field {
+    .media-section {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      
+      h4 {
+        margin-bottom: 10px;
+        font-weight: 500;
+      }
+      
+      .media-preview {
+        position: relative;
+        margin-bottom: 15px;
+        max-width: 100%;
+        
+        .preview-image {
+          max-width: 100%;
+          max-height: 300px;
+          border-radius: 4px;
+        }
+        
+        .preview-video {
+          max-width: 100%;
+          max-height: 300px;
+          border-radius: 4px;
+        }
+        
+        .preview-audio {
+          width: 100%;
+          margin-top: 10px;
+        }
+        
+        .remove-media-btn {
+          position: absolute;
+          top: -10px;
+          right: -10px;
+          background-color: white;
+          border-radius: 50%;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+      }
+      
+      .media-upload-btn {
+        margin-right: 10px;
+      }
+      
+      .hint {
+        display: block;
+        color: #666;
+        font-size: 12px;
+        margin-top: 5px;
+      }
+    }
+
+    .tags-section {
+      margin-top: 20px;
+      
+      h4 {
+        margin-bottom: 10px;
+        font-weight: 500;
+      }
+      
+      mat-chip-list {
+        margin-bottom: 15px;
+        
+        input {
+          width: 150px;
+        }
+      }
+      
+      .available-tags {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #666;
+        
+        button {
+          min-width: auto;
+          padding: 0 8px;
+          line-height: 24px;
+          font-size: 12px;
+        }
+      }
+    }
+
+    mat-dialog-actions {
+      padding: 20px 24px;
+      border-top: 1px solid #eee;
+    }
+    .mat-mdc-form-field {
       width: 100%;
     }
- `]
+
+    /* New styles for submit button */
+    .submit-button-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    mat-spinner {
+      margin-right: 8px;
+    }
+  `]
 })
 export class CreateThreadComponent implements OnInit {
- threadForm: FormGroup;
+  threadForm: FormGroup;
   tags: string[] = [];
   availableTags = ['music', 'tour', 'lyrics', 'news', 'discussion', 'videos', 'concert', 'album'];
+
+  isSubmitting = false;
+  
+  // Media properties
+  mediaFile: File | null = null;
+  mediaPreview: string | null = null;
+  mediaType: 'image' | 'video' | 'audio' | null = null;
+  mediaFileType: string | null = null;
   
   // Autocomplete properties
   separatorKeysCodes: number[] = [ENTER, COMMA];
@@ -162,8 +262,12 @@ export class CreateThreadComponent implements OnInit {
 
   private snackBar = inject(MatSnackBar);
   private userService = inject(UserService);
+  private cdRef = inject(ChangeDetectorRef);
   user: UserInterface | null = null;
   subscriptions: Subscription[] = [];
+
+  @ViewChild('mediaInput') mediaInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('tagInput') tagInput!: ElementRef<HTMLInputElement>;
 
   constructor(
     private fb: FormBuilder,
@@ -182,14 +286,52 @@ export class CreateThreadComponent implements OnInit {
   }
 
   ngOnInit(): void {
-      this.subscriptions.push(
+    this.subscriptions.push(
       this.userService.getCurrentUser$.subscribe({
         next: (user) => {
           this.user = user;
-          //console.log('current user ',this.user)
+          this.cdRef.detectChanges(); 
         }
       })
     )
+  }
+
+  onMediaSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.mediaFile = input.files[0];
+      
+      // Check file type
+      if (this.mediaFile.type.startsWith('image/')) {
+        this.mediaType = 'image';
+      } else if (this.mediaFile.type.startsWith('video/')) {
+        this.mediaType = 'video';
+      } else if (this.mediaFile.type.startsWith('audio/')) {
+        this.mediaType = 'audio';
+      } else {
+        this.snackBar.open('Unsupported file type', 'Close', { duration: 3000 });
+        return;
+      }
+      
+      this.mediaFileType = this.mediaFile.type;
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.mediaPreview = reader.result as string;
+        this.cdRef.detectChanges(); 
+      };
+      reader.readAsDataURL(this.mediaFile);
+    }
+  }
+
+  removeMedia(): void {
+    this.mediaFile = null;
+    this.mediaPreview = null;
+    this.mediaType = null;
+    this.mediaFileType = null;
+    this.mediaInput.nativeElement.value = '';
+    this.cdRef.detectChanges(); 
   }
 
   addTag(event: MatChipInputEvent): void {
@@ -198,6 +340,7 @@ export class CreateThreadComponent implements OnInit {
     // Add our tag
     if (value && !this.tags.includes(value)) {
       this.tags.push(value);
+      this.cdRef.detectChanges(); 
     }
 
     // Clear the input value
@@ -209,12 +352,14 @@ export class CreateThreadComponent implements OnInit {
     const index = this.tags.indexOf(tag);
     if (index >= 0) {
       this.tags.splice(index, 1);
+      this.cdRef.detectChanges(); 
     }
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
     if (!this.tags.includes(event.option.viewValue)) {
       this.tags.push(event.option.viewValue);
+      this.cdRef.detectChanges(); 
     }
     this.tagInput.nativeElement.value = '';
     this.tagCtrl.setValue(null);
@@ -226,35 +371,41 @@ export class CreateThreadComponent implements OnInit {
       tag.toLowerCase().includes(filterValue) && !this.tags.includes(tag));
   }
 
-  onSubmit() {
+ onSubmit() {
     if (this.threadForm.invalid) return;
     if (!this.user || !this.user._id) {
       this.snackBar.open('You need to sign in to make forum post', 'Close', { duration: 3000 });
     } else {
-
-      const threadData = {
-        title: this.threadForm.value.title,
-        content: this.threadForm.value.content,
-        tags: this.tags,
-        authorId: this.user._id as string,
-      };
+      this.isSubmitting = true;
+      const formData = new FormData();
+      formData.append('title', this.threadForm.value.title);
+      formData.append('content', this.threadForm.value.content);
+      formData.append('tags', JSON.stringify(this.tags));
+      formData.append('authorId', this.user._id as string);
       
-      this.forumService.createThread(threadData).subscribe( {
+      if (this.mediaFile) {
+        formData.append('media', this.mediaFile);
+        formData.append('mediaType', this.mediaType!);
+      }
+      
+      this.forumService.createThread(formData).subscribe({
         next: (thread) => {
+          this.isSubmitting = false;
           this.snackBar.open('Thread created successfully!', 'Close', { duration: 3000 });
           this.dialogRef.close(thread);
+          this.cdRef.detectChanges();
         },
         error: (error) => {
+          this.isSubmitting = false;
           console.error('Error creating thread:', error);
           this.snackBar.open('Failed to create thread. Please try again.', 'Close', { duration: 3000 });
+          this.cdRef.detectChanges();
         }
       });
     }
   }
 
-  @ViewChild('tagInput') tagInput!: ElementRef<HTMLInputElement>;
-
-    ngOnDestroy() {
+  ngOnDestroy() {
     // unsubscribe list
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   } 

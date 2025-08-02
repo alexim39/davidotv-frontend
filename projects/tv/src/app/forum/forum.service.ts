@@ -2,16 +2,43 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from '../common/services/api.service';
 
+// export interface Thread {
+//   _id: string;
+//   title: string;
+//   content: string;
+//   author: User;
+//   createdAt: Date;
+//   tags: string[];
+//   likeCount: number;
+//   commentCount: number;
+//   viewCount: number;
+//   isLiked?: boolean;
+// }
+
+// In your forum.service.ts or appropriate model file
 export interface Thread {
   _id: string;
   title: string;
   content: string;
-  author: User;
-  createdAt: Date;
+  author: {
+    _id: string;
+    name: string;
+    username: string;
+    avatar?: string;
+  };
   tags: string[];
+  media?: {
+    url: string;
+    type: 'image' | 'video' | 'audio';
+    filename: string;
+    originalName: string;
+    size: number;
+  };
   likeCount: number;
   commentCount: number;
   viewCount: number;
+  createdAt: string;
+  updatedAt: string;
   isLiked?: boolean;
 }
 
@@ -56,8 +83,12 @@ export class ForumService {
 
   // Thread Operations
   // This method creates a new thread in the forum
-  createThread(thread: { title: string; content: string; tags: string[], authorId: string }): Observable<Thread> {
-    return this.apiService.post<Thread>('forum/threads/new', thread,  undefined, true);
+  // createThread(thread: { title: string; content: string; tags: string[], authorId: string }): Observable<Thread> {
+  //   return this.apiService.post<Thread>('forum/threads/new', thread,  undefined, true);
+  // }
+
+  createThread(formData: FormData): Observable<Thread> {
+    return this.apiService.post<Thread>('forum/threads/new', formData, undefined, true);
   }
 
   // Get all threads

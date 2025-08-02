@@ -24,11 +24,12 @@ import { CommentComponent } from './comment.component';
 import { timeAgo as timeAgoUtil } from '../common/utils/time.util';
 import { SanitizeHtmlPipe } from '../common/pipes/sanitize-html.pipe';
 import { UserInterface, UserService } from '../common/services/user.service';
+import { ApiService } from '../common/services/api.service';
 
 @Component({
   selector: 'app-thread-detail',
   standalone: true,
-  providers: [ForumService],
+  providers: [ForumService, ApiService],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -45,325 +46,330 @@ import { UserInterface, UserService } from '../common/services/user.service';
   ],
   template: `
   <div class="thread-detail-container">
-  <!-- Back Navigation -->
-  <button mat-button class="back-button" (click)="handleBack()">
-    <mat-icon>arrow_back</mat-icon>
-    Back to Forum
-  </button>
-
-  <!-- Loading State -->
-  <div *ngIf="loadingStates" class="loading-state">
-    <mat-spinner diameter="50"></mat-spinner>
-    <p>Loading thread...</p>
-  </div>
-
-  <!-- Error State -->
-  <div *ngIf="error && !loadingStates" class="error-state">
-    <mat-icon color="warn">error_outline</mat-icon>
-    <p>{{ error }}</p>
-    <button mat-raised-button color="primary" (click)="loadThreadData()">
-      Retry
+    <!-- Back Navigation -->
+    <button mat-button class="back-button" (click)="handleBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Forum
     </button>
-  </div>
 
-  <!-- Thread Content -->
-  <ng-container *ngIf="thread && !loadingStates">
-    <mat-card class="thread-card">
-      <mat-card-header>
-        <img mat-card-avatar 
-             [src]="thread.author.avatar" 
-             [alt]="thread.author.name">
-        <mat-card-title>{{ thread.title }}</mat-card-title>
-        <mat-card-subtitle>
-          <span class="author-info">
-            <span>{{thread.author.name | titlecase}} - {{thread.author.username}}</span>
-            <!-- <mat-icon *ngIf="thread.author.isVerified" class="verified-icon" matTooltip="Verified User">verified</mat-icon> -->
-          </span>
-          <span class="spacer"></span>
-          <span class="time">{{ timeAgo(thread.createdAt) }}</span>
-        </mat-card-subtitle>
-      </mat-card-header>
+    <!-- Loading State -->
+    <div *ngIf="loadingStates" class="loading-state">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Loading thread...</p>
+    </div>
 
-      <mat-card-content>
-        <div class="thread-content" [innerHTML]="thread.content | sanitizeHtml"></div>
-        
-        <mat-chip-listbox class="thread-tags">
-          <mat-chip *ngFor="let tag of thread.tags" 
-                   color="primary">
-            {{ tag }}
-          </mat-chip>
-        </mat-chip-listbox>
-      </mat-card-content>
+    <!-- Error State -->
+    <div *ngIf="error && !loadingStates" class="error-state">
+      <mat-icon color="warn">error_outline</mat-icon>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" (click)="loadThreadData()">
+        Retry
+      </button>
+    </div>
 
-      <mat-card-actions class="thread-actions">
-        <button mat-button 
-                [color]="thread.isLiked ? 'accent' : 'primary'"
-                (click)="toggleLikeThread()"
-                aria-label="Like thread"
-                [attr.aria-pressed]="thread.isLiked">
-          <mat-icon>thumb_up</mat-icon>
-          {{ thread.likeCount }}
-        </button>
-        <button mat-button color="primary" disabled>
-          <mat-icon>comment</mat-icon>
-          {{ thread.commentCount }}
-        </button>
-        <button mat-button color="primary" disabled>
-          <mat-icon>visibility</mat-icon>
-          {{ thread.viewCount }}
-        </button>
-      </mat-card-actions>
-    </mat-card>
+    <!-- Thread Content -->
+    <ng-container *ngIf="thread && !loadingStates">
+      <mat-card class="thread-card">
+        <mat-card-header>
+          <img mat-card-avatar 
+               [src]="thread.author.avatar || 'assets/default-avatar.png'" 
+               [alt]="thread.author.name">
+          <mat-card-title>{{ thread.title }}</mat-card-title>
+          <mat-card-subtitle>
+            <span class="author-info">
+              <span>{{thread.author.name | titlecase}} - {{thread.author.username}}</span>
+            </span>
+            <span class="spacer"></span>
+            <span class="time">{{ timeAgo(thread.createdAt) }}</span>
+          </mat-card-subtitle>
+        </mat-card-header>
 
-    <!-- Comment Section -->
-    <section class="comment-section" aria-labelledby="comments-heading">
-      <h3 id="comments-heading">Comments ({{ thread.commentCount }})</h3>
+        <mat-card-content>
+          <!-- Media Display -->
+          <div *ngIf="thread.media" class="thread-media">
+            <img *ngIf="thread.media.type === 'image'" 
+                 [src]="apiService.getBaseUrl() + thread.media.url" 
+                 [alt]="thread.media.originalName"
+                 class="media-content">
+            <video *ngIf="thread.media.type === 'video'" 
+                   controls 
+                   class="media-content">
+              <source [src]="apiService.getBaseUrl() + thread.media.url" [type]="getMediaType(thread.media)">
+            </video>
+            <audio *ngIf="thread.media.type === 'audio'" 
+                   controls 
+                   class="media-content">
+              <source [src]="apiService.getBaseUrl() + thread.media.url" [type]="getMediaType(thread.media)">
+            </audio>
+          </div>
 
-      <!-- Comment Form -->
-      <form [formGroup]="commentForm" class="comment-form">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Add your comment</mat-label>
-          <textarea matInput 
-                  formControlName="content"
-                  rows="4"
-                  aria-label="Comment text area"
-                  [attr.maxlength]="2000"></textarea>
-          <mat-hint align="end">{{ remainingChars }} characters remaining</mat-hint>
-        </mat-form-field>
-        <button mat-raised-button 
-                color="primary"
-                (click)="addComment()"
-                [disabled]="commentForm.invalid || isSubmitting || !currentUser"
-                aria-label="Post comment">
-          <span *ngIf="!isSubmitting">Post Comment</span>
-          <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
-        </button>
-      </form>
+          <div class="thread-content" [innerHTML]="thread.content | sanitizeHtml"></div>
+          
+          <mat-chip-listbox class="thread-tags">
+            <mat-chip *ngFor="let tag of thread.tags" 
+                     color="primary">
+              {{ tag }}
+            </mat-chip>
+          </mat-chip-listbox>
+        </mat-card-content>
 
-      <!-- Comments Loading -->
-      <div *ngIf="loadingStates" class="loading-comments">
-        <mat-spinner diameter="40"></mat-spinner>
-      </div>
+        <mat-card-actions class="thread-actions">
+          <button mat-button 
+                  [color]="thread.isLiked ? 'accent' : 'primary'"
+                  (click)="toggleLikeThread()"
+                  aria-label="Like thread"
+                  [attr.aria-pressed]="thread.isLiked">
+            <mat-icon>thumb_up</mat-icon>
+            {{ thread.likeCount }}
+          </button>
+          <button mat-button color="primary" disabled>
+            <mat-icon>comment</mat-icon>
+            {{ thread.commentCount }}
+          </button>
+          <button mat-button color="primary" disabled>
+            <mat-icon>visibility</mat-icon>
+            {{ thread.viewCount }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
 
-      <!-- Comments List -->
-      <div class="comments-list">
-        <app-comment *ngFor="let comment of comments; trackBy: trackByCommentId"
-          [comment]="comment"
-          [threadId]="thread._id"
-          [isAuthor]="isCommentAuthor(comment)"
-          (likeComment)="toggleLikeComment($event)"
-          (commentDeleted)="onCommentDeleted($event)">
-        </app-comment>
+      <!-- Comment Section -->
+      <section class="comment-section" aria-labelledby="comments-heading">
+        <h3 id="comments-heading">Comments ({{ thread.commentCount }})</h3>
 
-        <!-- Empty State -->
-        <div *ngIf="comments.length === 0" class="no-comments">
-          <mat-icon>forum</mat-icon>
-          <p>No comments yet. Be the first to comment!</p>
+        <!-- Comment Form -->
+        <form [formGroup]="commentForm" class="comment-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Add your comment</mat-label>
+            <textarea matInput 
+                    formControlName="content"
+                    rows="4"
+                    aria-label="Comment text area"
+                    [attr.maxlength]="2000"></textarea>
+            <mat-hint align="end">{{ remainingChars }} characters remaining</mat-hint>
+          </mat-form-field>
+          <button mat-raised-button 
+                  color="primary"
+                  (click)="addComment()"
+                  [disabled]="commentForm.invalid || isSubmitting || !currentUser"
+                  aria-label="Post comment">
+            <span *ngIf="!isSubmitting">Post Comment</span>
+            <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+          </button>
+        </form>
+
+        <!-- Comments Loading -->
+        <div *ngIf="loadingStates" class="loading-comments">
+          <mat-spinner diameter="40"></mat-spinner>
         </div>
-      </div>
-    </section>
-  </ng-container>
-</div>
+
+        <!-- Comments List -->
+        <div class="comments-list">
+          <app-comment *ngFor="let comment of comments; trackBy: trackByCommentId"
+            [comment]="comment"
+            [threadId]="thread._id"
+            [isAuthor]="isCommentAuthor(comment)"
+            (likeComment)="toggleLikeComment($event)"
+            (commentDeleted)="onCommentDeleted($event)">
+          </app-comment>
+
+          <!-- Empty State -->
+          <div *ngIf="comments.length === 0" class="no-comments">
+            <mat-icon>forum</mat-icon>
+            <p>No comments yet. Be the first to comment!</p>
+          </div>
+        </div>
+      </section>
+    </ng-container>
+  </div>
   `,
   styles: [`
+    .thread-detail-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 16px;
 
-
-.thread-detail-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 16px;
-
-  .back-button {
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-  }
-
-  .loading-state, .error-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
-    gap: 16px;
-    text-align: center;
-  }
-
-  .error-state {
-    color: red; //mat-color($warn);
-  }
-
-  .thread-card {
-    margin-bottom: 32px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-
-    mat-card-header {
-      padding: 16px 16px 0;
-
-      mat-card-title {
-        font-size: 1.5rem;
-        font-weight: 500;
-        margin-bottom: 4px;
-      }
-
-      mat-card-subtitle {
+      .back-button {
+        margin-bottom: 24px;
         display: flex;
         align-items: center;
-        font-size: 0.875rem;
+      }
 
-        .author-info {
-          display: flex;
-          align-items: center;
-          gap: 4px;
+      .loading-state, .error-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        gap: 16px;
+        text-align: center;
+      }
 
-          .verified-icon {
-            color: blue;// $verified-blue;
-            font-size: 1rem;
-            height: 1rem;
-            width: 1rem;
-          }         
+      .error-state {
+        color: red;
+      }
 
-        }
+      .thread-card {
+        margin-bottom: 32px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 
-         .time {
-            margin-left: auto;
-            color: #888;
-            font-size: 13px;
-            white-space: nowrap;
+        mat-card-header {
+          padding: 16px 16px 0;
+
+          mat-card-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 4px;
           }
 
-        .spacer {
-          flex: 1;
+          mat-card-subtitle {
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+
+            .author-info {
+              display: flex;
+              align-items: center;
+              gap: 4px;
+            }
+
+            .time {
+              margin-left: auto;
+              color: #888;
+              font-size: 13px;
+              white-space: nowrap;
+            }
+
+            .spacer {
+              flex: 1;
+            }
+          }
+        }
+
+        mat-card-content {
+          padding: 0 16px;
+
+          .thread-media {
+            margin: 16px 0;
+            max-width: 100%;
+            
+            .media-content {
+              max-width: 100%;
+              max-height: 500px;
+              border-radius: 8px;
+              object-fit: contain;
+              
+              video {
+                width: 100%;
+              }
+              
+              audio {
+                width: 100%;
+              }
+            }
+          }
+
+          .thread-content {
+            line-height: 1.6;
+            margin-bottom: 16px;
+            white-space: pre-line;
+            word-break: break-word;
+          }
+
+          .thread-tags {
+            margin-top: 12px;
+          }
+        }
+
+        mat-card-actions {
+          padding: 8px 16px;
+          border-top: 1px solid rgba(0, 0, 0, 0.08);
+          display: flex;
+          gap: 8px;
+
+          button {
+            min-width: auto;
+          }
         }
       }
-    }
 
-    mat-card-content {
-      padding: 0 16px;
-
-      .thread-content {
-        line-height: 1.6;
-        margin-bottom: 16px;
-        white-space: pre-line;
-        word-break: break-word;
-      }
-
-      .thread-tags {
-        margin-top: 12px;
-      }
-    }
-
-    mat-card-actions {
-      padding: 8px 16px;
-      border-top: 1px solid rgba(0, 0, 0, 0.08);
-      display: flex;
-      gap: 8px;
-
-      button {
-        min-width: auto;
-      }
-    }
-  }
-
-  .comment-section {
-    h3 {
-      font-size: 1.25rem;
-      font-weight: 500;
-      margin-bottom: 16px;
-      //color: rgba(0, 0, 0, 0.87);
-    }
-
-   /*  .comment-form {
-      margin-bottom: 24px;
-
-      button {
-        margin-top: 8px;
-        float: right;
-      }
-    } */
-
-    .comment-form {
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 24px;
-
-      mat-form-field.full-width {
-        width: 100%;
-      }
-
-      button[mat-raised-button] {
-        align-self: flex-end;
-        margin-top: 8px;
-      }
-    }
-
-    .loading-comments {
-      display: flex;
-      justify-content: center;
-      padding: 40px;
-    }
-
-    .no-comments {
-      text-align: center;
-      padding: 40px 20px;
-      //color: rgba(0, 0, 0, 0.54);
-
-      mat-icon {
-        font-size: 48px;
-        width: 48px;
-        height: 48px;
-        margin-bottom: 16px;
-        //color: rgba(0, 0, 0, 0.12);
-      }
-
-      p {
-        font-size: 1rem;
-      }
-    }
-  }
-
-  /* styles.scss or component styles */
-.snackbar-center-bottom {
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  justify-content: center !important;
-}
-
-
-}
-
-
-@media (max-width: 600px) {
-  .thread-detail-container {
-    padding: 8px;
-
-    .thread-card {
-      mat-card-header {
-        mat-card-title {
+      .comment-section {
+        h3 {
           font-size: 1.25rem;
+          font-weight: 500;
+          margin-bottom: 16px;
         }
-      }
 
-      mat-card-content {
-        .thread-content {
-          font-size: 0.9375rem;
+        .comment-form {
+          width: 100%;
+          max-width: 100%;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin-bottom: 24px;
+
+          mat-form-field.full-width {
+            width: 100%;
+          }
+
+          button[mat-raised-button] {
+            align-self: flex-end;
+            margin-top: 8px;
+          }
+        }
+
+        .loading-comments {
+          display: flex;
+          justify-content: center;
+          padding: 40px;
+        }
+
+        .no-comments {
+          text-align: center;
+          padding: 40px 20px;
+
+          mat-icon {
+            font-size: 48px;
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+          }
+
+          p {
+            font-size: 1rem;
+          }
         }
       }
     }
 
-    .comment-section {
-      h3 {
-        font-size: 1.125rem;
+    @media (max-width: 600px) {
+      .thread-detail-container {
+        padding: 8px;
+
+        .thread-card {
+          mat-card-header {
+            mat-card-title {
+              font-size: 1.25rem;
+            }
+          }
+
+          mat-card-content {
+            .thread-content {
+              font-size: 0.9375rem;
+            }
+          }
+        }
+
+        .comment-section {
+          h3 {
+            font-size: 1.125rem;
+          }
+        }
       }
     }
-  }
-}
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -374,6 +380,7 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
   private snackBar = inject(MatSnackBar);
   private cd = inject(ChangeDetectorRef);
   private userService = inject(UserService);
+  public apiService = inject(ApiService);
 
   // Component State
   thread: Thread | null = null;
@@ -404,6 +411,22 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  getMediaType(media: Thread['media']): string {
+    if (!media) return '';
+    const extension = media.filename.split('.').pop()?.toLowerCase();
+    
+    switch (media.type) {
+      case 'image':
+        return `image/${extension}`;
+      case 'video':
+        return `video/${extension}`;
+      case 'audio':
+        return `audio/${extension}`;
+      default:
+        return '';
+    }
+  }
+
   private loadCurrentUser(): void {
     this.userService.getCurrentUser$.pipe(
       takeUntil(this.destroy$)
@@ -424,16 +447,12 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (response) => {
-        //console.log('returned thread ',response.data)
         this.thread = response.data || null;
         this.loadingStates = false;
         if (response.data) {
-          //this.loadComments();
           this.comments = response.data.comments || [];
-          //this.incrementViewCount();
           this.cd.markForCheck();
         }
-        
       },
       error: (err) => {
         this.error = 'Failed to load thread';
@@ -458,12 +477,6 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
       next: (response) => {
         if (response.success) {
           this.thread = response.data;
-          // this.snackBar.open(response.message, 'Ok', {
-          //   duration: 3000,
-          //   horizontalPosition: 'center',
-          //   verticalPosition: 'bottom',
-          //   panelClass: 'snackbar-center-bottom'
-          // });
           this.cd.markForCheck();
         }
       },
@@ -529,27 +542,7 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
     if (this.thread) {
       this.thread.commentCount = Math.max(0, this.thread.commentCount - 1);
     }
-        //this.cd.markForCheck();
   }
-
- /*  handleDeleteComment(commentId: any): void {
-    if (!this.thread || !this.currentUser) return;
-
-    this.forumService.deleteComment(commentId).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: () => {
-        this.comments = this.comments.filter(c => c._id !== commentId);
-        if (this.thread) {
-          this.thread.commentCount = Math.max(0, this.thread.commentCount - 1);
-        }
-        this.cd.markForCheck();
-      },
-      error: (err) => {
-        this.showError('Failed to delete comment');
-      }
-    });
-  } */
 
   private updateCommentInList(updatedComment: Comment): void {
     const index = this.comments.findIndex(c => c._id === updatedComment._id);
@@ -585,7 +578,7 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
     return 2000 - (this.commentForm.value.content?.length || 0);
   }
 
-   timeAgo(date: string | Date): string {
+  timeAgo(date: string | Date): string {
     return timeAgoUtil(date);
   }
 }
