@@ -33,7 +33,7 @@ type SimpleAudioPlayer = HTMLAudioElement | null;
         <div class="header-content">
           <div class="logo-container">
             <img src="./img/logo2.PNG" alt="DavidoTv Logo" class="logo">
-            <h1>DavidoTV</h1>
+            <!-- <h1>DavidoTV</h1> -->
           </div>
           <div class="header-actions">
             <button mat-button class="subscribe-btn">

@@ -262,6 +262,7 @@ export class ProfileImageUploaderComponent {
               this.imagePreview = response.profileImage;
             }
           } else {
+            console.error('Upload failed:', response);
             this.snackBar.open(response.message || 'Upload failed', 'Close', { duration: 5000 });
           }
         }

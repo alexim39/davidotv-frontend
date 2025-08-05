@@ -48,7 +48,7 @@ import { AuthService } from './auth.service';
         Or sign in with
         <div class="social-buttons-sign-in" style="margin-top: 1rem;">
           <button mat-stroked-button class="social-btn google" (click)="signInWithGoogle()">
-            <img src="./img/google-logo.png" width="4000" alt="Google Logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google Logo">
           </button>
          <!--  <button mat-stroked-button class="social-btn facebook" (click)="signInWithFacebook()">
             <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook logo">
@@ -257,8 +257,8 @@ import { AuthService } from './auth.service';
     }
 
     .social-btn img {
-      width: 25px;
-      height: 25px;
+      width: 65px;
+      height: 65px;
     }
 
     .social-btn.google {

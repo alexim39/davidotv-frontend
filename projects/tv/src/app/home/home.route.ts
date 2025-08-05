@@ -36,7 +36,7 @@ export const HomeRoutes: Routes = [
             { path: 'library', loadChildren: () => import('../library/library.routes').then(r => r.LibraryRoutes) },      
             { path: 'history', loadChildren: () => import('../history/history.route').then(r => r.HistoryRoutes) },     
             { path: 'search', loadChildren: () => import('../home/search/search.route').then(r => r.SearchRoutes) },    
-            { path: 'upload', loadChildren: () => import('../upload/upload.route').then(r => r.UploadRoutes) },
+            { path: 'upload', loadChildren: () => import('../fan-content/upload/upload.route').then(r => r.UploadRoutes) },
             { path: 'forum', loadChildren: () => import('../forum/forum.routes').then(r => r.ForumRoutes) },  
             { path: 'faq', loadChildren: () => import('../faq/faq.route').then(r => r.FaqRoutes) },    
             { path: 'about', loadChildren: () => import('../home/about/about.route').then(r => r.AboutRoutes) },    

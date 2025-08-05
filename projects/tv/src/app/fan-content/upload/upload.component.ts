@@ -10,7 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { CommonModule } from '@angular/common';
-import { TruncatePipe } from '../common/pipes/truncate.pipe';
+import { TruncatePipe } from '../../common/pipes/truncate.pipe';
 import { UploadService } from './upload.service';
 
 import { ViewChild, ElementRef } from '@angular/core';
@@ -24,7 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
 <div class="upload-container">
   <div class="upload-header">
     <h1>Upload Your Davido Content</h1>
-    <p>Share your Davido remixes, covers, and fan videos with the world</p>
+    <p>Share your Davido remixes, covers, arts, and fan videos with the world</p>
   </div>
 
   <div class="upload-stepper">

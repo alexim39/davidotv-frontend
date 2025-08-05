@@ -255,7 +255,7 @@ export class ThreadListComponent implements OnInit {
 
   ngOnInit() {
     this.loadCurrentUser();
-    console.log('ThreadListComponent initialized with threads:', this.threads);
+    //console.log('ThreadListComponent initialized with threads:', this.threads);
   }
 
   ngOnDestroy(): void {
