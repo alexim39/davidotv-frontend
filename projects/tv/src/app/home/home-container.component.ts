@@ -74,6 +74,10 @@ import { MatDialog } from '@angular/material/dialog';
             <mat-divider></mat-divider>
 
             <h3 matSubheader>FAN COMMUNITY</h3>
+            <!-- <a mat-list-item routerLink="/feed" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+              <mat-icon>rss_feed</mat-icon>
+              <span>Feeds</span>
+            </a> -->
             <a mat-list-item routerLink="/forum" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>groups</mat-icon>
               <span>Forum</span>

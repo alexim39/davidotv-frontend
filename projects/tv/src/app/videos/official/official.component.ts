@@ -14,8 +14,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
-import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat } from '../common/utils/time.util';
-import { YoutubeService } from "../common/services/youtube.service";
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat } from '../../common/utils/time.util';
+import { YoutubeService } from "../../common/services/youtube.service";
 
 @Component({
   selector: 'async-official',

@@ -14,18 +14,20 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
-import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat   } from '../common/utils/time.util';
-import { YoutubeService } from "../common/services/youtube.service";
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat } from '../common/utils/time.util';
+import { YoutubeService, YoutubeVideoInterface } from "../common/services/youtube.service";
 import { throttleTime } from 'rxjs/operators';
+import { TruncatePipe } from "../common/pipes/truncate.pipe";
 
 @Component({
   selector: 'async-videos',
   providers: [],
+  standalone: true,
   imports: [
-    CommonModule, 
-    MatCardModule, 
-    MatIconModule, 
-    MatButtonModule, 
+    CommonModule,
+    MatCardModule,
+    MatIconModule,
+    MatButtonModule,
     MatChipsModule,
     MatProgressSpinnerModule,
     MatToolbarModule,
@@ -35,6 +37,7 @@ import { throttleTime } from 'rxjs/operators';
     MatMenuModule,
     MatDividerModule,
     MatTabsModule,
+    TruncatePipe
   ],
   template: `
     <div class="trending-all-container" 
@@ -88,78 +91,122 @@ import { throttleTime } from 'rxjs/operators';
         </mat-form-field>
       </div>
 
-      <!-- video content -->
-      <div class="video-content">
-
-        <!-- Videos grid -->
-        <div *ngIf="videos.length > 0" class="video-grid">
-          <mat-card *ngFor="let video of filteredVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
-            <div class="thumbnail-container">
-              <img mat-card-image [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" [alt]="video.title" loading="lazy">
-              <div class="video-duration">{{ formatDuration(video.duration) }}</div>
-            </div>
-            <mat-card-content>
-              <div class="video-info">
-                <img src="./img/ytch.jpeg" alt="Channel" class="channel-icon" loading="lazy">
-                <div class="video-meta">
-                  <h3 title="{{video.title}}">{{ video.title }}</h3>
-                  <p class="channel-name">{{ video.channel }}</p>
-                  <div class="video-stats">
-                    <span class="stat-item">
-                      <mat-icon class="stat-icon">visibility</mat-icon>
-                      {{ formatViewCount(video.views) }}
-                    </span>
-                    <span class="stat-item">
-                      {{ timeAgo(video.publishedAt) }}
-                    </span>
-                  </div>
+      <!-- Video content with tabs -->
+      <mat-tab-group animationDuration="0ms" class="video-tabs" (selectedTabChange)="onTabChange($event.index)">
+        <mat-tab label="Shorts">
+          <div class="tab-content">
+            <!-- Short videos grid -->
+            <div *ngIf="shortVideos.length > 0" class="video-grid short-videos">
+              <mat-card *ngFor="let video of filteredShortVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
+                <div class="thumbnail-container">
+                  <img mat-card-image [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" [alt]="video.title" loading="lazy">
+                  <div class="video-duration">{{ formatDuration(video.duration) }}</div>
+                  <div class="short-badge">SHORT</div>
                 </div>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        </div>
+                <mat-card-content>
+                  <div class="video-info">
+                    <img src="./img/ytch.jpeg" alt="Channel" class="channel-icon" loading="lazy">
+                    <div class="video-meta">
+                      <h3 title="{{video.title}}">{{ video.title | truncate:50 }}</h3>
+                      <p class="channel-name">{{ video.channel }}</p>
+                      <div class="video-stats">
+                        <span class="stat-item">
+                          <mat-icon class="stat-icon">visibility</mat-icon>
+                          {{ formatViewCount(video.views) }}
+                        </span>
+                        <span class="stat-item">
+                          {{ timeAgo(video.publishedAt) }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
 
-        <!-- No results -->
-        <div *ngIf="!loading && filteredVideos.length === 0 && !error" class="no-results">
-          <mat-icon>search_off</mat-icon>
-          <h3>No videos found</h3>
-          <p>Try adjusting your search or filter criteria</p>
-          <button mat-flat-button color="primary" (click)="resetFilters()">Reset Filters</button>
-        </div>
+            <!-- No short videos -->
+            <div *ngIf="!loadingShorts && filteredShortVideos.length === 0 && !error" class="no-results">
+              <mat-icon>search_off</mat-icon>
+              <h3>No short videos found</h3>
+              <p>Try adjusting your search or filter criteria</p>
+              <button mat-flat-button color="primary" (click)="resetFilters()">Reset Filters</button>
+            </div>
 
-        <!-- Error state -->
-        <div *ngIf="error" class="error-state">
-          <mat-icon>error_outline</mat-icon>
-          <h3>Error loading videos</h3>
-          <p>{{ error }}</p>
-          <button mat-raised-button color="primary" (click)="retryLoading()">Retry</button>
-        </div>
+            <!-- Short videos loading indicator -->
+            <div *ngIf="loadingShorts" class="loading-more">
+              <mat-spinner diameter="30" strokeWidth="2" color="accent"></mat-spinner>
+              <span>Loading shorts...</span>
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Full Videos">
+          <div class="tab-content">
+            <!-- Full videos grid -->
+            <div *ngIf="fullVideos.length > 0" class="video-grid full-videos">
+              <mat-card *ngFor="let video of filteredFullVideos" class="video-card" (click)="goToVideo(video.youtubeVideoId)">
+                <div class="thumbnail-container">
+                  <img mat-card-image [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" [alt]="video.title" loading="lazy">
+                  <div class="video-duration">{{ formatDuration(video.duration) }}</div>
+                </div>
+                <mat-card-content>
+                  <div class="video-info">
+                    <img src="./img/ytch.jpeg" alt="Channel" class="channel-icon" loading="lazy">
+                    <div class="video-meta">
+                      <h3 title="{{video.title}}">{{ video.title }}</h3>
+                      <p class="channel-name">{{ video.channel }}</p>
+                      <div class="video-stats">
+                        <span class="stat-item">
+                          <mat-icon class="stat-icon">visibility</mat-icon>
+                          {{ formatViewCount(video.views) }}
+                        </span>
+                        <span class="stat-item">
+                          {{ timeAgo(video.publishedAt) }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+
+            <!-- No full videos -->
+            <div *ngIf="!loadingFullVideos && filteredFullVideos.length === 0 && !error" class="no-results">
+              <mat-icon>search_off</mat-icon>
+              <h3>No full videos found</h3>
+              <p>Try adjusting your search or filter criteria</p>
+              <button mat-flat-button color="primary" (click)="resetFilters()">Reset Filters</button>
+            </div>
+
+            <!-- Full videos loading indicator -->
+            <div *ngIf="loadingFullVideos" class="loading-more">
+              <mat-spinner diameter="30" strokeWidth="2" color="accent"></mat-spinner>
+              <span>Loading videos...</span>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+
+      <!-- Error state -->
+      <div *ngIf="error" class="error-state">
+        <mat-icon>error_outline</mat-icon>
+        <h3>Error loading videos</h3>
+        <p>{{ error }}</p>
+        <button mat-raised-button color="primary" (click)="retryLoading()">Retry</button>
       </div>
-
-      <div *ngIf="loading && !error" class="loading-more">
-        <mat-spinner diameter="30" strokeWidth="2" color="accent"></mat-spinner>
-        <span>Loading videos...</span>
-      </div>
-    
     </div>
   `,
   styleUrls: ['./videos.component.scss']
 })
 export class VideosComponent implements OnInit, OnDestroy {
-  allVideos: any[] = []
-  /* allVideos: DavidoVideo[] = [
-    { youtubeVideoId: 'NnWe5Lhi0G8', title: 'Davido - Fall',  thumbnail: 'https://i.ytimg.com/vi/NnWe5Lhi0G8/mqdefault.jpg', views: '245M views', publishedAt: '5 years ago' },
-    { youtubeVideoId: 'helEv0kGHd4', title: 'Davido - IF',  thumbnail: 'https://i.ytimg.com/vi/helEv0kGHd4/mqdefault.jpg', views: '187M views', publishedAt: '4 years ago' },
-    { youtubeVideoId: 'l6QMJniQWxQ', title: 'Davido - Assurance',  thumbnail: 'https://i.ytimg.com/vi/l6QMJniQWxQ/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: '8ORvJcpe2Oc', title: 'Davido - Assurance',  thumbnail: 'https://i.ytimg.com/vi/8ORvJcpe2Oc/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: 'oiHh2-6jmnU', title: 'Davido - Assurance',  thumbnail: 'https://i.ytimg.com/vi/oiHh2-6jmnU/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: '3Iyuym-Gci0', title: 'Davido - Fall',  thumbnail: 'https://i.ytimg.com/vi/3Iyuym-Gci0/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: 'QGrxqOcZpZU', title: 'Davido - Fall',  thumbnail: 'https://i.ytimg.com/vi/QGrxqOcZpZU/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-    { youtubeVideoId: 'dAD73UeU6Dw', title: 'Davido - Fall',  thumbnail: 'https://i.ytimg.com/vi/dAD73UeU6Dw/mqdefault.jpg', views: '98M views', publishedAt: '3 years ago' },
-  ]; */
-  videos: any[] = [];
-  filteredVideos: any[] = [];
-  loading = false;
+  shortVideos: YoutubeVideoInterface[] = [];
+  fullVideos: YoutubeVideoInterface[] = [];
+  filteredShortVideos: YoutubeVideoInterface[] = [];
+  filteredFullVideos: YoutubeVideoInterface[] = [];
+  
+  // Separate loading states
+  loadingShorts = false;
+  loadingFullVideos = false;
   error: string | null = null;
   
   // Filters
@@ -167,12 +214,14 @@ export class VideosComponent implements OnInit, OnDestroy {
   selectedCategory = 'all';
   private videosSubscription?: Subscription;
 
-   // Infinite scroll state
-  private page = 0;
-  private pageSize = 30;
-  private allLoaded = false;
+  // Infinite scroll state
+  private shortPage = 0;
+  private fullPage = 0;
+  private pageSize = 15;
+  private allShortsLoaded = false;
+  private allFullVideosLoaded = false;
   private scrollSubscription?: Subscription;
-
+  private activeTabIndex = 0;
 
   constructor(
     private router: Router,
@@ -182,8 +231,7 @@ export class VideosComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.loadVideos();
-    // Listen to scroll events on the container
+    this.loadInitialVideos();
     setTimeout(() => this.initScrollListener());
   }
 
@@ -193,89 +241,200 @@ export class VideosComponent implements OnInit, OnDestroy {
     this.scrollSubscription = fromEvent(container, 'scroll')
       .pipe(throttleTime(200))
       .subscribe(() => {
-        if (this.loading || this.allLoaded) return;
-        const threshold = 200; // px from bottom
+        if ((this.activeTabIndex === 0 && this.loadingShorts) || 
+            (this.activeTabIndex === 1 && this.loadingFullVideos)) return;
+            
+        const threshold = 200;
         if (container.scrollTop + container.clientHeight >= container.scrollHeight - threshold) {
-          this.loadVideos();
+          if (this.activeTabIndex === 0 && !this.allShortsLoaded) {
+            this.loadMoreShortVideos();
+          } else if (this.activeTabIndex === 1 && !this.allFullVideosLoaded) {
+            this.loadMoreFullVideos();
+          }
         }
       });
   }
 
-  // Update the loadVideos method in VideosComponent
-  loadVideos() {
-    if (this.loading || this.allLoaded) return;
-    
-    this.loading = true;
+  onTabChange(index: number) {
+    this.activeTabIndex = index;
+    if (index === 0 && this.shortVideos.length === 0 && !this.allShortsLoaded) {
+      this.loadMoreShortVideos();
+    } else if (index === 1 && this.fullVideos.length === 0 && !this.allFullVideosLoaded) {
+      this.loadMoreFullVideos();
+    }
+  }
+
+  loadInitialVideos() {
     this.error = null;
+    this.loadInitialShortVideos();
+    this.loadInitialFullVideos();
+  }
 
-    this.youtubeService.getAllVideos(this.pageSize, this.page, true).subscribe({
-      next: (response: any) => {
-        const newVideos = response.data || [];
-        
-        // If we get fewer videos than requested, we've reached the end
-        if (newVideos.length < this.pageSize) {
-          this.allLoaded = true;
-        }
-
-        // Avoid duplicates
-        const newUnique = newVideos.filter(
-          (v: any) => !this.videos.some(existing => existing.youtubeVideoId === v.youtubeVideoId)
-        );
-
-        this.videos = [...this.videos, ...newUnique];
-        this.filteredVideos = [...this.videos];
-        this.page++;
-        this.loading = false;
+  private loadInitialShortVideos() {
+    this.loadingShorts = true;
+    this.youtubeService.getAllShortVideos(this.pageSize, 0).subscribe({
+      next: (shorts) => {
+        this.shortVideos = (shorts.data || []).filter((v: YoutubeVideoInterface) => v.isShort || (v.durationSeconds && v.durationSeconds <= 120));
+        this.filteredShortVideos = [...this.shortVideos];
+        this.shortPage = 1;
+        this.allShortsLoaded = this.shortVideos.length < this.pageSize;
+        this.loadingFullVideos = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.error = 'Failed to load videos. Please try again later.';
-        this.loading = false;
+        this.handleInitialLoadError(err, 'short videos');
+        this.loadingFullVideos = false;
         this.cdr.detectChanges();
-        console.error('Error loading videos:', err);
+      },
+      complete: () => {
+        this.loadingShorts = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private loadInitialFullVideos() {
+    this.loadingFullVideos = true;
+    this.youtubeService.getAllFullVideos(this.pageSize, 0).subscribe({
+      next: (fullVideos) => {
+        console.log('Initial full videos loaded:', fullVideos);
+        this.fullVideos = (fullVideos.data || []).filter((v: YoutubeVideoInterface) => !v.isShort && (!v.durationSeconds || v.durationSeconds > 120));
+        this.filteredFullVideos = [...this.fullVideos];
+        this.fullPage = 1;
+        this.allFullVideosLoaded = this.fullVideos.length < this.pageSize;
+        this.loadingFullVideos = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.handleInitialLoadError(err, 'full videos');
+        this.loadingFullVideos = false;
+        this.cdr.detectChanges();
+      },
+      complete: () => {
+        this.loadingFullVideos = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private handleInitialLoadError(err: any, videoType: string) {
+    console.error(`Error loading initial ${videoType}:`, err);
+    if (!this.error) {
+      this.error = `Failed to load ${videoType}. Some content may not be available.`;
+    }
+  }
+
+  loadMoreShortVideos() {
+    if (this.loadingShorts || this.allShortsLoaded) return;
+    
+    this.loadingShorts = true;
+    this.error = null;
+
+    this.youtubeService.getAllShortVideos(this.pageSize, this.shortPage).subscribe({
+      next: (response) => {
+        const newVideos = response.data || [];
+        
+        if (newVideos.length < this.pageSize) {
+          this.allShortsLoaded = true;
+        }
+
+        const newUnique = newVideos.filter(
+          (v: any) => !this.shortVideos.some(existing => existing.youtubeVideoId === v.youtubeVideoId) &&
+                     (v.isShort || (v.durationSeconds && v.durationSeconds <= 120))
+        );
+
+        this.shortVideos = [...this.shortVideos, ...newUnique];
+        this.filteredShortVideos = [...this.shortVideos];
+        this.shortPage++;
+      },
+      error: (err) => {
+        this.error = 'Failed to load more short videos. Please try again later.';
+        console.error('Error loading more short videos:', err);
+      },
+      complete: () => {
+        this.loadingShorts = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  loadMoreFullVideos() {
+    if (this.loadingFullVideos || this.allFullVideosLoaded) return;
+    
+    this.loadingFullVideos = true;
+    this.error = null;
+
+    this.youtubeService.getAllFullVideos(this.pageSize, this.fullPage).subscribe({
+      next: (response) => {
+        const newVideos = response.data || [];
+        
+        if (newVideos.length < this.pageSize) {
+          this.allFullVideosLoaded = true;
+        }
+
+        const newUnique = newVideos.filter(
+          (v: any) => !this.fullVideos.some(existing => existing.youtubeVideoId === v.youtubeVideoId) &&
+                     !v.isShort && (!v.durationSeconds || v.durationSeconds > 120)
+        );
+
+        this.fullVideos = [...this.fullVideos, ...newUnique];
+        this.filteredFullVideos = [...this.fullVideos];
+        this.fullPage++;
+      },
+      error: (err) => {
+        this.error = 'Failed to load more full videos. Please try again later.';
+        console.error('Error loading more full videos:', err);
+      },
+      complete: () => {
+        this.loadingFullVideos = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
   // Sorting
   sortBy(property: 'title' | 'views' | 'publishedAt') {
-    this.filteredVideos.sort((a, b) => {
-      if (property === 'publishedAt') {
-        // Extract numeric value from "X years ago"
-        const aYears = parseInt(a.publishedAt);
-        const bYears = parseInt(b.publishedAt);
-        return aYears - bYears;
-      } else if (property === 'views') {
-        // Extract numeric value from views string (e.g., "245M views" -> 245)
-        const aViews = parseFloat(a.views ?? '');
-        const bViews = parseFloat(b.views ?? '');
-        return bViews - aViews;
-      } else {
-        // Sort by title
-        return (a.title ?? '').localeCompare(b.title ?? '');
-      }
-    });
+    this.filteredShortVideos.sort((a, b) => this.getSortComparator(a, b, property));
+    this.filteredFullVideos.sort((a, b) => this.getSortComparator(a, b, property));
+  }
+
+  private getSortComparator(a: any, b: any, property: 'title' | 'views' | 'publishedAt'): number {
+    if (property === 'publishedAt') {
+      return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+    } else if (property === 'views') {
+      return (b.views || 0) - (a.views || 0);
+    } else {
+      return (a.title || '').localeCompare(b.title || '');
+    }
   }
 
   // Filtering and searching
   applySearch() {
     if (!this.searchQuery) {
-      this.filteredVideos = [...this.videos];
+      this.filteredShortVideos = [...this.shortVideos];
+      this.filteredFullVideos = [...this.fullVideos];
       return;
     }
     const query = this.searchQuery.toLowerCase();
-    this.filteredVideos = this.videos.filter(video => 
+    this.filteredShortVideos = this.shortVideos.filter(video => 
+      video.title?.toLowerCase().includes(query)
+    );
+    this.filteredFullVideos = this.fullVideos.filter(video => 
       video.title?.toLowerCase().includes(query)
     );
   }
 
   applyFilters() {
     if (this.selectedCategory === 'all') {
-      this.filteredVideos = [...this.videos];
+      this.filteredShortVideos = [...this.shortVideos];
+      this.filteredFullVideos = [...this.fullVideos];
       return;
     }
     
-    this.filteredVideos = this.videos.filter(video => 
+    this.filteredShortVideos = this.shortVideos.filter(video => 
+      video.title?.toLowerCase().includes(this.selectedCategory)
+    );
+    this.filteredFullVideos = this.fullVideos.filter(video => 
       video.title?.toLowerCase().includes(this.selectedCategory)
     );
   }
@@ -283,7 +442,8 @@ export class VideosComponent implements OnInit, OnDestroy {
   resetFilters() {
     this.searchQuery = '';
     this.selectedCategory = 'all';
-    this.filteredVideos = [...this.videos];
+    this.filteredShortVideos = [...this.shortVideos];
+    this.filteredFullVideos = [...this.fullVideos];
   }
 
   // Navigation
@@ -297,35 +457,43 @@ export class VideosComponent implements OnInit, OnDestroy {
 
   clearSearch() {
     this.searchQuery = '';
-    this.filteredVideos = [...this.videos];
+    this.filteredShortVideos = [...this.shortVideos];
+    this.filteredFullVideos = [...this.fullVideos];
   }
 
   retryLoading() {
     this.error = null;
-    this.loadVideos();
+    if (this.activeTabIndex === 0) {
+      this.loadMoreShortVideos();
+    } else {
+      this.loadMoreFullVideos();
+    }
   }
 
-   ngOnDestroy() {
+  ngOnDestroy() {
     this.videosSubscription?.unsubscribe();
     this.scrollSubscription?.unsubscribe();
   }
 
-  // Handle scroll event (currently does nothing, but required for template binding)
-onContainerScroll(event: Event): void {
-  const container = event.target as HTMLElement;
-  const threshold = 100; // px from bottom
-  
-  if (container.scrollTop + container.clientHeight >= container.scrollHeight - threshold) {
-    this.loadVideos();
+  onContainerScroll(event: Event): void {
+    const container = event.target as HTMLElement;
+    const threshold = 100;
+    
+    if (container.scrollTop + container.clientHeight >= container.scrollHeight - threshold) {
+      if (this.activeTabIndex === 0 && !this.allShortsLoaded) {
+        this.loadMoreShortVideos();
+      } else if (this.activeTabIndex === 1 && !this.allFullVideosLoaded) {
+        this.loadMoreFullVideos();
+      }
+    }
   }
-}
 
   timeAgo(date: string | Date): string {
-     return timeAgoUtil(date);
+    return timeAgoUtil(date);
   }
 
   formatDuration(duration: string): string {
-    return videoDuration(duration)
+    return videoDuration(duration);
   }
 
   formatViewCount(views: number | 0): string {

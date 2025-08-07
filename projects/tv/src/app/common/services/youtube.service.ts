@@ -33,6 +33,8 @@ export interface YoutubeVideoInterface {
   dislikedBy?: string;
   appLikes?: number;
   appDislikes?: number;
+  isShort?: boolean;
+  durationSeconds?: number; // Duration in seconds
   
 }
 
@@ -128,43 +130,84 @@ getOfficialVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = 
   );
 }
 
-  /**
-   * Get all Davido-related videos (excluding official music)
-   * @param limit Number of videos to return
-   * @param forceRefresh Bypass cache and force refresh
-   */
-  getAllVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<YoutubeVideoInterface[]> {
-    // Always get current cache value safely
-    const currentCache = this.videosCache.value || [];
+/**
+ * Get all Davido-related videos (excluding official music)
+ * @param limit Number of videos to return
+ * @param forceRefresh Bypass cache and force refresh
+ */
+getAllFullVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<any> {
+  // Always get current cache value safely
+  const currentCache = this.videosCache.value || [];
 
-    if (!forceRefresh && page === 0 && currentCache.length > 0) {
-      return this.videosCache.asObservable().pipe(
-        map(videos => videos.slice(0, limit))
-      );
-    }
-
-    const params = new HttpParams()
-      .set('menuType', 'videos')
-      .set('limit', limit.toString())
-      .set('page', page.toString())
-      .set('sort', '-publishedAt');
-
-    return this.apiService.get<YoutubeVideoInterface[]>(`youtube/videos`, params).pipe(
-      tap(videos => {
-        // Ensure videos is an array
-        const newVideos = Array.isArray(videos) ? videos : [];
-        
-        if (page === 0) {
-          // First page - replace cache
-          this.videosCache.next(newVideos);
-        } else {
-          // Subsequent pages - append to cache
-          this.videosCache.next([...currentCache, ...newVideos]);
-        }
-      }),
-      catchError(this.handleError)
+  if (!forceRefresh && page === 0 && currentCache.length > 0) {
+    return this.videosCache.asObservable().pipe(
+      map(videos => videos.slice(0, limit))
     );
   }
+
+  const params = new HttpParams()
+    .set('isShort', 'false') 
+    .set('menuType', 'videos')
+    .set('limit', limit.toString())
+    .set('page', page.toString())
+    .set('sort', '-publishedAt');
+
+  return this.apiService.get<YoutubeVideoInterface[]>(`youtube/videos`, params).pipe(
+    tap(videos => {
+      // Ensure videos is an array
+      const newVideos = Array.isArray(videos) ? videos : [];
+      
+      if (page === 0) {
+        // First page - replace cache
+        this.videosCache.next(newVideos);
+      } else {
+        // Subsequent pages - append to cache
+        this.videosCache.next([...currentCache, ...newVideos]);
+      }
+    }),
+    catchError(this.handleError)
+  );
+}
+
+
+/**
+ * Get all Davido-related videos (excluding official music)
+ * @param limit Number of videos to return
+ * @param forceRefresh Bypass cache and force refresh
+ */
+getAllShortVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = false): Observable<any> {
+  // Always get current cache value safely
+  const currentCache = this.videosCache.value || [];
+
+  if (!forceRefresh && page === 0 && currentCache.length > 0) {
+    return this.videosCache.asObservable().pipe(
+      map(videos => videos.slice(0, limit))
+    );
+  }
+
+  const params = new HttpParams()
+    .set('isShort', 'true')
+    .set('menuType', 'videos')
+    .set('limit', limit.toString())
+    .set('page', page.toString())
+    .set('sort', '-publishedAt');
+
+  return this.apiService.get<YoutubeVideoInterface[]>(`youtube/videos`, params).pipe(
+    tap(videos => {
+      // Ensure videos is an array
+      const newVideos = Array.isArray(videos) ? videos : [];
+      
+      if (page === 0) {
+        // First page - replace cache
+        this.videosCache.next(newVideos);
+      } else {
+        // Subsequent pages - append to cache
+        this.videosCache.next([...currentCache, ...newVideos]);
+      }
+    }),
+    catchError(this.handleError)
+  );
+}
 
   /**
    * Search for Davido-related videos
