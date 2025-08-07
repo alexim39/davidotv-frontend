@@ -26,6 +26,9 @@ import { UserInterface } from '../../common/services/user.service';
           <div class="thumbnail-container">
             <img [src]="'https://i.ytimg.com/vi/' + video.youtubeVideoId + '/mqdefault.jpg'" alt="{{ video.title }}" class="thumbnail">                
             <span class="duration"> {{ formatDuration(video.duration) }}</span>
+            @if ( video.isShort || (video.durationSeconds && video.durationSeconds <= 120)) {
+              <div class="short-badge">SHORT</div>
+            }
           </div>
           <div class="video-details">
             <h4>{{ video.title }}</h4>

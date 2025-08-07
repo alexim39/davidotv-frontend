@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from '../common/services/api.service';
 import { HttpParams } from '@angular/common/http';
+import { YoutubeVideoInterface } from '../common/services/youtube.service';
 
 interface PlaylistResponse {
-  data: any[];
+  data: YoutubeVideoInterface[];
   pagination: {
     currentPage: number;
     pageSize: number;

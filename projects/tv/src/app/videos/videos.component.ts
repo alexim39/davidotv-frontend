@@ -297,7 +297,7 @@ export class VideosComponent implements OnInit, OnDestroy {
     this.loadingFullVideos = true;
     this.youtubeService.getAllFullVideos(this.pageSize, 0).subscribe({
       next: (fullVideos) => {
-        console.log('Initial full videos loaded:', fullVideos);
+        //console.log('Initial full videos loaded:', fullVideos);
         this.fullVideos = (fullVideos.data || []).filter((v: YoutubeVideoInterface) => !v.isShort && (!v.durationSeconds || v.durationSeconds > 120));
         this.filteredFullVideos = [...this.fullVideos];
         this.fullPage = 1;
