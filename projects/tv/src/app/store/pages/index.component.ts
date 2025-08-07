@@ -23,7 +23,7 @@ import { CategoryNavComponent } from './nav.component';
       <!-- Hero Banner -->
       <mat-card class="hero-banner mat-elevation-z0">
         <div class="hero-content">
-          <h1>Official Davido Merchandise</h1>
+          <h1><!-- Official --> Davido Merchandise</h1>
           <div class="animated-text-container">
             <div *ngFor="let message of messages; let i = index" 
                  class="animated-text"

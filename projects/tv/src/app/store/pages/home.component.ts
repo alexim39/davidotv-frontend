@@ -139,7 +139,7 @@ import { UserInterface, UserService } from '../../common/services/user.service';
         <mat-toolbar class="section-header">
           <h2>Limited Edition</h2>
           <span class="spacer"></span>
-          <p>Get these exclusive items before they're gone</p>
+          <!-- <p>Get these exclusive items before they're gone</p> -->
         </mat-toolbar>
         <mat-divider></mat-divider>
         @if (isLoading) {
@@ -189,6 +189,7 @@ import { UserInterface, UserService } from '../../common/services/user.service';
         color: #666;
         margin: 0;
         font-size: 0.9rem;
+        display: block !important;
       }
 
       .spacer {

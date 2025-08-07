@@ -288,14 +288,15 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       this.playerReady = true;
       this.isLoading = false;
 
-      this.cdr.detectChanges();
+      // Use a setTimeout to defer the value updates to the next change detection cycle.
+      setTimeout(() => {
+        const duration = this.player.getDuration();
+        this.duration = isNaN(duration) ? 0 : duration;
+        this.currentTime = isNaN(this.player.getCurrentTime()) ? 0 : this.player.getCurrentTime();
+        this.cdr.detectChanges(); // Manually trigger change detection after the update
+      }, 0);
 
-      const duration = this.player.getDuration();
-      this.duration = isNaN(duration) ? 0 : duration;
       this.startUpdateLoop();
-
-      const time = this.player.getCurrentTime();
-      this.currentTime = isNaN(time) ? 0 : time;
       this.startPlayerStatePolling();
 
       if (this.user?.preferences?.autoplay && !this.isPlaying) {
@@ -314,8 +315,13 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
         this.startWatchHistoryTracking();
 
+        // Check if duration is already set, if not, get it.
+        // Call getDuration directly without .then()
         if (this.duration === 0 || isNaN(this.duration)) {
-          this.getDuration();
+          const duration = this.player.getDuration();
+          if (!isNaN(duration) && duration > 0) {
+            this.duration = duration;
+          }
         }
       } else if (state === window.YT.PlayerState.PAUSED) {
         this.isPlaying = false;
@@ -495,7 +501,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.resetControlsTimer();
   }
 
-  getDuration() {
+  /* getDuration() {
     if (this.playerReady && this.player) {
       this.player.getDuration().then((duration: number) => {
         this.ngZone.run(() => {
@@ -508,6 +514,20 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       }).catch((error: any) => {
         console.error('Error getting duration:', error);
         setTimeout(() => this.getDuration(), 1000);
+      });
+    }
+  } */
+
+  getDuration() {
+    if (this.playerReady && this.player) {
+      const duration = this.player.getDuration();
+      this.ngZone.run(() => {
+        if (!isNaN(duration) && duration > 0) {
+          this.duration = duration;
+        } else {
+          // If the duration is not yet available, try again after a delay
+          setTimeout(() => this.getDuration(), 1000);
+        }
       });
     }
   }
@@ -542,7 +562,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       this.player.seekTo(0, true);
       this.playVideo();
     } else if (this.user?.preferences?.autoplay) {
-      console.log('video has ended, playing next...')
+      //console.log('video has ended, playing next...')
       this.playNextRecommendedVideo();
     } else {
       this.isPlaying = false;
@@ -944,9 +964,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   playNextRecommendedVideo() {
     if (this.recommendedVideos.length === 0) return;
 
-    const currentIndex = this.recommendedVideos.findIndex(video =>
-      video.youtubeVideoId === this.currentVideoId
-    );
+    const currentIndex = this.recommendedVideos.findIndex(video => video.youtubeVideoId === this.currentVideoId);
 
     let nextVideo;
 
