@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, } from 'rxjs';
 import { ApiService } from './api.service';
+import { SavedAccountInterface } from '../../payments/payment.service';
 
 export interface UserInterface {
   _id: string;
@@ -63,6 +64,27 @@ export interface UserInterface {
     hobbies: string[];
     favoriteTopics: string[];
   };
+  savedAccounts?: SavedAccountInterface[]; 
+  // transactions?: Array<{    
+  //   amount: number;
+  //   reference: string;
+  //   status: string;
+  //   paymentStatus?: boolean;
+  //   date: Date;
+  // }>;
+  balance?: number;
+  // withdrawalHistory?: Array<{ 
+  //   amount: number;
+  //   reference: string;
+  //   status: string;
+  //   date: Date;
+  // }>;
+  // withdrawalRequests?: Array<{ 
+  //   amount: number;
+  //   reference: string;
+  //   status: string;
+  //   date: Date;
+  // }>;
  
 }
 

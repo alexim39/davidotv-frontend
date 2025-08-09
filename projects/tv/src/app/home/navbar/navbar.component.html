@@ -183,9 +183,13 @@
         <mat-icon>chat</mat-icon>
         <span>Chat rooms</span>
       </a> -->
-      <a mat-button routerLink="/settings/account" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a mat-button routerLink="/settings" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon>settings</mat-icon>
         <span>Settings</span>
+      </a>
+      <a mat-button routerLink="/payment" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <mat-icon>payments</mat-icon>
+        <span>Payment</span>
       </a>
       <button mat-button (click)="logout(); toggleMobileMenu()">
         <mat-icon>logout</mat-icon>
@@ -222,6 +226,10 @@
     <button mat-menu-item routerLink="/library">
       <mat-icon>video_library</mat-icon>
       <span>Your Videos</span>
+    </button>
+    <button mat-menu-item routerLink="/payment">
+      <mat-icon>payments</mat-icon>
+      <span>Payment</span>
     </button>
     <button mat-menu-item routerLink="/settings/account">
       <mat-icon>settings</mat-icon>

@@ -18,9 +18,11 @@ import { MatButtonModule } from '@angular/material/button';
         <div class="message-container">
           <mat-icon class="info-icon">info</mat-icon>
           <p class="banner-text">
-            <span class="highlight-text">Legal Disclaimer:</span> 
-            This website is a <strong>non-commercial prototype</strong> created to showcase platform development capabilities. 
-            This is <strong>NOT an official Davido platform</strong> and has no connection to the artist or his management team.
+            <span class="highlight-text">Legal Notice:</span> 
+            This platform was independently developed as a <strong>fan-created demonstration</strong> to showcase engagement capabilities for Davido and his music community. 
+            This platform is <strong>currently not officially endorsed</strong> by Davido or his representatives. 
+            Created by fans for the fan community, this is presently a <strong>non-commercial project</strong> that operates independently. 
+            All trademarks, names, and intellectual property remain the property of their respective owners. 
            <!--  <a mat-button routerLink="plans" routerLinkActive="active" 
                [routerLinkActiveOptions]="{ exact: true }" 
                (click)="scrollToTop()" class="cta-link">

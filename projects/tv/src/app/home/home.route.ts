@@ -47,6 +47,7 @@ export const HomeRoutes: Routes = [
             { path: 'settings', loadChildren: () => import('../settings/settings.route').then(r => r.SettingsRoutes) }, 
             { path: 'chat', loadChildren: () => import('../chatroom/chatroom.route').then(r => r.ChatroomRoutes) }, 
             { path: 'audio', loadChildren: () => import('../audio/audio.route').then(r => r.AudioRoutes) }, 
+            { path: 'payment', loadChildren: () => import('../payments/payment-route').then(r => r.PaymentRoutes) },   
         ]
     }
 ];

@@ -149,7 +149,8 @@ import { HttpErrorResponse } from '@angular/common/http';
           h1 {
             font-weight: 700;
             margin-bottom: 1rem;
-            color: #8f0045;
+            //color: #8f0045;
+            font-size: 3.5rem;
           }
           
           .search-container {
