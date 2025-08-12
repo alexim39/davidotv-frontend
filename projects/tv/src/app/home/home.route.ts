@@ -1,7 +1,8 @@
 import { Routes } from "@angular/router";
 import { HomeContainerComponent } from "./home-container.component";
 import { HomeComponent } from "./home.component";
-import { VideoPlayerComponent } from "../video-player/video-player.component";
+import { VideoPlayerComponent } from "../video-player/desktop/video-player.component";
+import { VideoPlayerIndex } from "../video-player";
 
 
 export const HomeRoutes: Routes = [
@@ -27,9 +28,14 @@ export const HomeRoutes: Routes = [
             }, 
             { 
                 path: 'watch/:id', 
-                component: VideoPlayerComponent, 
+                component: VideoPlayerIndex, 
                 title: 'Watch Video - DavidoTV',
             },    
+           /*  { 
+                path: 'watch/:id', 
+                component: VideoPlayerComponent, 
+                title: 'Watch Video - DavidoTV',
+            },    */ 
             { path: 'videos', loadChildren: () => import('../videos/videos.route').then(r => r.VideosRoutes) },      
             { path: 'official', loadChildren: () => import('../videos/official/official.route').then(r => r.OfficialRoutes) },      
             { path: 'events', loadChildren: () => import('../event/event.route').then(r => r.EventRoutes) },      

@@ -2,10 +2,10 @@ import { Component, Input, Output, EventEmitter, HostListener, OnInit, OnChanges
 import { CommonModule } from '@angular/common';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
-import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat } from '../../common/utils/time.util';
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat } from '../../../common/utils/time.util';
 import { debounceTime, filter, fromEvent } from 'rxjs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { UserInterface } from '../../common/services/user.service';
+import { UserInterface } from '../../../common/services/user.service';
 
 @Component({
   selector: 'async-recommendations-sidebar',

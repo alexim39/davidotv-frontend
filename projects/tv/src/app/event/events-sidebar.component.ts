@@ -73,7 +73,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
           <mat-icon class="not-signed-in-message-icon">info</mat-icon>
           <h3>No Message found</h3>
           <p>We couldn't load message at this time. Please sign in to see message.</p>
-          
         </div>
       }
     </mat-card-content>
@@ -100,6 +99,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         <mat-card-header>
           <mat-card-title>Trending in Davidotv</mat-card-title>
         </mat-card-header>
+        @if (trendingEvents.length > 0) {
         <mat-card-content>
           <mat-list style="max-height: 500px; overflow-y: auto;">
             <mat-list-item *ngFor="let event of trendingEvents" style="padding: 1em 0;">
@@ -108,6 +108,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
             </mat-list-item>
           </mat-list>
         </mat-card-content>
+
+        } @else {
+
+          <div class="not-signed-in-message" style="padding: 2em;">
+            <mat-icon class="not-signed-in-message-icon">info</mat-icon>
+            <h3>No Event found</h3>
+            <p>We couldn't load event at this time. Please sign try again later.</p>
+          </div>
+        }
       </mat-card>
     </div>
   `,

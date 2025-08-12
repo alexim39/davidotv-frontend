@@ -1,0 +1,80 @@
+<div class="mobile-video-container" #videoContainer>
+  <!-- Video Player -->
+  <div class="video-wrapper" [class.loading]="isLoading">
+    <iframe 
+      #videoFrame
+      [src]="safeUrl"
+      width="100%"
+      height="100%"
+      frameborder="0"
+      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen
+    ></iframe>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" *ngIf="isLoading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- Video Controls Overlay -->
+    <div class="controls-overlay" *ngIf="showControls" (click)="$event.stopPropagation()">
+      <!-- Top Controls -->
+      <div class="top-controls">
+        <button mat-icon-button (click)="toggleMute()">
+          <mat-icon>{{ isMuted ? 'volume_off' : 'volume_up' }}</mat-icon>
+        </button>
+      </div>
+
+      <!-- Side Controls (Right) -->
+      <div class="side-controls">
+        <!-- Like Button -->
+        <div class="action-button" (click)="likeVideo()">
+          <mat-icon class="action-icon">{{ liked ? 'favorite' : 'favorite_border' }}</mat-icon>
+          <span class="action-count">{{ formatViewCount(appLikes) }}</span>
+        </div>
+
+        <!-- Comments Button -->
+        <div class="action-button" (click)="openComments()">
+          <mat-icon class="action-icon">comment</mat-icon>
+          <span class="action-count">{{ formatViewCount(commentsCount) }}</span>
+        </div>
+
+        <!-- Share Button -->
+        <div class="action-button" (click)="shareVideo()">
+          <mat-icon class="action-icon">share</mat-icon>
+        </div>
+
+        <!-- More Info Button -->
+        <div class="action-button" (click)="openVideoInfo()">
+          <mat-icon class="action-icon">info</mat-icon>
+        </div>
+      </div>
+
+      <!-- Bottom Controls -->
+      <div class="bottom-controls">
+        <div class="video-info" (click)="openVideoInfo()">
+          <div class="video-title">{{ currentVideo.title }}</div>
+          <div class="video-channel">{{ currentVideo.channel }}</div>
+        </div>
+
+        <div class="progress-container">
+          <div class="progress-bar" [style.width]="(currentTime / duration) * 100 + '%'"></div>
+        </div>
+        <div class="time-display">{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</div>
+      </div>
+    </div>
+
+    <!-- Play/Pause Button -->
+    <div class="center-controls" *ngIf="showControls">
+      <button mat-icon-button class="play-button" (click)="togglePlayPause()">
+        <mat-icon>{{ isPlaying ? 'pause' : 'play_arrow' }}</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Next Video Loading Indicator -->
+  <div class="next-video-loading" *ngIf="false">
+    <mat-spinner diameter="30"></mat-spinner>
+    <span>Loading next video...</span>
+  </div>
+</div>

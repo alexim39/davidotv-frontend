@@ -1,0 +1,260 @@
+
+// Variables
+$primary-color: #ff4b2b;
+$background-dark: #121212;
+$text-color: #ffffff;
+$text-muted: rgba(255, 255, 255, 0.7);
+$hover-bg: rgba(255, 255, 255, 0.1);
+$like-color: #ff2d55;
+
+// Mixins
+@mixin flex-center($direction: row, $justify: center, $align: center) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+}
+
+.mobile-video-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  overflow: hidden;
+  touch-action: pan-y;
+
+  .video-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+
+    &.loading {
+      iframe {
+        opacity: 0;
+      }
+    }
+
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    @include flex-center;
+    background-color: rgba(0, 0, 0, 0.5);
+    //z-index: 10;
+  }
+
+  .controls-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 30%, transparent 50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 16px;
+
+    .top-controls {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      
+
+      button {
+        color: white;
+        background-color: rgba(0, 0, 0, 0.3);
+        margin-right: 25px !important;
+      }
+    }
+
+    .side-controls {
+      position: absolute;
+      right: 16px;
+      bottom: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      max-width: calc(100vw - 45px); // Prevent overflow
+      padding-right: 25px; // Add padding to avoid clipping
+      box-sizing: border-box;
+
+      .action-button {
+        @include flex-center(column);
+        color: white;
+        text-align: center;
+        cursor: pointer;
+        width: 48px; // Ensure consistent width
+        overflow: hidden;
+
+        .action-icon {
+          font-size: 28px;
+          width: 28px;
+          height: 28px;
+          margin-bottom: 4px;
+        }
+
+        .action-count {
+          font-size: 12px;
+          font-weight: 500;
+          word-break: keep-all;
+        }
+
+        &:active {
+          transform: scale(1.1);
+        }
+      }
+    }
+
+
+    .bottom-controls {
+      width: 100%;
+      color: white;
+      padding-bottom: 16px;
+
+      .video-info {
+        margin-bottom: 12px;
+        cursor: pointer;
+
+        .video-title {
+          font-size: 16px;
+          font-weight: 500;
+          margin-bottom: 4px;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .video-channel {
+          font-size: 14px;
+          opacity: 0.9;
+        }
+      }
+
+      .progress-container {
+        width: 100%;
+        height: 3px;
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+        margin-bottom: 8px;
+        overflow: hidden;
+
+        .progress-bar {
+          height: 100%;
+          background-color: $primary-color;
+          transition: width 0.3s linear;
+        }
+      }
+
+      .time-display {
+        font-size: 12px;
+        opacity: 0.8;
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+  }
+
+  .center-controls {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+
+    .play-button {
+      color: white;
+      background-color: rgba(0, 0, 0, 0.5);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+
+      mat-icon {
+        font-size: 40px;
+        width: 40px;
+        height: 40px;
+      }
+    }
+  }
+
+  .next-video-loading {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    @include flex-center;
+    gap: 8px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+
+    mat-spinner {
+      ::ng-deep circle {
+        stroke: white;
+      }
+    }
+  }
+}
+
+// Bottom sheet styles
+.comments-bottom-sheet {
+  border-radius: 24px 24px 0 0;
+  max-height: 80vh;
+
+  .mat-bottom-sheet-container {
+    padding: 0;
+    border-radius: 24px 24px 0 0;
+    background-color: $background-dark;
+    color: $text-color;
+  }
+}
+
+// Animation for swipe hint
+@keyframes swipeHint {
+  0% { transform: translateX(0); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(-20px); opacity: 0; }
+}
+
+.swipe-hint {
+  position: absolute;
+  bottom: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 14px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: swipeHint 2s infinite;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}

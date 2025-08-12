@@ -9,13 +9,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { PlaylistService } from './playlist.service';
-import { YoutubeService, YoutubeVideoInterface } from '../common/services/youtube.service';
-import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat, formatLikeCount as likeFormat, formatDislikesCount as dislikesFormat } from '../common/utils/time.util';
+import { PlaylistService } from '../playlist.service';
+import { YoutubeService, YoutubeVideoInterface } from '../../common/services/youtube.service';
+import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat, formatLikeCount as likeFormat, formatDislikesCount as dislikesFormat } from '../../common/utils/time.util';
 import { Subscription, timer } from 'rxjs';
-import { UserInterface, UserService } from '../common/services/user.service';
+import { UserInterface, UserService } from '../../common/services/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { VideoService } from '../common/services/videos.service';
+import { VideoService } from '../../common/services/videos.service';
 import { VideoCommentsComponent } from './video-comments/video-comments.component';
 import { RecommendationsSidebarComponent } from './recommendations-sidebar/recommendations-sidebar.component';
 import { VideoCommentService, Comment } from './video-comments/video-comments.service';
@@ -863,9 +863,6 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   navigateToVideo(videoId: string) {
     this.router.navigate(['/watch', videoId]).then(() => {
-
-      this.scrollToTop();
-
       this.loadVideo(videoId);
       if (this.user?.preferences?.autoplay) {
         const checkPlayer = setInterval(() => {
@@ -874,6 +871,11 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
             this.player.playVideo();
           }
         }, 100);
+      }
+
+      // Add this conditional check
+      if (this.isMobile) {
+        this.scrollToTop();
       }
     });
   }

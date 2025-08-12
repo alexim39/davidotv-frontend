@@ -71,8 +71,8 @@
         width: 100%;
       }
       mat-form-field {
-        input {
-          color: white;
+        textarea {
+          color: white !important;
         }
       }
 
@@ -195,7 +195,7 @@
     .reply-box {
       margin-top: 16px;
       mat-form-field {
-        input {
+        textarea {
           color: white;
         }
       }

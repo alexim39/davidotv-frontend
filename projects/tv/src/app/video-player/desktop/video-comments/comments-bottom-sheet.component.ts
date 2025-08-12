@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit } from '@angula
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { VideoCommentsComponent } from './video-comments.component';
 import { MatIconModule } from '@angular/material/icon';
-import { UserInterface } from '../../common/services/user.service';
+import { UserInterface } from '../../../common/services/user.service';
 import { MatButtonModule } from '@angular/material/button';
 import { Subscription } from 'rxjs';
 import { VideoCommentService, Comment } from './video-comments.service';

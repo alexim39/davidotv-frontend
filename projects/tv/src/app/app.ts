@@ -1,13 +1,11 @@
-import { ViewportScroller } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { Router, NavigationEnd, RouterModule } from '@angular/router'; // <-- import Router, NavigationEnd
-import { filter } from 'rxjs/operators'; // <-- import filter
+import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router'; // <-- import Router, NavigationEnd
 
 @Component({
 selector: 'async-root',
 imports: [RouterModule],
 template: `
-  <div class="container" id="containerX">
+  <div class="container">
       <router-outlet />
   </div>
 `,
@@ -25,25 +23,4 @@ styles: `
 }
 `
 })
-export class App {
-   readonly viewportScroller = inject(ViewportScroller);
-   private router = inject(Router);
-
-   constructor() {
-     // Listen for route changes and scroll to top
-     this.router.events
-       .pipe(filter(event => event instanceof NavigationEnd))
-       .subscribe(() => this.scrollToTop());
-   }
-
-   private scrollToTop() {
-    // Scroll to specific element with id 'container' after navigation is complete
-    const element = document.getElementById('container');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      // Fallback to scrolling to top if element not found
-      this.viewportScroller.scrollToPosition([0, 0]);
-    }
-  }
-}
+export class App {}

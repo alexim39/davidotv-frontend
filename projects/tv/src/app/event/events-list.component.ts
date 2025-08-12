@@ -30,8 +30,20 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     </div>
 
     <div *ngIf="!loading && filteredEvents.length === 0" class="no-events-message">
-      <mat-icon color="warn">info</mat-icon>
-      No events found for this category.
+       <div class="no-results">
+          <mat-icon class="no-results-icon" aria-hidden="false" aria-label=" No events found for this category">info</mat-icon>
+          <h3> No events found for this category</h3>
+          <p>We couldn't load events at this time. Please try again.</p>
+          <button 
+            mat-flat-button 
+            color="primary" 
+            (click)="retry()"
+            aria-label="Retry loading events"
+          >
+            <mat-icon>refresh</mat-icon>
+            Try Again
+          </button>
+        </div>
     </div>
 
     <div class="events-grid" *ngIf="!loading">
@@ -229,16 +241,43 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       }
     }
 
-    .no-events-message {
-    text-align: center;
-    color: #8f0045;
-    margin: 2rem 0;
-    font-size: 1.1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-  }
+    .no-results {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 0;
+      gap: 16px;
+
+      .no-results-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        //color: #AAA;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+        font-weight: 500;
+        //color: #333;
+        margin: 0;
+      }
+
+      p {
+        font-size: 0.875rem;
+        color: #666;
+        margin: 0;
+        max-width: 300px;
+      }
+
+      button {
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
   `]
 })
 export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
@@ -298,18 +337,18 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
       this.cd.detectChanges();
   }
 
-   private applyCategoryFilter() {
-      if (!this.category || this.category === 'All') {
-        this.filteredEvents = this.events;
-      } else {
-        this.filteredEvents = this.events.filter(
-          e => (e.category || '').toLowerCase() === this.category.toLowerCase()
-        );
-      }
-      this.cd.detectChanges();
-    }
+  // private applyCategoryFilter() {
+  //   if (!this.category || this.category === 'All') {
+  //     this.filteredEvents = this.events;
+  //   } else {
+  //     this.filteredEvents = this.events.filter(
+  //       e => (e.category || '').toLowerCase() === this.category.toLowerCase()
+  //     );
+  //   }
+  //   this.cd.detectChanges();
+  // }
 
-   ngOnDestroy() {
+  ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
@@ -325,7 +364,7 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
   } 
 
 
-   private getEvents(): void {
+  private getEvents(): void {
     this.loading = true;
     this.cd.detectChanges();
 
@@ -468,5 +507,10 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
 
   isPastEvent(event: Event): boolean {
     return new Date(event.date) < new Date();
+  }
+
+   retry(): void {
+    this.loading = true;
+    this.getEvents();
   }
 }
