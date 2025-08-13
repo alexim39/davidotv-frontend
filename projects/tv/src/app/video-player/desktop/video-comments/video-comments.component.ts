@@ -12,7 +12,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../common/component/confirmationDialog.component';
-import { VideoCommentService } from './video-comments.service';
+import { VideoCommentService } from '../../video-comments.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 

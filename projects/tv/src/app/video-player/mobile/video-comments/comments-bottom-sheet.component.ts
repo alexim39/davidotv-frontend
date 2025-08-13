@@ -1,12 +1,12 @@
 // comments-bottom-sheet.component.ts
 import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bottom-sheet';
-import { VideoCommentsComponent } from './video-comments.component';
+import { VideoCommentsComponent } from '../../desktop/video-comments/video-comments.component';
 import { MatIconModule } from '@angular/material/icon';
 import { UserInterface } from '../../../common/services/user.service';
 import { MatButtonModule } from '@angular/material/button';
 import { Subscription } from 'rxjs';
-import { VideoCommentService, Comment } from './video-comments.service';
+import { VideoCommentService, Comment } from '../../video-comments.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
@@ -72,9 +72,9 @@ export class CommentsBottomSheetComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-      console.log('mobile user', this.data.user)
-      console.log('mobile comments', this.data.comments)
-      console.log('mobile videoId', this.data.videoId)
+      // console.log('mobile user', this.data.user)
+      // console.log('mobile comments', this.data.comments)
+      // console.log('mobile videoId', this.data.videoId)
   }
 
   dismiss() {

@@ -18,9 +18,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { VideoService } from '../../common/services/videos.service';
 import { VideoCommentsComponent } from './video-comments/video-comments.component';
 import { RecommendationsSidebarComponent } from './recommendations-sidebar/recommendations-sidebar.component';
-import { VideoCommentService, Comment } from './video-comments/video-comments.service';
+import { VideoCommentService, Comment } from '../video-comments.service';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { CommentsBottomSheetComponent } from './video-comments/comments-bottom-sheet.component';
+import { CommentsBottomSheetComponent } from '../mobile/video-comments/comments-bottom-sheet.component';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 
 declare global {

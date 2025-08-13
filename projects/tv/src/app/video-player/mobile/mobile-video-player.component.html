@@ -1,7 +1,6 @@
 <div class="mobile-video-container" #videoContainer>
-  <!-- Video Player -->
-  <div class="video-wrapper" [class.loading]="isLoading">
-    <iframe 
+  <div class="video-wrapper">
+    <iframe
       #videoFrame
       [src]="safeUrl"
       width="100%"
@@ -11,70 +10,160 @@
       allowfullscreen
     ></iframe>
 
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-overlay" *ngIf="isLoading()" @fadeInOut>
       <mat-spinner diameter="40"></mat-spinner>
+      <span class="loading-text">Loading...</span>
     </div>
 
-    <!-- Video Controls Overlay -->
-    <div class="controls-overlay" *ngIf="showControls" (click)="$event.stopPropagation()">
-      <!-- Top Controls -->
+    <div class="unmute-hint" *ngIf="isPlaying() && isMuted()" (click)="toggleMute()">
+      <mat-icon>volume_off</mat-icon>
+      <span class="unmute-text">Tap to unmute</span>
+    </div>
+
+    <div class="controls-overlay" 
+        *ngIf="showControls()" 
+        @fadeInOut
+        (click)="$event.stopPropagation()">
+      
       <div class="top-controls">
-        <button mat-icon-button (click)="toggleMute()">
-          <mat-icon>{{ isMuted ? 'volume_off' : 'volume_up' }}</mat-icon>
+        <button mat-icon-button 
+                class="control-button mute-button"
+                (click)="toggleMute()"
+                [attr.aria-label]="isMuted() ? 'Unmute' : 'Mute'">
+          <mat-icon>{{ isMuted() ? 'volume_off' : 'volume_up' }}</mat-icon>
         </button>
+        
+       <!--  <div class="video-progress-mini">
+          <div class="progress-bar-mini" [style.width.%]="progressPercentage()"></div>
+        </div> -->
       </div>
 
-      <!-- Side Controls (Right) -->
       <div class="side-controls">
-        <!-- Like Button -->
-        <div class="action-button" (click)="likeVideo()">
-          <mat-icon class="action-icon">{{ liked ? 'favorite' : 'favorite_border' }}</mat-icon>
-          <span class="action-count">{{ formatViewCount(appLikes) }}</span>
+        <div class="creator-avatar" (click)="openCreatorProfile()">
+          <img [src]="currentVideo.channelThumbnail || user?.avatar || '/img/ytch.jpeg'" 
+               alt="Creator" 
+               class="avatar-image">
+          <div class="follow-button" *ngIf="!isFollowing">
+            <mat-icon>add</mat-icon>
+          </div>
         </div>
 
-        <!-- Comments Button -->
+        <div class="action-button like-button" 
+              (click)="handleLikeAction()"
+              [@heartBeat]="liked() ? 'liked' : 'unliked'">
+          <div class="action-icon-wrapper">
+            <mat-icon class="action-icon" 
+                      [class.liked]="liked()">
+              {{ liked() ? 'favorite' : 'favorite_border' }}
+            </mat-icon>
+          </div>
+          <span class="action-count">{{ formattedLikes() }}</span>
+        </div>
+
         <div class="action-button" (click)="openComments()">
-          <mat-icon class="action-icon">comment</mat-icon>
-          <span class="action-count">{{ formatViewCount(commentsCount) }}</span>
+          <div class="action-icon-wrapper">
+            <mat-icon class="action-icon">comment</mat-icon>
+          </div>
+          <span class="action-count">{{ formattedComments() }}</span>
         </div>
 
-        <!-- Share Button -->
         <div class="action-button" (click)="shareVideo()">
-          <mat-icon class="action-icon">share</mat-icon>
+          <div class="action-icon-wrapper">
+            <mat-icon class="action-icon">share</mat-icon>
+          </div>
+          <span class="action-text">Share</span>
         </div>
 
-        <!-- More Info Button -->
+        <div class="action-button" (click)="saveVideo()">
+          <div class="action-icon-wrapper">
+            <mat-icon class="action-icon" 
+                      [class.saved]="saved()">
+              {{ saved() ? 'bookmark' : 'bookmark_border' }}
+            </mat-icon>
+          </div>
+          <span class="action-text">{{ saved() ? 'Saved' : 'Save' }}</span>
+        </div>
+
         <div class="action-button" (click)="openVideoInfo()">
-          <mat-icon class="action-icon">info</mat-icon>
+          <div class="action-icon-wrapper">
+            <mat-icon class="action-icon">more_horiz</mat-icon>
+          </div>
         </div>
       </div>
 
-      <!-- Bottom Controls -->
       <div class="bottom-controls">
         <div class="video-info" (click)="openVideoInfo()">
-          <div class="video-title">{{ currentVideo.title }}</div>
-          <div class="video-channel">{{ currentVideo.channel }}</div>
+          <div class="creator-info">
+            <span class="creator-name">{{ currentVideo.channel }}</span>
+            <mat-icon class="verified-icon" *ngIf="currentVideo?.verified">verified</mat-icon>
+          </div>
+          <div class="video-title" [title]="currentVideo.title">
+            {{ currentVideo.title }}
+          </div>
+          <div class="video-description" 
+               *ngIf="currentVideo?.description"
+               [class.expanded]="showFullDescription()">
+            {{ showFullDescription() ? currentVideo.description : (currentVideo.description | slice:0:100) }}
+            <span class="expand-toggle" 
+                  *ngIf="currentVideo.description && currentVideo.description.length > 100"
+                  (click)="toggleDescription($event)">
+              {{ showFullDescription() ? ' Show less' : '... Show more' }}
+            </span>
+          </div>
+
+          <div class="video-tags" *ngIf="currentVideo?.tags?.length">
+            <span class="tag" *ngFor="let tag of currentVideo.tags | slice:0:3">
+              #{{ tag }}
+            </span>
+          </div>
         </div>
 
         <div class="progress-container">
-          <div class="progress-bar" [style.width]="(currentTime / duration) * 100 + '%'"></div>
+          <div class="progress-bar" [style.width.%]="progressPercentage()"></div>
         </div>
-        <div class="time-display">{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</div>
+        
+        <div class="time-display">
+          <span>{{ formattedCurrentTime() }}</span>
+          <span class="separator">/</span>
+          <span>{{ formattedDuration() }}</span>
+        </div>
       </div>
     </div>
 
-    <!-- Play/Pause Button -->
-    <div class="center-controls" *ngIf="showControls">
-      <button mat-icon-button class="play-button" (click)="togglePlayPause()">
-        <mat-icon>{{ isPlaying ? 'pause' : 'play_arrow' }}</mat-icon>
+    <!-- <div class="center-controls" *ngIf="showControls() || !isPlaying()" @scaleAnimation>
+      <button mat-icon-button 
+              class="play-button"
+              (click)="togglePlayPause()"
+              [attr.aria-label]="isPlaying() ? 'Pause' : 'Play'">
+        <mat-icon>{{ isPlaying() ? 'pause' : 'play_arrow' }}</mat-icon>
       </button>
+    </div> -->
+
+    </div>
+
+  <div class="navigation-hints" *ngIf="showControls()" @fadeInOut>
+    <div class="hint hint-up">
+      <mat-icon>keyboard_arrow_up</mat-icon>
+      <span>Previous video</span>
+    </div>
+    <div class="hint hint-down">
+      <mat-icon>keyboard_arrow_down</mat-icon>
+      <span>Next video</span>
     </div>
   </div>
 
-  <!-- Next Video Loading Indicator -->
-  <div class="next-video-loading" *ngIf="false">
-    <mat-spinner diameter="30"></mat-spinner>
-    <span>Loading next video...</span>
+  <div class="like-animation-area left-area" (dblclick)="seekRelative(-10)">
+    <div class="seek-indicator">
+      <mat-icon>fast_rewind</mat-icon>
+      <span>10s</span>
+    </div>
   </div>
-</div>
+  
+  <div class="like-animation-area right-area" (dblclick)="seekRelative(10)">
+    <div class="seek-indicator">
+      <mat-icon>fast_forward</mat-icon>
+      <span>10s</span>
+    </div>
+  </div>
+
+  </div>

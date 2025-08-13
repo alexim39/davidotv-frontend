@@ -1,8 +1,7 @@
 // src/app/common/services/comment.service.ts
 import { Injectable } from '@angular/core';
-import { Observable, catchError, throwError } from 'rxjs';
-import { ApiService } from '../../../common/services/api.service';
-import { UserInterface } from '../../../common/services/user.service';
+import { Observable, } from 'rxjs';
+import { ApiService } from '../common/services/api.service';
 
 export interface Comment {
   _id?: string;
@@ -24,9 +23,7 @@ export interface Comment {
 @Injectable()
 export class VideoCommentService {
 
-   constructor(private apiService: ApiService) {}
-
-
+  constructor(private apiService: ApiService) {}
 
   addComment(videoId: string, userId: string, text: string): Observable<any> {
     return this.apiService.patch(`youtube/comment/add`, { userId, videoId, text }, undefined, true);

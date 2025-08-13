@@ -35,6 +35,16 @@ export interface YoutubeVideoInterface {
   appDislikes?: number;
   isShort?: boolean;
   durationSeconds?: number; // Duration in seconds
+  savedBy?: string; // User ID of the person who saved the video
+  verified?: boolean; // Whether the channel is verified
+  channelThumbnail?: {
+    default: string;
+    medium?: string;
+    high?: string;
+    standard?: string;
+    maxres?: string;
+  };
+  tags?: string[]; // Tags associated with the video
   
 }
 
