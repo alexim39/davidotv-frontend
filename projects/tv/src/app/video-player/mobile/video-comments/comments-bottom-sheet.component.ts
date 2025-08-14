@@ -10,11 +10,12 @@ import { VideoCommentService, Comment } from '../../video-comments.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'async-comments-bottom-sheet',
   providers: [VideoCommentService],
-  imports: [VideoCommentsComponent, MatIconModule, MatButtonModule, MatProgressBarModule],
+  imports: [VideoCommentsComponent, MatIconModule, CommonModule, MatButtonModule, MatProgressBarModule],
   template: `
     <div class="comments-bottom-sheet">
         <mat-progress-bar *ngIf="isLoading" mode="indeterminate"/>

@@ -1,4 +1,8 @@
 <div class="mobile-video-container" #videoContainer>
+
+  <mat-progress-bar mode="indeterminate" *ngIf="isLoading()" @fadeInOut/>
+
+
   <div class="video-wrapper">
     <iframe
       #videoFrame
@@ -10,15 +14,15 @@
       allowfullscreen
     ></iframe>
 
-    <div class="loading-overlay" *ngIf="isLoading()" @fadeInOut>
+   <!--  <div class="loading-overlay" *ngIf="isLoading()" @fadeInOut>
       <mat-spinner diameter="40"></mat-spinner>
       <span class="loading-text">Loading...</span>
-    </div>
+    </div> -->
 
-    <div class="unmute-hint" *ngIf="isPlaying() && isMuted()" (click)="toggleMute()">
+   <!--  <div class="unmute-hint" *ngIf="isPlaying() && isMuted()" (click)="toggleMute()">
       <mat-icon>volume_off</mat-icon>
       <span class="unmute-text">Tap to unmute</span>
-    </div>
+    </div> -->
 
     <div class="controls-overlay" 
         *ngIf="showControls()" 
@@ -139,17 +143,6 @@
       </button>
     </div> -->
 
-    </div>
-
-  <div class="navigation-hints" *ngIf="showControls()" @fadeInOut>
-    <div class="hint hint-up">
-      <mat-icon>keyboard_arrow_up</mat-icon>
-      <span>Previous video</span>
-    </div>
-    <div class="hint hint-down">
-      <mat-icon>keyboard_arrow_down</mat-icon>
-      <span>Next video</span>
-    </div>
   </div>
 
   <div class="like-animation-area left-area" (dblclick)="seekRelative(-10)">
@@ -165,5 +158,18 @@
       <span>10s</span>
     </div>
   </div>
+
+  @if (showControls()) {
+    <div class="navigation-hints" @fadeInOut>
+      <button class="navigation-hint hint-up" (click)="playPreviousVideo()">
+        <div class="arrow-icon">▲</div>
+        <!-- <span>Previous video</span> -->
+      </button>
+      <button class="navigation-hint hint-down" (click)="playNextVideo()">
+        <div class="arrow-icon">▼</div>
+        <!-- <span>Next video</span> -->
+      </button>
+    </div>
+  }
 
   </div>

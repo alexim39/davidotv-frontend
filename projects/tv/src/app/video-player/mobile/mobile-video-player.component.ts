@@ -33,6 +33,7 @@ import { PlaylistService } from '../playlist.service';
 import { VideoInfoSheetComponent } from './video-info-sheet.component';
 import { VideoCommentService } from '../video-comments.service';
 import { CommentsBottomSheetComponent } from './video-comments/comments-bottom-sheet.component';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 @Component({
   selector: 'async-mobile-video-player',
@@ -43,7 +44,8 @@ import { CommentsBottomSheetComponent } from './video-comments/comments-bottom-s
     MatButtonModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    CommonModule
+    CommonModule,
+    MatProgressBarModule
   ],
   templateUrl: './mobile-video-player.component.html',
   styleUrls: ['./mobile-video-player.component.scss'],
@@ -268,6 +270,7 @@ export class MobileVideoPlayerComponent implements OnInit, OnDestroy, AfterViewI
 
   // Navigation methods updated to use the single loading state
   playNextVideo() {
+    //console.log('nexting video')
     const nextVideo = this.getNextVideo();
     if (nextVideo) {
       // You've already correctly updated this to use the single isLoading state
@@ -277,6 +280,7 @@ export class MobileVideoPlayerComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   playPreviousVideo() {
+    //console.log('previous video')
     const prevVideo = this.getPreviousVideo();
     if (prevVideo) {
       this.isLoading.set(true); // Now uses the single loading state

@@ -102,7 +102,7 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 5;
+    //z-index: 5;
     background: linear-gradient(
       to bottom,
       rgba(0, 0, 0, 0.6) 0%,
@@ -131,6 +131,7 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         border-radius: 50%;
         @include flex-center;
         transition: $transition;
+        margin-top: 10px;
 
         &:hover {
           transform: scale(1.05);
@@ -739,5 +740,102 @@ $shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+
+
+
+.navigation-hints {
+  position: relative;
+  left: 10%;
+  top: 10%;
+  transform: translate(-50%, -50%);
+  
+  pointer-events: auto !important; // Enable interaction
+  z-index: 9999;        
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 500px; // Space between up and down arrows
+
+  .navigation-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: $text-color;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.9;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 12px 20px;
+    border-radius: 24px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    transition: $transition;
+    animation: pulseHint 3s ease-in-out infinite;
+    min-width: 140px;
+    //z-index: 1000;
+
+    .arrow-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+// Arrow animations
+.hint-up .arrow-icon {
+  animation: bounceUp 1.5s ease-in-out infinite;
+}
+
+.hint-down .arrow-icon {
+  animation: bounceDown 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseHint {
+  0%, 100% { 
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes bounceUp {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes bounceDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+
+// Responsive adjustments
+@media (max-width: 375px) {
+  .navigation-hints {
+    gap: 60px; // Smaller gap on smaller screens
+    
+    .navigation-hint {
+      font-size: 11px;
+      padding: 10px 16px;
+      min-width: 120px;
+      
+      .arrow-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
   }
 }
