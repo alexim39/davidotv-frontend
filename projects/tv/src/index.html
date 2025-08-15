@@ -2,17 +2,300 @@
 <html lang="en">
 <head>
   <style type="text/css">
-    body, html {height: 100%;}
-    .app-loading { position: relative;  display: flex;  flex-direction: column; align-items: center; justify-content: center; height: 100%; font-size: 12px; }
-    .app-loading .spinner {  height: 160px;  width: 160px;  animation: rotate 2s linear infinite;  transform-origin: center center;  position: absolute; top: 0; bottom: 0; left: 0; right: 0; margin: auto; }
-    .app-loading .spinner .path {  stroke-dasharray: 1, 200;  stroke-dashoffset: 0;  animation: dash 1.5s ease-in-out infinite;  stroke-linecap: round; stroke: #050111;  /* stroke: #006064 */;  }
-    @keyframes rotate {
-      100% {   transform: rotate(360deg);  }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    @keyframes dash {
-      0% {   stroke-dasharray: 1, 200;   stroke-dashoffset: 0;  }
-      50% {  stroke-dasharray: 89, 200;  stroke-dashoffset: -35px;  }
-      100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124px;   }
+
+    body, html {
+      height: 100%;
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+
+    .app-loading {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    /* Animated background particles */
+    .app-loading::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+      animation: backgroundPulse 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes backgroundPulse {
+      0% { opacity: 0.3; transform: scale(1); }
+      100% { opacity: 0.6; transform: scale(1.1); }
+    }
+
+    /* Floating particles */
+    .particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .particle:nth-child(1) { width: 4px; height: 4px; left: 10%; animation-delay: 0s; }
+    .particle:nth-child(2) { width: 6px; height: 6px; left: 20%; animation-delay: 1s; }
+    .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-delay: 2s; }
+    .particle:nth-child(4) { width: 5px; height: 5px; left: 40%; animation-delay: 0.5s; }
+    .particle:nth-child(5) { width: 4px; height: 4px; left: 50%; animation-delay: 1.5s; }
+    .particle:nth-child(6) { width: 7px; height: 7px; left: 60%; animation-delay: 2.5s; }
+    .particle:nth-child(7) { width: 3px; height: 3px; left: 70%; animation-delay: 0.8s; }
+    .particle:nth-child(8) { width: 5px; height: 5px; left: 80%; animation-delay: 1.8s; }
+    .particle:nth-child(9) { width: 4px; height: 4px; left: 90%; animation-delay: 0.3s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10%, 90% { opacity: 1; }
+      50% { transform: translateY(-10vh) rotate(180deg); }
+    }
+
+    /* Logo container */
+    .logo-container {
+      position: relative;
+      z-index: 3;
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    .logo-text {
+      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #8f0045, #96ceb4);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 4s ease-in-out infinite, logoGlow 2s ease-in-out infinite alternate;
+      letter-spacing: 2px;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    @keyframes logoGlow {
+      from { text-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
+      to { text-shadow: 0 0 30px rgba(255, 255, 255, 0.4), 0 0 40px rgba(255, 255, 255, 0.1); }
+    }
+
+    .tagline {
+      font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+      color: rgba(255, 255, 255, 0.8);
+      margin-top: 1rem;
+      font-weight: 300;
+      letter-spacing: 1px;
+      animation: fadeInUp 2s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Modern loading spinner */
+    .loading-container {
+      position: relative;
+      z-index: 3;
+      margin-bottom: 2rem;
+    }
+
+    .modern-spinner {
+      width: 60px;
+      height: 60px;
+      position: relative;
+      margin: 0 auto 1.5rem;
+    }
+
+    .spinner-ring {
+      position: absolute;
+      border: 3px solid transparent;
+      border-radius: 50%;
+      animation: spin 2s linear infinite;
+    }
+
+    .spinner-ring:nth-child(1) {
+      width: 60px;
+      height: 60px;
+      border-top-color: #ff6b6b;
+      animation-delay: 0s;
+    }
+
+    .spinner-ring:nth-child(2) {
+      width: 45px;
+      height: 45px;
+      top: 7.5px;
+      left: 7.5px;
+      border-top-color: #4ecdc4;
+      animation-delay: 0.3s;
+      animation-direction: reverse;
+    }
+
+    .spinner-ring:nth-child(3) {
+      width: 30px;
+      height: 30px;
+      top: 15px;
+      left: 15px;
+      border-top-color: #8f0045;
+      animation-delay: 0.6s;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Loading text and progress */
+    .loading-text {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: clamp(1rem, 3vw, 1.3rem);
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      animation: pulse 2s ease-in-out infinite;
+      text-align: center;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    /* Progress bar */
+    .progress-container {
+      width: 280px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #8f0045);
+      border-radius: 2px;
+      width: 0%;
+      animation: loadProgress 3s ease-in-out infinite;
+      position: relative;
+    }
+
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    @keyframes loadProgress {
+      0% { width: 0%; }
+      50% { width: 70%; }
+      100% { width: 100%; }
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* Status text */
+    .status-text {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: clamp(0.8rem, 2vw, 1rem);
+      margin-top: 1.5rem;
+      font-weight: 300;
+      text-align: center;
+    }
+
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+      .app-loading {
+        padding: 2rem 1rem;
+      }
+      
+      .logo-container {
+        margin-bottom: 2rem;
+      }
+      
+      .progress-container {
+        width: 240px;
+      }
+      
+      .modern-spinner {
+        width: 50px;
+        height: 50px;
+      }
+      
+      .spinner-ring:nth-child(1) {
+        width: 50px;
+        height: 50px;
+      }
+      
+      .spinner-ring:nth-child(2) {
+        width: 38px;
+        height: 38px;
+        top: 6px;
+        left: 6px;
+      }
+      
+      .spinner-ring:nth-child(3) {
+        width: 26px;
+        height: 26px;
+        top: 12px;
+        left: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .progress-container {
+        width: 200px;
+      }
+      
+      .logo-container {
+        margin-bottom: 1.5rem;
+      }
+    }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
    <!-- Metadata and SEO Optimization -->
@@ -23,7 +306,7 @@
    <!-- Primary SEO Tags -->
   <title>DavidoTV - Centralized Video Platform for Davido Fan Content</title>
   <meta name="description" content="Stay updated with DavidoTV – the #1 fan hub for exclusive Davido news, music, videos, events, and behind-the-scenes content. Your ultimate source for everything Davido and Afrobeats.">
-  <meta name="keywords" content="Davido, DavidoTV, Davido tv, Davido news, Davido music, Davido videos, 30BG fans, Davido fan site, Davido updates, Davido exclusive content, Afrobeat superstar, Nigerian music artist, Afrobeats news, Davido concerts, Behind the scenes Davido, OBO fan club, Davido lifestyle, Afrobeat entertainment, Davido fan community, Where to watch Davido music videos, Latest Davido tour updates 2025, Exclusive Davido interviews, How to join Davido’s fanbase, Top Davido collaborations, Best Davido moments with fans, Davido TV official platform">
+  <meta name="keywords" content="Davido, DavidoTV, Davido tv, 'Davido news', 'Davido music', 'Davido videos', '30BG fans', 'Davido fan site', Davido updates, 'Davido exclusive content', Afrobeat superstar, Nigerian music artist, Afrobeats news, Davido concerts, Behind the scenes Davido, OBO fan club, Davido lifestyle, Afrobeat entertainment, Davido fan community, Where to watch Davido music videos, Latest Davido tour updates 2025, Exclusive Davido interviews, How to join Davido's fanbase, Top Davido collaborations, Best Davido moments with fans, Davido TV official platform">
   <meta name="author" content="DavidoTV Team (Alex Imenwo)">
   <link rel="canonical" href="https://davidotv.com/" />
   <meta name="robots" content="index, follow" />
@@ -45,17 +328,49 @@
     
   
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body class="mat-typography">
   <async-root>
     <main class="app-loading">
-      <div class="logo">Loading Davido TV!</div>
-      <svg class="spinner" viewBox="25 25 50 50">
-        <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="1" stroke-miterlimit="10"/>
-      </svg>
+      <!-- Floating particles background -->
+      <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+      </div>
+
+      <!-- Logo and branding -->
+      <div class="logo-container">
+        <div class="logo-text">DavidoTV</div>
+        <div class="tagline">Your Ultimate Davido Experience</div>
+      </div>
+
+      <!-- Modern loading animation -->
+      <div class="loading-container">
+        <div class="modern-spinner">
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+        </div>
+        
+        <div class="loading-text">Loading amazing content...</div>
+        
+        <!-- Progress bar -->
+        <div class="progress-container">
+          <div class="progress-bar"></div>
+        </div>
+        
+        <div class="status-text">Preparing your Davido experience</div>
+      </div>
     </main>
   </async-root>
 </body>
