@@ -6,12 +6,17 @@
 .premium-merch-section {
   margin: 0 auto 64px;
   max-width: 1800px;
-  padding: 20px 24px;
+  padding: 24px;
   position: relative;
-  //background: linear-gradient(to bottom, rgba(2, 2, 2, 0.9) 0%, rgba(12, 4, 4, 0.9) 100%);
-  border-radius: 16px;
-  border: 1px solid rgba(28, 5, 5, 0.4);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.09);
+  background: #0B0B0C;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+  overflow: hidden;
+}
+.premium-merch-section::before {
+  content: ''; position: absolute; inset: 0 0 auto 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(251,113,133,0.18), transparent);
 }
 
 .section-header {
@@ -31,9 +36,9 @@
       bottom: 0;
       left: 0;
       width: 80px;
-      height: 3px;
-      background: linear-gradient(to right, #8f0045, #FF4D4D);
-      border-radius: 3px;
+      height: 2.5px;
+      background: linear-gradient(90deg, #BE123C, #FB7185);
+      border-radius: 999px;
     }
   }
 
@@ -44,14 +49,10 @@
   }
 
   .icon-wrapper {
-    background: linear-gradient(135deg, #8f0045 0%, #FF4D4D 100%);
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(143, 0, 69, 0.2);
+    background: linear-gradient(135deg, #BE123C 0%, #FB7185 100%);
+    width: 56px; height: 56px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 24px rgba(225,29,72,0.30);
   }
 
   .section-icon {
@@ -148,7 +149,7 @@
     }
     
     .product-title {
-      color: #8f0045;
+      color: #FB7185;
     }
   }
 
@@ -294,14 +295,15 @@
 }
 
 .price {
-  font-weight: 700;
-  color: #8f0045;
+  font-weight: 800;
+  background: linear-gradient(135deg,#BE123C,#FB7185);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   font-size: 1.15rem;
 }
-
 .discount-price {
-  font-weight: 700;
-  color: #8f0045;
+  font-weight: 800;
+  background: linear-gradient(135deg,#BE123C,#FB7185);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   font-size: 1.15rem;
 }
 

@@ -89,10 +89,12 @@ template: `
 styles: [`
 
 a {
-	color: #333;
-	font-size: 14px;
+	color: #FB7185;
+	font-size: 13px;
+  font-weight: 600;
 	text-decoration: none;
-	margin: 15px 0;
+	margin: 12px 0;
+  &:hover { color: #F8F7F8; text-decoration: underline; text-underline-offset: 3px; }
 }
 
 form {
@@ -102,31 +104,47 @@ form {
 	flex-direction: column;
 	height: 100%;
 	text-align: center;
+  background: transparent;
+  color: #F8F7F8;
   h1 {
-    font-size: 1.2em;
+    font-size: 1.35em;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    background: linear-gradient(135deg,#F8F7F8 0%, #FB7185 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   }
   span {
     font-size: 12px;
     margin-bottom: 1em;
+    color: #A1A1AA;
+    letter-spacing: 0.02em;
   }
 	mat-form-field {
-		width: 80%;
-    
+		width: 86%;
+		margin-top: 6px;
 		div {
 			cursor: pointer;
-			mat-icon {
-				font-size: 1rem;
-			}
+			mat-icon { font-size: 1rem; color: #A1A1AA; }
 		}
 	}
 
   .tnc {
     font-size: 0.8em;
-    color: gray;
+    color: #A1A1AA;
+    --mdc-switch-selected-handle-color: #E11D48;
+    --mdc-switch-selected-track-color: rgba(225,29,72,0.35);
   }
 
-  button {
-    margin: 1em 0;
+  button[mat-flat-button] {
+    margin: 14px 0 6px;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg,#BE123C,#FB7185) !important;
+    color: white !important;
+    font-weight: 700;
+    height: 44px;
+    padding: 0 22px !important;
+    box-shadow: 0 8px 24px rgba(225,29,72,0.35);
+    &:disabled { opacity: 0.55; }
   }
 
 }

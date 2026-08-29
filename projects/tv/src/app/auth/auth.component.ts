@@ -99,10 +99,14 @@ import { AuthService } from './auth.service';
   styles: [`
     .container {
       position: relative;
-      overflow: auto; /* Changed from hidden to visible */
+      overflow: hidden;
       width: 800px;
       max-width: 100%;
-      min-height: 520px; /* Increased from 500px to accommodate social buttons */
+      min-height: 540px;
+      background: #131316;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.65);
     }
 
     .form-container {
@@ -164,8 +168,7 @@ import { AuthService } from './auth.service';
     }
 
     .overlay {
-      background: #8f0045;
-      background: linear-gradient(to right, #8f0045, #8f0045);
+      background: linear-gradient(135deg, #0B0B0C 0%, #1A1A1E 40%, #BE123C 100%);
       color: #ffffff;
       position: relative;
       left: -100%;
@@ -173,6 +176,12 @@ import { AuthService } from './auth.service';
       width: 200%;
       transform: translateX(0);
       transition: transform 0.6s ease-in-out;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .overlay::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 20%, rgba(251,113,133,0.18), transparent 60%);
+      pointer-events: none;
     }
 
     .container.right-panel-active .overlay-container {

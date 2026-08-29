@@ -63,46 +63,37 @@ import { UpcomingEventComponent } from './upcoming-event.component';
   `,
   styles: [`
     .community-section {
-      padding: 2rem;
-      //background: #fafafa;
-      margin-top: 2rem;
-      border-radius: 10px;
+      padding: 28px 24px;
+      margin-top: 28px;
+      background: #0B0B0C;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+      overflow: hidden;
+      position: relative;
     }
-
+    .community-section::before {
+      content: ''; position: absolute; inset: 0 0 auto 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(251,113,133,0.18), transparent);
+    }
     .section-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 10px; margin-bottom: 18px;
+      padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.06);
     }
-
     .section-icon {
-      margin-right: 8px;
-      //color: #8f0045;
+      width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px;
+      background: linear-gradient(135deg, #BE123C, #FB7185); color: white; font-size: 18px; box-shadow: 0 4px 16px rgba(225,29,72,0.25);
     }
-
-    
-    h2 {
-      margin: 0;
-      flex: 1;
-      font-size: clamp(1rem, 2vw, 1.25rem);
-      font-weight: 500;
-    }
-
-
-
+    h2 { margin: 0; flex: 1; font-size: clamp(1.05rem,2vw,1.35rem); font-weight: 800; letter-spacing: -0.01em; color: #F8F7F8; }
     .posts-container {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-top: 1rem;
-      height: 900px;              /* Fixed height */
-      overflow-y: auto;  
+      display: flex; flex-direction: column; gap: 14px; margin-top: 18px;
+      height: 860px; overflow-y: auto; padding-right: 6px;
+      scrollbar-width: thin; scrollbar-color: rgba(251,113,133,0.30) transparent;
     }
-
-    .post-card {
-      width: 100%;
-    }
+    .post-card { width: 100%; }
+    :host ::ng-deep .mat-mdc-tab-group { --mdc-tab-indicator-active-indicator-color: #E11D48; }
+    :host ::ng-deep .mat-mdc-tab-labels { gap: 4px; }
+    :host ::ng-deep .mat-mdc-tab { border-radius: 999px; }
   `]
 })
 export class CommunityComponent implements OnInit, OnDestroy {

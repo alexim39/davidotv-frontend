@@ -1,10 +1,17 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-    { path: '', loadChildren: () => import('./home/home.route').then(r => r.HomeRoutes) },
-    //{ path: 'store', loadChildren: () => import('./store/store.route').then(r => r.StoreRoutes) },
-    { path: 'legal', loadChildren: () => import('./legal/legal-routes').then(r => r.legalRoutes) },
-    
+  { path: '', loadChildren: () => import('./home/home.route').then(r => r.HomeRoutes) },
+  { path: 'legal', loadChildren: () => import('./legal/legal-routes').then(r => r.legalRoutes) },
 
-
+  // ── New modular feature routes (domain-driven) ──────
+  // Talent Hub - Next Global Star (primary rebrand)
+  { path: 'talent', loadChildren: () => import('./features/community/talent-hub/talent-hub.routes').then(r => r.TalentHubRoutes) },
+  // Media - cached YouTube pipeline
+  { path: 'media', loadChildren: () => import('./features/media/media.routes').then(r => r.MediaRoutes) },
+  // User profile (isolated domain)
+  { path: 'profile', loadComponent: () => import('./features/user-profile/profile.component').then(m => m.ProfileComponent), title: 'Profile — DavidO TV' },
+  // Back-compat aliases
+  { path: 'upload', redirectTo: 'talent/upload', pathMatch: 'full' },
+  { path: 'curated', redirectTo: 'talent/curated', pathMatch: 'full' },
 ];

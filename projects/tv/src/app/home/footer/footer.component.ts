@@ -137,11 +137,19 @@ import { RouterModule } from '@angular/router';
   `,
   styles: [`
     .main-footer {
-      background-color: #0a0a0a;
-      color: rgba(255, 255, 255, 0.9);
-      padding: 48px 0 0;
+      background: #0B0B0C;
+      color: #F8F7F8;
+      padding: 56px 0 0;
       font-family: 'Roboto', sans-serif;
       line-height: 1.6;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    .main-footer::before {
+      content: ''; position: absolute; inset: 0 0 auto 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(251,113,133,0.22), transparent);
+      opacity: 0.9;
     }
 
     .footer-content {
@@ -167,10 +175,10 @@ import { RouterModule } from '@angular/router';
           position: absolute;
           left: 0;
           bottom: 0;
-          width: 40px;
-          height: 2px;
-          //background: #ff5500;
-          background: #8f0045;
+          width: 36px;
+          height: 2.5px;
+          background: linear-gradient(90deg, #BE123C, #FB7185);
+          border-radius: 999px;
         }
       }
 
@@ -215,13 +223,17 @@ import { RouterModule } from '@angular/router';
 
 
         .tagline {
-          color: #ccc;
-          font-size: 8.5px;
-          margin: -1em 0 0;
-          border: 1px solid #ccc;
-          padding: 0.2rem 0.5rem;
+          color: #A1A1AA;
+          font-size: 10px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          margin: 6px 0 0;
+          border: 1px solid rgba(255,255,255,0.10);
+          background: rgba(255,255,255,0.06);
+          backdrop-filter: blur(8px);
+          padding: 4px 8px;
           width: fit-content;
-          border-radius: 10px;
+          border-radius: 999px;
         }
       }
 
@@ -242,8 +254,7 @@ import { RouterModule } from '@angular/router';
           mat-icon {
             margin-right: 8px;
             font-size: 16px;
-            //color: #ff5500;
-            color: #8f0045;
+            color: #FB7185;
           }
         }
       }
@@ -284,7 +295,13 @@ import { RouterModule } from '@angular/router';
 
         button {
           align-self: flex-start;
-          font-weight: 500;
+          font-weight: 700;
+          border-radius: 999px !important;
+          background: linear-gradient(135deg, #BE123C, #FB7185) !important;
+          color: white !important;
+          box-shadow: 0 8px 24px rgba(225,29,72,0.35);
+          padding: 0 18px;
+          height: 40px;
         }
       }
 
@@ -302,8 +319,9 @@ import { RouterModule } from '@angular/router';
     }
 
     .footer-bottom {
-      background-color: rgba(0, 0, 0, 0.2);
-      padding: 20px 24px;
+      background: #0B0B0C;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 22px 24px;
       text-align: center;
 
       .social-links {
@@ -340,12 +358,11 @@ import { RouterModule } from '@angular/router';
           align-items: center;
           justify-content: center;
           margin-top: 8px;
-
+          color: #A1A1AA;
           mat-icon {
-            //color: #ff5500;
-            color: #8f0045;
+            color: #FB7185;
             font-size: 14px;
-            margin: 4px 0 0 2px;
+            margin: 4px 0 0 4px;
           }
         }
       }

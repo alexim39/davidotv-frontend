@@ -1,0 +1,36 @@
+@use './variables' as *;
+@use './mixins' as *;
+
+// Global glass utilities for premium Afrobeats aesthetic
+.glass-surface {
+  @include glass;
+  border-radius: $radius-md;
+  box-shadow: $shadow-soft;
+}
+
+.glass-card {
+  @include glass;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  @include card-hover;
+}
+
+.rose-btn {
+  @include rose-gradient-bg;
+  border-radius: $radius-pill;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: filter $transition, transform $transition;
+  &:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  &:active { transform: translateY(0); filter: brightness(0.98); }
+}
+
+.obsidian-bg {
+  background: $obsidian;
+  color: $text-primary;
+}
+
+.skeleton {
+  @include skeleton-shimmer;
+  border-radius: $radius-sm;
+}

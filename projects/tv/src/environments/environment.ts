@@ -1,0 +1,17 @@
+/**
+ * Environment config - zoneless + signal safe.
+ * apiUrl is used by core/ApiService.
+ */
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000',
+  firebase: {
+    apiKey: "AIzaSyBrwGNcGk0Tt1drGhUDcz1WTCX_CM62ibo",
+    authDomain: "davidotv-39aeb.firebaseapp.com",
+    projectId: "davidotv-39aeb",
+    storageBucket: "davidotv-39aeb.firebasestorage.app",
+    messagingSenderId: "440666214473",
+    appId: "1:440666214473:web:b04983ae04f8765b94ef98",
+    measurementId: "G-J1TWLE4V2P"
+  }
+};

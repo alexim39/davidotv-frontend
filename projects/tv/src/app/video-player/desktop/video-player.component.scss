@@ -1,9 +1,9 @@
-// Variables
-$primary-color: #ff4b2b;
-$background-dark: #121212;
-$text-color: #ffffff;
-$text-muted: rgba(255, 255, 255, 0.7);
-$hover-bg: rgba(255, 255, 255, 0.1);
+// Variables — Midnight Luxury
+$primary-color: #E11D48; // rose
+$background-dark: #0B0B0C; // obsidian
+$text-color: #F8F7F8;
+$text-muted: #A1A1AA;
+$hover-bg: rgba(255,255,255,0.06);
 $youtube-red: #ff0000;
 $like-green: #4caf50;
 $dislike-red: #f44336;
@@ -73,9 +73,11 @@ $breakpoint-mobile: 768px;
   @include flex-center(12px);
   
   .premium-btn {
-    background: linear-gradient(90deg, #8f0045, #ff416c);
-    font-weight: 500;
+    background: linear-gradient(135deg, #BE123C 0%, #E11D48 50%, #FB7185 100%);
+    font-weight: 700;
     color: white;
+    border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(225,29,72,0.35);
   }
 }
 
