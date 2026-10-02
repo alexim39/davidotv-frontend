@@ -33,6 +33,7 @@ export class PlaylistService {
       params = params.set('menuType', menuType);
     }
 
-    return this.apiService.get<PlaylistResponse>(`youtube/videos/playlist`, params);
+    // API-01: same params/response as legacy (see docs youtube-parity.md).
+    return this.apiService.get<PlaylistResponse>(`api/v1/youtube/videos/playlist`, params);
   }
 }

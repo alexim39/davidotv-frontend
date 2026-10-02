@@ -26,29 +26,28 @@ export class VideoCommentService {
 
   constructor(private apiService: ApiService) {}
 
-  // API-01: RESTful create (session user used server-side). Reply/like/delete
-  // stay on legacy until ported (see docs youtube-parity.md).
+  // API-01: RESTful engagement (session user used server-side; same response
+  // keys as legacy — see docs youtube-parity.md).
   addComment(videoId: string, userId: string, text: string): Observable<any> {
     return this.apiService.post(`api/v1/youtube/videos/${videoId}/comments`, { text }, undefined, true);
   }
 
   addReply(videoId: string, parentCommentId: string, userId: string, text: string): Observable<any>  {
-    return this.apiService.patch(`youtube/comment/reply/add`, { userId,  videoId,  parentCommentId,  text }, undefined, true);
+    return this.apiService.post(`api/v1/youtube/videos/${videoId}/comments/${parentCommentId}/replies`, { text }, undefined, true);
   }
 
   // Delete comment by ID
   deleteComment(commentId: string, userId: string, videoId: string): Observable<any> {
-    return this.apiService.delete<any>(`youtube/comment/delete/${commentId}/${userId}/${videoId}`, undefined, undefined, true);
+    return this.apiService.delete<any>(`api/v1/youtube/videos/${videoId}/comments/${commentId}`, undefined, undefined, true);
   }
 
   // Delete reply by ID
   deleteReply(parentCommentId: string, replyId: string, userId: string, videoId: string): Observable<any> {
-    console.log('values ', parentCommentId, replyId, userId, videoId)
-    return this.apiService.delete<any>(`youtube/comment/reply/delete/${parentCommentId}/${replyId}/${userId}/${videoId}`, undefined, undefined, true);
+    return this.apiService.delete<any>(`api/v1/youtube/videos/${videoId}/comments/${parentCommentId}/replies/${replyId}`, undefined, undefined, true);
   }
 
   likeComment(videoId: string, commentId: string, userId: string): Observable<any>  {
-    return this.apiService.patch(`youtube/comment/like/${commentId}/${videoId}`, { userId }, undefined, true );
+    return this.apiService.post(`api/v1/youtube/videos/${videoId}/comments/${commentId}/like`, {}, undefined, true);
   }
 
 }
