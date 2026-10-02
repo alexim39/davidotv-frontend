@@ -17,7 +17,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ProductInterface, StoreService } from '../../services/store.service';
 import { WishlistMoveToCartDialogComponent } from './wishlist-dialog.component';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
@@ -760,13 +759,11 @@ export class WishlistComponent implements OnInit, OnDestroy {
               this.isLoading = false;
               this.cdr.markForCheck(); // Trigger change detection
             },
-            error: (error: HttpErrorResponse) => {
+            // FE-01: normalized error shape {status,message,requestId}.
+            error: (error: any) => {
                 this.isLoading = false;
 
-                let errorMessage = 'Server error occurred, please try again.'; // default error message.
-                if (error.error && error.error.message) {
-                    errorMessage = error.error.message; // Use backend's error message if available.
-                }  
+                const errorMessage = error?.message || 'Server error occurred, please try again.';
                 this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
                 this.cdr.markForCheck();
             }
@@ -788,12 +785,10 @@ export class WishlistComponent implements OnInit, OnDestroy {
           this.isRecommendationsLoading = false;
           this.cdr.markForCheck(); // Trigger change detection
         },
-        error: (error: HttpErrorResponse) => {
+        // FE-01: normalized error shape {status,message,requestId}.
+        error: (error: any) => {
           this.isRecommendationsLoading = false;
-          let errorMessage = 'Failed to load recommendations';
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message;
-          }
+          const errorMessage = error?.message || 'Failed to load recommendations';
           this.snackBar.open(errorMessage, 'Ok', { duration: 3000 });
           this.cdr.markForCheck();
         }

@@ -18,7 +18,6 @@ import { StoreService, ProductInterface } from '../../services/store.service';
 import { catchError, finalize, of, Subscription } from 'rxjs';
 import { CartService } from '../cart/cart.service';
 import { UserInterface, UserService } from '../../../common/services/user.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 @Component({
@@ -850,12 +849,10 @@ export class ProductDetailComponent implements OnInit {
         this.isSubmitting = false;
         this.cdr.markForCheck();
       },
-       error: (error: HttpErrorResponse) => {
+       // FE-01: normalized error shape {status,message,requestId}.
+       error: (error: any) => {
         //this.cdr.markForCheck();
-        let errorMessage = 'Server error occurred, please try again.'; // default error message.
-        if (error.error && error.error.message) {
-          errorMessage = error.error.message; // Use backend's error message if available.
-        }  
+        const errorMessage = error?.message || 'Server error occurred, please try again.';
         this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
         this.isSubmitting = false;
         this.cdr.markForCheck();
@@ -886,15 +883,13 @@ export class ProductDetailComponent implements OnInit {
           this.cdr.markForCheck();
         }
       },
-      error: (error: HttpErrorResponse) => {
+      // FE-01: normalized error shape {status,message,requestId}.
+      error: (error: any) => {
           this.isSubmitting = false;
           this.isInWishlist = false; // Reset to false if error occurs
           this.cdr.markForCheck();
 
-          let errorMessage = 'Server error occurred, please try again.'; // default error message.
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message; // Use backend's error message if available.
-          }  
+          const errorMessage = error?.message || 'Server error occurred, please try again.';
           this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
 
         }

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import { ApiService } from '../../../common/services/api.service';
+// FE-01 store domain migrated: transport via core. Errors NORMALIZED.
+import { ApiService } from '../../../core/services/api.service';
 import { ProductInterface } from '../../services/store.service';
 
 export interface CartInterface {

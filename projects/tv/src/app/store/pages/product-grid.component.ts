@@ -10,7 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ProductInterface, StoreService } from '../services/store.service';
 import { UserInterface, UserService } from '../../common/services/user.service';
-import { HttpErrorResponse } from '@angular/common/http';
+
 import { CartService } from './cart/cart.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { Subscription } from 'rxjs';
@@ -563,13 +563,11 @@ export class ProductGridComponent implements OnInit {
         this.loadingProductId = null;
         this.cdr.markForCheck();
       },
-      error: (error: HttpErrorResponse) => {
+      // FE-01: normalized error shape {status,message,requestId}.
+      error: (error: any) => {
         this.loadingProductId = null;
         this.cdr.markForCheck();
-        let errorMessage = 'Server error occurred, please try again.';
-        if (error.error && error.error.message) {
-          errorMessage = error.error.message;
-        }  
+        const errorMessage = error?.message || 'Server error occurred, please try again.';
         this.snackBar.open(errorMessage, 'Ok', {duration: 3000});
       }
     });
@@ -589,11 +587,9 @@ export class ProductGridComponent implements OnInit {
           this.wishlistUpdated.emit();
         }
       },
-      error: (error: HttpErrorResponse) => {
-        let errorMessage = 'Server error occurred, please try again.';
-        if (error.error && error.error.message) {
-          errorMessage = error.error.message;
-        }  
+      // FE-01: normalized error shape {status,message,requestId}.
+      error: (error: any) => {
+        const errorMessage = error?.message || 'Server error occurred, please try again.';
         this.snackBar.open(errorMessage, 'Ok', {duration: 3000});
       }
     });
