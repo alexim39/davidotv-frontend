@@ -14,6 +14,6 @@ export const adminGuard: CanActivateFn = () => {
 
   if (auth.isAdmin()) return true;
   snack.open('Admin access required', 'Dismiss', { duration: 2500 });
-  router.navigate(['/']);
+  router.navigate(['/forbidden']);
   return false;
 };

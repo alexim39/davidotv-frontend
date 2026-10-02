@@ -5,8 +5,8 @@ import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 /**
- * Global error normalisation: 401 -> redirect, 429 -> toast, 5xx -> toast.
- * Keeps feature services lean.
+ * Global error normalisation: 401 -> /auth, 403 -> /forbidden, 429 -> toast,
+ * 5xx -> toast. Keeps feature services lean.
  */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
@@ -21,6 +21,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         // Let auth guard handle, but give feedback
         snack.open('Session expired. Please sign in.', 'Dismiss', { duration: 3000 });
         router.navigate(['/auth']);
+      } else if (status === 403) {
+        snack.open('Not allowed.', 'Dismiss', { duration: 3000 });
+        router.navigate(['/forbidden']);
       } else if (status === 429) {
         snack.open('Too many requests. Slow down.', 'Dismiss', { duration: 3000 });
       } else if (status >= 500) {

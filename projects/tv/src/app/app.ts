@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router'; // <-- import Router, NavigationEnd
+import { OfflineBannerComponent } from './shared/components/offline-banner/offline-banner.component';
 
 @Component({
 selector: 'async-root',
-imports: [RouterModule],
+imports: [RouterModule, OfflineBannerComponent],
 template: `
   <div class="container">
+      <async-offline-banner />
       <router-outlet />
   </div>
 `,

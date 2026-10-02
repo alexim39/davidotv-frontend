@@ -15,6 +15,7 @@ export const routes: Routes = [
   // Back-compat aliases
   { path: 'upload', redirectTo: 'talent/upload', pathMatch: 'full' },
   { path: 'curated', redirectTo: 'talent/curated', pathMatch: 'full' },
+  { path: 'forbidden', loadComponent: () => import('./shared/components/forbidden/forbidden.component').then(m => m.ForbiddenComponent), title: 'Not allowed — DavidO TV' },
   // FE-01: catch-all must stay last
   { path: '**', loadComponent: () => import('./shared/components/not-found/not-found.component').then(m => m.NotFoundComponent), title: 'Not found — DavidO TV' },
 ];
