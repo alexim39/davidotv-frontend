@@ -22,7 +22,6 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { EventsListComponent } from './events-list.component';
 import { Subscription } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-event',
@@ -336,7 +335,7 @@ export class EventComponent implements OnInit, OnDestroy {
           this.loading = false;
           this.cd.detectChanges();
         },
-        error: (eror: HttpErrorResponse) => {
+        error: (eror: any) => {
           this.featuredEvents = [];
           this.loading = false;
           this.cd.detectChanges();
@@ -378,7 +377,7 @@ export class EventComponent implements OnInit, OnDestroy {
                   this.loading = false;
                   this.cd.detectChanges();
               },
-              error: (error: HttpErrorResponse) => {
+              error: (error: any) => {
                   this.featuredEvents = [];
                   this.loading = false;
                   this.cd.detectChanges();

@@ -7,7 +7,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { Event } from './event.model';
 import { finalize, Subscription } from 'rxjs';
 import { EventService } from './event.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UserInterface, UserService } from '../common/services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -391,7 +390,7 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
           this.loading = false;
           this.cd.detectChanges();
         },
-        error: (error: HttpErrorResponse) => {
+        error: (error: any) => {
           this.events = [];
           this.filteredEvents = [];
           this.loading = false;
@@ -494,11 +493,9 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
           next: (response) => {
             this.snackBar.open(response.message, 'Close', { duration: 3000 });
           },
-          error: (error: HttpErrorResponse) => {
-            let errorMessage = 'Server error occurred, please try again.';
-            if (error.error && error.error.message) {
-              errorMessage = error.error.message;
-            }
+          // FE-01: dual-shape reader (raw or normalized error).
+          error: (error: any) => {
+            const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
             this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
           }
         })

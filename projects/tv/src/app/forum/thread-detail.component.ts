@@ -24,7 +24,8 @@ import { CommentComponent } from './comment.component';
 import { timeAgo as timeAgoUtil } from '../common/utils/time.util';
 import { SanitizeHtmlPipe } from '../common/pipes/sanitize-html.pipe';
 import { UserInterface, UserService } from '../common/services/user.service';
-import { ApiService } from '../common/services/api.service';
+// FE-01: core transport (getBaseUrl only — fixes prod media URLs).
+import { ApiService } from '../core/services/api.service';
 
 @Component({
   selector: 'app-thread-detail',

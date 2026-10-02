@@ -22,7 +22,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UserInterface, UserService } from '../common/services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { EventDetailDialogComponent } from './event-detail-dialog.component';
 
@@ -393,11 +392,9 @@ export class EventsCarouselComponent implements OnInit, OnDestroy, AfterViewInit
           this.loading = false;
           this.cd.detectChanges();
         },
-        error: (error: HttpErrorResponse) => {
-          let errorMessage = 'Server error occurred, please try again.'; // default error message.
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message; // Use backend's error message if available.
-          }
+        // FE-01: dual-shape reader (raw or normalized error).
+        error: (error: any) => {
+          const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
           this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
           this.loading = false;
           this.errorMessage = errorMessage;

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from '../common/services/api.service';
+// FE-01 event/forum batch migrated: transport via core.
+import { ApiService } from '../core/services/api.service';
 import { Observable } from 'rxjs';
 @Injectable()
 export class EventService {

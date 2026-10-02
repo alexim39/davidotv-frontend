@@ -13,7 +13,8 @@ import { Subject, Subscription, takeUntil } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../common/component/confirmationDialog.component';
-import { ApiService } from '../common/services/api.service';
+// FE-01: core transport (getBaseUrl only — fixes prod media URLs).
+import { ApiService } from '../core/services/api.service';
 
 @Component({
   selector: 'app-thread-list',

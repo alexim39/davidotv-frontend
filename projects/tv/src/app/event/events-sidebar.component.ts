@@ -5,7 +5,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { Subscription } from 'rxjs';
 import { EventService } from './event.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Event } from './event.model'
 import { UserInterface, UserService } from '../common/services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -408,7 +407,7 @@ export class EventsSidebarComponent implements OnInit, OnDestroy {
           this.loading = false;
           this.cd.detectChanges();
         },
-        error: (eror: HttpErrorResponse) => {
+        error: (eror: any) => {
           this.trendingEvents = [];
           this.loading = false;
           this.cd.detectChanges();
@@ -434,7 +433,7 @@ export class EventsSidebarComponent implements OnInit, OnDestroy {
             this.interestedEventloader = false;
             this.cd.detectChanges();
           },
-          error: (eror: HttpErrorResponse) => {
+          error: (eror: any) => {
             this.trendingEvents = [];
             this.interestedEventloader = false;
             this.cd.detectChanges();
