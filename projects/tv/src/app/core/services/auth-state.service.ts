@@ -31,10 +31,24 @@ export class AuthStateService {
   readonly isAdmin = computed(() => this._user()?.role === 'admin');
   readonly avatar = computed(() => this._user()?.avatar ?? 'img/avatar.png');
 
+  /**
+   * SEC-02: backend returns {success,user,token} on signin/signup/google-signin
+   * (legacy returned message-only). Normalizer tolerates {user|data} + optional
+   * token (cookie-only sessions have no token in body).
+   */
+  private normalizeSession(res: any): { user: AuthUser | null; token?: string } {
+    const user = res?.user ?? res?.data ?? null;
+    const token = res?.token ?? user?.token;
+    return { user, token };
+  }
+
   login(credentials: { email: string; password: string }) {
     this._loading.set(true);
-    return this.api.post<{ user: AuthUser; token: string }>('auth/signin', credentials, undefined, true).pipe(
-      tap(res => this.persist(res.user, res.token)),
+    return this.api.post<any>('auth/signin', credentials, undefined, true).pipe(
+      tap(res => {
+        const { user, token } = this.normalizeSession(res);
+        if (user) this.persist(user, token);
+      }),
       catchError(err => { this._loading.set(false); throw err; }),
       tap(() => this._loading.set(false))
     );
@@ -42,17 +56,41 @@ export class AuthStateService {
 
   loginWithGoogle(idToken: string) {
     this._loading.set(true);
-    return this.api.post<{ user: AuthUser; token: string }>('auth/google-signin', { idToken }, undefined, true).pipe(
-      tap(res => this.persist(res.user, res.token)),
+    return this.api.post<any>('auth/google-signin', { idToken }, undefined, true).pipe(
+      tap(res => {
+        const { user, token } = this.normalizeSession(res);
+        if (user) this.persist(user, token);
+      }),
       tap(() => this._loading.set(false))
     );
   }
 
   signup(payload: { email: string; password: string; name: string; lastname: string; username: string }) {
     this._loading.set(true);
-    return this.api.post<{ user: AuthUser; token: string }>('auth/signup', payload, undefined, true).pipe(
-      tap(res => this.persist(res.user, res.token)),
+    return this.api.post<any>('auth/signup', payload, undefined, true).pipe(
+      tap(res => {
+        const { user, token } = this.normalizeSession(res);
+        if (user) this.persist(user, token);
+      }),
       tap(() => this._loading.set(false))
+    );
+  }
+
+  /** SEC-02 identity check: new /api/identity/me, fallback legacy GET auth. */
+  me() {
+    return this.api.get<any>('api/identity/me').pipe(
+      tap(res => {
+        const user = res?.data ?? res?.user ?? null;
+        if (user) this.persist(user, user.token ?? this._user()?.token);
+      }),
+      catchError(() =>
+        this.api.get<any>('auth', undefined, undefined, true).pipe(
+          tap(res => {
+            const user = res?.user ?? res?.data ?? null;
+            if (user) this.persist(user, user.token ?? this._user()?.token);
+          })
+        )
+      )
     );
   }
 
@@ -67,8 +105,8 @@ export class AuthStateService {
     return this.hydrate();
   }
 
-  private persist(user: AuthUser, token: string) {
-    const withToken = { ...user, token };
+  private persist(user: AuthUser, token?: string) {
+    const withToken = token ? { ...user, token } : { ...user };
     localStorage.setItem('davidotv_auth', JSON.stringify(withToken));
     this._user.set(withToken);
   }
