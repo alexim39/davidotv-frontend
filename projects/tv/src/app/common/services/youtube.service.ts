@@ -83,7 +83,7 @@ getTrendingVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = 
     .set('page', page.toString())
     .set('sort', '-engagementScore,-publishedAt');
 
-  return this.apiService.get<YoutubeVideoInterface[]>(`youtube/videos`, params).pipe(
+  return this.apiService.get<YoutubeVideoInterface[]>(`api/v1/youtube/videos`, params).pipe(
     tap(videos => {
       // Ensure videos is an array
       const newVideos = Array.isArray(videos) ? videos : [];
@@ -124,7 +124,7 @@ getOfficialVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = 
     .set('page', page.toString())
     .set('sort', '-publishedAt');
 
-  return this.apiService.get<YoutubeVideoInterface[]>(`youtube/videos`, params).pipe(
+  return this.apiService.get<YoutubeVideoInterface[]>(`api/v1/youtube/videos`, params).pipe(
     tap(videos => {
       // Ensure videos is an array
       const newVideos = Array.isArray(videos) ? videos : [];
@@ -163,7 +163,7 @@ getAllFullVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = f
     .set('page', page.toString())
     .set('sort', '-publishedAt');
 
-  return this.apiService.get<YoutubeVideoInterface[]>(`youtube/videos`, params).pipe(
+  return this.apiService.get<YoutubeVideoInterface[]>(`api/v1/youtube/videos`, params).pipe(
     tap(videos => {
       // Ensure videos is an array
       const newVideos = Array.isArray(videos) ? videos : [];
@@ -203,7 +203,7 @@ getAllShortVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = 
     .set('page', page.toString())
     .set('sort', '-publishedAt');
 
-  return this.apiService.get<YoutubeVideoInterface[]>(`youtube/videos`, params).pipe(
+  return this.apiService.get<YoutubeVideoInterface[]>(`api/v1/youtube/videos`, params).pipe(
     tap(videos => {
       // Ensure videos is an array
       const newVideos = Array.isArray(videos) ? videos : [];
@@ -232,7 +232,7 @@ getAllShortVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = 
       .set('page', page.toString())
       .set('limit', limit.toString());
 
-    return this.apiService.get<{ data: YoutubeVideoInterface[], meta: { total: number } }>(`youtube/videos/search`, params).pipe(
+    return this.apiService.get<{ data: YoutubeVideoInterface[], meta: { total: number } }>(`api/v1/youtube/videos/search`, params).pipe(
       catchError(this.handleError)
     );
   }
@@ -242,7 +242,7 @@ getAllShortVideos(limit: number = 12, page: number = 0, forceRefresh: boolean = 
    * @param videoId YouTube video ID
    */
   getVideoById(videoId: string): Observable<YoutubeVideoInterface> {
-    return this.apiService.get<YoutubeVideoInterface>(`youtube/videos/${videoId}`).pipe(
+    return this.apiService.get<YoutubeVideoInterface>(`api/v1/youtube/videos/${videoId}`).pipe(
       catchError(this.handleError)
     );
   }

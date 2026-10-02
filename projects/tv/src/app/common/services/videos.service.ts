@@ -47,14 +47,14 @@ export class VideoService {
     return this.apiService.delete<any>(`user/history/clear/${userId}`, undefined, undefined, true);
   }
 
-   // Like a video
+   // Like a video (API-01: session user used server-side; same response keys)
   likeVideo(videoId: string, userId: string) {
-    return this.apiService.post<any>(`youtube/videos/like`, { userId, videoId });
+    return this.apiService.post<any>(`api/v1/youtube/videos/${videoId}/like`, {});
   }
 
-  // Dislike a video
+  // Dislike a video (API-01: session user used server-side; same response keys)
   dislikeVideo(videoId: string, userId: string) {
-    return this.apiService.post<any>(`youtube/videos/dislike`, { userId, videoId });
+    return this.apiService.post<any>(`api/v1/youtube/videos/${videoId}/dislike`, {});
   }
 
 }

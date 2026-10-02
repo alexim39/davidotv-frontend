@@ -26,8 +26,10 @@ export class VideoCommentService {
 
   constructor(private apiService: ApiService) {}
 
+  // API-01: RESTful create (session user used server-side). Reply/like/delete
+  // stay on legacy until ported (see docs youtube-parity.md).
   addComment(videoId: string, userId: string, text: string): Observable<any> {
-    return this.apiService.patch(`youtube/comment/add`, { userId, videoId, text }, undefined, true);
+    return this.apiService.post(`api/v1/youtube/videos/${videoId}/comments`, { text }, undefined, true);
   }
 
   addReply(videoId: string, parentCommentId: string, userId: string, text: string): Observable<any>  {

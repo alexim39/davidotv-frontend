@@ -56,7 +56,7 @@ export class MediaService {
       .set('limit', String(limit))
       .set('page', String(page))
       .set('sort', '-engagementScore,-publishedAt');
-    return this.api.get<{ success: boolean; data: YoutubeVideo[] }>('youtube/videos', params).pipe(
+    return this.api.get<{ success: boolean; data: YoutubeVideo[] }>('api/v1/youtube/videos', params).pipe(
       tap(res => {
         this.cache.set(key, { data: res.data, ts: Date.now() });
         this.trendingSubject.next(res.data);
@@ -74,7 +74,7 @@ export class MediaService {
       .set('page', String(page))
       .set('sort', '-publishedAt');
     this.officialLoading.set(true);
-    return this.api.get<{ success: boolean; data: YoutubeVideo[] }>('youtube/videos', params).pipe(
+    return this.api.get<{ success: boolean; data: YoutubeVideo[] }>('api/v1/youtube/videos', params).pipe(
       tap(() => this.officialLoading.set(false))
     ) as any;
   }
@@ -86,22 +86,23 @@ export class MediaService {
       .set('limit', String(limit))
       .set('page', String(page))
       .set('sort', '-publishedAt');
-    return this.api.get<{ success: boolean; data: YoutubeVideo[] }>('youtube/videos', params) as any;
+    return this.api.get<{ success: boolean; data: YoutubeVideo[] }>('api/v1/youtube/videos', params) as any;
   }
 
   getById(id: string): Observable<{ data: YoutubeVideo }> {
-    return this.api.get<{ success: boolean; data: YoutubeVideo }>(`youtube/videos/${id}`) as any;
+    return this.api.get<{ success: boolean; data: YoutubeVideo }>(`api/v1/youtube/videos/${id}`) as any;
   }
 
   search(q: string, page = 0, limit = 12): Observable<{ data: YoutubeVideo[]; meta: any }> {
     const params = new HttpParams().set('search', q).set('page', String(page)).set('limit', String(limit));
-    return this.api.get<{ success: boolean; data: YoutubeVideo[]; meta: any }>('youtube/videos/search', params) as any;
+    return this.api.get<{ success: boolean; data: YoutubeVideo[]; meta: any }>('api/v1/youtube/videos/search', params) as any;
   }
 
+  // API-01: session user is used server-side; userId kept for callers.
   like(videoId: string, userId: string): Observable<any> {
-    return this.api.post('youtube/like', { videoId, userId });
+    return this.api.post(`api/v1/youtube/videos/${videoId}/like`, {});
   }
   dislike(videoId: string, userId: string): Observable<any> {
-    return this.api.post('youtube/dislike', { videoId, userId });
+    return this.api.post(`api/v1/youtube/videos/${videoId}/dislike`, {});
   }
 }
