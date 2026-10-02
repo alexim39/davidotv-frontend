@@ -7,6 +7,7 @@ import { TalentService, TalentUpload } from './talent.service';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader.component';
 import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
 import { IntersectionDirective } from '../../../shared/directives/intersection.directive';
+import { AnalyticsService } from '../../../core/services/analytics.service';
 
 /**
  * Public talent feed - TikTok/Spotify inspired vertical list with play + like/share.
@@ -74,6 +75,7 @@ import { IntersectionDirective } from '../../../shared/directives/intersection.d
 })
 export class TalentFeedComponent implements OnInit {
   private readonly talent = inject(TalentService);
+  private readonly analytics = inject(AnalyticsService);
   items = signal<TalentUpload[]>([]);
   loading = signal(true);
   loadingMore = signal(false);
@@ -99,11 +101,16 @@ export class TalentFeedComponent implements OnInit {
   }
   like(t: TalentUpload): void {
     if (this.likedSet.has(t._id)) return;
+    this.analytics.track('like', t._id);
     this.talent.like(t._id).subscribe(()=>{ t.likeCount++; this.likedSet.add(t._id); });
   }
   share(t: TalentUpload): void {
+    this.analytics.track('share', t._id);
     this.talent.share(t._id).subscribe(()=> t.shareCount++);
     if (navigator.share) navigator.share({ title: t.title, url: location.href }).catch(()=>{});
   }
-  play(t: TalentUpload): void { this.talent.play(t._id).subscribe(()=> t.plays++); }
+  play(t: TalentUpload): void {
+    this.analytics.track('talent_view', t._id);
+    this.talent.play(t._id).subscribe(()=> t.plays++);
+  }
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { MediaService, YoutubeVideo } from '../media.service';
 import { AuthStateService } from '../../../core/services/auth-state.service';
+import { AnalyticsService } from '../../../core/services/analytics.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
@@ -65,6 +66,7 @@ export class VideoPlayerComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly media = inject(MediaService);
   private readonly auth = inject(AuthStateService);
+  private readonly analytics = inject(AnalyticsService);
 
   video = signal<YoutubeVideo | null>(null);
   likes = signal(0);
@@ -74,6 +76,8 @@ export class VideoPlayerComponent implements OnInit {
   ngOnInit(): void {
     const id = this.videoId ?? this.route.snapshot.paramMap.get('id') ?? '';
     if (!id) return;
+    // WEF-01: consumption signal (anon-safe: service skips when signed out).
+    this.analytics.track('video_watch', id);
     this.media.getById(id).subscribe((res:any)=>{
       const v = res?.data ?? res;
       this.video.set(v);
@@ -89,6 +93,7 @@ export class VideoPlayerComponent implements OnInit {
   like(v: YoutubeVideo): void {
     const user = this.auth.user();
     if(!user) return;
+    this.analytics.track('like', v.youtubeVideoId);
     this.media.like(v.youtubeVideoId, user._id).subscribe((r:any)=> this.likes.set(r?.appLikes ?? this.likes()+1));
   }
   dislike(v: YoutubeVideo): void {
