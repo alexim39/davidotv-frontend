@@ -73,6 +73,8 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
+            "karmaConfig": "projects/tv/karma.conf.js",
+            "polyfills": ["projects/tv/src/test.ts"],
             "tsConfig": "projects/tv/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
