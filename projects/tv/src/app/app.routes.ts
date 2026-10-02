@@ -12,6 +12,8 @@ export const routes: Routes = [
   { path: 'media', loadChildren: () => import('./features/media/media.routes').then(r => r.MediaRoutes) },
   // User profile (isolated domain)
   { path: 'profile', loadComponent: () => import('./features/user-profile/profile.component').then(m => m.ProfileComponent), canActivate: [authGuard], title: 'Profile — DavidO TV' },
+  // Membership billing (pay-as-you-go)
+  { path: 'membership', loadChildren: () => import('./features/membership/membership.routes').then(r => r.MembershipRoutes) },
   // Back-compat aliases
   { path: 'upload', redirectTo: 'talent/upload', pathMatch: 'full' },
   { path: 'curated', redirectTo: 'talent/curated', pathMatch: 'full' },
