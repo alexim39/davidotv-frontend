@@ -14,6 +14,8 @@ export const routes: Routes = [
   { path: 'profile', loadComponent: () => import('./features/user-profile/profile.component').then(m => m.ProfileComponent), canActivate: [authGuard], title: 'Profile — DavidO TV' },
   // Membership billing (pay-as-you-go)
   { path: 'membership', loadChildren: () => import('./features/membership/membership.routes').then(r => r.MembershipRoutes) },
+  // Notification preferences (NOT-01)
+  { path: 'notifications', loadChildren: () => import('./features/notifications/notifications.routes').then(r => r.NotificationRoutes) },
   // Back-compat aliases
   { path: 'upload', redirectTo: 'talent/upload', pathMatch: 'full' },
   { path: 'curated', redirectTo: 'talent/curated', pathMatch: 'full' },
