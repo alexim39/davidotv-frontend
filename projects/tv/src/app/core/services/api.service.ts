@@ -56,6 +56,12 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
+  head<T>(endpoint: string, params?: HttpParams, headers?: HttpHeaders, withCredentials = true): Observable<T> {
+    return this.http
+      .head<T>(`${this.baseUrl}/${endpoint.replace(/^\//, '')}`, { params, headers, withCredentials })
+      .pipe(timeout(15000), retry({ count: 1, delay: 300 }), catchError(this.handleError));
+  }
+
   /** Upload multipart (talent hub) */
   upload<T>(endpoint: string, formData: FormData, withCredentials = true): Observable<T> {
     return this.http

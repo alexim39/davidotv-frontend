@@ -1,61 +1,55 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { catchError, Observable, retry, throwError } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { HttpHeaders, HttpParams } from '@angular/common/http';
+import { Observable, catchError, throwError } from 'rxjs';
+import { ApiService as CoreApiService } from '../../core/services/api.service';
 
+/**
+ * @deprecated FE-01 — legacy adapter, do not inject in new code.
+ * Delegates transport to `core/services/api.service` (single baseUrl, timeout,
+ * retry, request-id) but rethrows the RAW HttpErrorResponse so the 60+ legacy
+ * call sites reading `error.error.message` keep working unchanged.
+ * Migration: inject the core ApiService and read the normalized
+ * `{ status, message, requestId }` shape instead. Removal only after every
+ * consumer is migrated (tracked in docs/modernization).
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  //private readonly baseUrl = 'https://davidotv-j3malln3.b4a.run';
-  private readonly baseUrl = 'http://localhost:3000'; // For local testing
+  private readonly core = inject(CoreApiService);
 
   getBaseUrl(): string {
-    return this.baseUrl; 
+    return this.core.getBaseUrl();
   }
 
-  private handleError(error: HttpErrorResponse): Observable<never> {
-    console.error('Service: An error occurred:', error);
-    return throwError(() => error);
+  /** Unwrap core's normalized error back to the raw HttpErrorResponse. */
+  private legacyError<T>(source: Observable<T>): Observable<T> {
+    return source.pipe(
+      catchError((norm: { raw?: unknown }) => throwError(() => norm?.raw ?? norm))
+    );
   }
-
-  constructor(private http: HttpClient) {}
 
   get<T>(endpoint: string, params?: HttpParams, headers?: HttpHeaders, withCredentials: boolean = false): Observable<T> {
-    return this.http.get<T>(`${this.baseUrl}/${endpoint}`, { params, headers, withCredentials }).pipe(
-      retry({ count: 1, delay: 0 }),
-      catchError(this.handleError)
-    );
+    return this.legacyError(this.core.get<T>(endpoint, params, headers, withCredentials));
   }
 
   post<T>(endpoint: string, data: any, headers?: HttpHeaders, withCredentials: boolean = false): Observable<T> {
-    return this.http.post<T>(`${this.baseUrl}/${endpoint}`, data, { headers, withCredentials }).pipe(
-      retry({ count: 1, delay: 0 }),
-      catchError(this.handleError)
-    );
+    return this.legacyError(this.core.post<T>(endpoint, data, headers, withCredentials));
   }
 
   put<T>(endpoint: string, data: any, headers?: HttpHeaders, withCredentials: boolean = false): Observable<T> {
-    return this.http.put<T>(`${this.baseUrl}/${endpoint}`, data, { headers, withCredentials }).pipe(
-      retry({ count: 1, delay: 0 }),
-      catchError(this.handleError)
-    );
+    return this.legacyError(this.core.put<T>(endpoint, data, headers, withCredentials));
   }
 
   delete<T>(endpoint: string, params?: HttpParams, headers?: HttpHeaders, withCredentials: boolean = false): Observable<T> {
-    return this.http.delete<T>(`${this.baseUrl}/${endpoint}`, { params, headers, withCredentials }).pipe(
-      retry({ count: 1, delay: 0 }),
-      catchError(this.handleError)
-    );
+    return this.legacyError(this.core.delete<T>(endpoint, params, headers, withCredentials));
   }
 
   patch<T>(endpoint: string, data: any, headers?: HttpHeaders, withCredentials: boolean = false): Observable<T> {
-    return this.http.patch<T>(`${this.baseUrl}/${endpoint}`, data, { headers, withCredentials });
+    return this.legacyError(this.core.patch<T>(endpoint, data, headers, withCredentials));
   }
 
   head<T>(endpoint: string, params?: HttpParams, headers?: HttpHeaders, withCredentials: boolean = false): Observable<T> {
-    return this.http.head<T>(`${this.baseUrl}/${endpoint}`, { params, headers, withCredentials }).pipe(
-      retry({ count: 1, delay: 0 }),
-      catchError(this.handleError)
-    );
+    return this.legacyError(this.core.head<T>(endpoint, params, headers, withCredentials));
   }
 }
