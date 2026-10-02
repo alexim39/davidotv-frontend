@@ -153,7 +153,7 @@ import { ApiService } from '../../common/services/api.service';
 })
 export class ProfileImageUploaderComponent {
   @Input() user!: UserInterface;
-  //apiURL = 'http://localhost:8080';
+  //apiURL = 'http://localhost:3000';
 
   profileForm: FormGroup;
   isDragOver = false;

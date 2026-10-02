@@ -7,7 +7,7 @@ import { catchError, Observable, retry, throwError } from 'rxjs';
 })
 export class ApiService {
   //private readonly baseUrl = 'https://davidotv-j3malln3.b4a.run';
-  private readonly baseUrl = 'http://localhost:8080'; // For local testing
+  private readonly baseUrl = 'http://localhost:3000'; // For local testing
 
   getBaseUrl(): string {
     return this.baseUrl; 

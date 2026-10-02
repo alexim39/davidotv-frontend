@@ -20,7 +20,7 @@ export interface YoutubeVideo {
   duration: string;
   durationSeconds?: number;
   isShort?: boolean;
-  views: number;
+  views?: number;
   likes: number;
   appViews?: number;
   isOfficialContent: boolean;
