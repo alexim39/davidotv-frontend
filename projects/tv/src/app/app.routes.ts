@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', loadChildren: () => import('./home/home.route').then(r => r.HomeRoutes) },
@@ -10,8 +11,10 @@ export const routes: Routes = [
   // Media - cached YouTube pipeline
   { path: 'media', loadChildren: () => import('./features/media/media.routes').then(r => r.MediaRoutes) },
   // User profile (isolated domain)
-  { path: 'profile', loadComponent: () => import('./features/user-profile/profile.component').then(m => m.ProfileComponent), title: 'Profile — DavidO TV' },
+  { path: 'profile', loadComponent: () => import('./features/user-profile/profile.component').then(m => m.ProfileComponent), canActivate: [authGuard], title: 'Profile — DavidO TV' },
   // Back-compat aliases
   { path: 'upload', redirectTo: 'talent/upload', pathMatch: 'full' },
   { path: 'curated', redirectTo: 'talent/curated', pathMatch: 'full' },
+  // FE-01: catch-all must stay last
+  { path: '**', loadComponent: () => import('./shared/components/not-found/not-found.component').then(m => m.NotFoundComponent), title: 'Not found — DavidO TV' },
 ];
