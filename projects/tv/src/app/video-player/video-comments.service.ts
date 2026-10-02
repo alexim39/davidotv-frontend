@@ -1,7 +1,8 @@
 // src/app/common/services/comment.service.ts
 import { Injectable } from '@angular/core';
 import { Observable, } from 'rxjs';
-import { ApiService } from '../common/services/api.service';
+// FE-01 watch/save batch migrated: transport via core.
+import { ApiService } from '../core/services/api.service';
 
 export interface Comment {
   _id?: string;

@@ -14,7 +14,6 @@ import { YoutubeService, YoutubeVideoInterface } from '../../common/services/you
 import { timeAgo as timeAgoUtil, formatDuration as videoDuration, formatViewCount as viewFormat, formatLikeCount as likeFormat, formatDislikesCount as dislikesFormat } from '../../common/utils/time.util';
 import { Subscription, timer } from 'rxjs';
 import { UserInterface, UserService } from '../../common/services/user.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { VideoService } from '../../common/services/videos.service';
 import { VideoCommentsComponent } from './video-comments/video-comments.component';
 import { RecommendationsSidebarComponent } from './recommendations-sidebar/recommendations-sidebar.component';
@@ -696,12 +695,10 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
           next: (response: any) => {
             this.snackBar.open(response.message, '', { duration: 2000 });
           },
-          error: (error: HttpErrorResponse) => {
+          // FE-01: dual-shape reader (raw or normalized error).
+          error: (error: any) => {
             this.saved = false;
-            let errorMessage = 'Server error occurred, please try again.';
-            if (error.error && error.error.message) {
-              errorMessage = error.error.message;
-            }
+            const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
             this.snackBar.open(errorMessage, 'Ok',{duration: 2000});
           }
         })
@@ -711,7 +708,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         next: () => {
           this.snackBar.open('Video removed from library', '', { duration: 2000 });
         },
-        error: (error: HttpErrorResponse) => {
+        error: (error: any) => {
           this.saved = true;
           this.snackBar.open('Failed to remove video', '', { duration: 2000 });
         }
@@ -754,13 +751,11 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
           this.comments = [tempComment, ...this.comments];
           this.cdr.detectChanges();
         },
-        error: (error: HttpErrorResponse) => {
+        // FE-01: dual-shape reader (raw or normalized error).
+        error: (error: any) => {
           this.comments = this.comments.filter(c => c._id !== tempComment._id);
 
-          let errorMessage = 'Server error occurred, please try again.';
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message;
-          }
+          const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
           this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
 
           this.cdr.detectChanges();
@@ -784,11 +779,9 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.snackBar.open(response.message, 'Ok',{duration: 3000});
         },
-        error: (error: HttpErrorResponse) => {
-          let errorMessage = 'Server error occurred, please try again.';
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message;
-          }
+        // FE-01: dual-shape reader (raw or normalized error).
+        error: (error: any) => {
+          const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
           this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
           this.cdr.markForCheck();
         }
@@ -852,7 +845,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
           }
           this.cdr.detectChanges();
         },
-        error: (error: HttpErrorResponse) => {
+        error: (error: any) => {
           console.error('Failed to post reply:', error);
           this.snackBar.open('Failed to post reply. Please try again.', 'Close', { duration: 3000 });
           this.cdr.detectChanges();

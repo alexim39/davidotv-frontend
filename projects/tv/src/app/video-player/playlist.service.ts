@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiService } from '../common/services/api.service';
+// FE-01 watch/save batch migrated: transport via core.
+import { ApiService } from '../core/services/api.service';
 import { HttpParams } from '@angular/common/http';
 import { YoutubeVideoInterface } from '../common/services/youtube.service';
 

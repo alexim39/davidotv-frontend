@@ -13,7 +13,6 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../common/component/confirmationDialog.component';
 import { VideoCommentService } from '../../video-comments.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
@@ -305,11 +304,9 @@ export class VideoCommentsComponent implements OnDestroy {
         this.isLoading = false;
         this.cdr.markForCheck();
       },
-      error: (error: HttpErrorResponse) => {
-        let errorMessage = 'Server error occurred, please try again.'; // default error message.
-        if (error.error && error.error.message) {
-          errorMessage = error.error.message; // Use backend's error message if available.
-        }  
+      // FE-01: dual-shape reader (raw or normalized error).
+      error: (error: any) => {
+        const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
         this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
         this.isLoading = false;
         this.cdr.markForCheck();
@@ -360,11 +357,9 @@ export class VideoCommentsComponent implements OnDestroy {
         this.isLoading = false;
         this.cdr.markForCheck();
       },
-      error: (error: HttpErrorResponse) => {
-        let errorMessage = 'Server error occurred, please try again.'; // default error message.
-        if (error.error && error.error.message) {
-          errorMessage = error.error.message; // Use backend's error message if available.
-        }  
+      // FE-01: dual-shape reader (raw or normalized error).
+      error: (error: any) => {
+        const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
         if (errorMessage === 'Reply not found.') window.location.reload();
         this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
         this.isLoading = false;

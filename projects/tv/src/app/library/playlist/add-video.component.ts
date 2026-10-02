@@ -354,8 +354,9 @@ export class AddPlaylistDialogComponent implements OnInit {
         this.snackBar.open(response.message, 'Close', { duration: 3000 });
         this.dialogRef.close(true);
       },
+      // FE-01: dual-shape reader (raw or normalized error).
       error: (error) => {
-        this.snackBar.open(error.error?.message || 'Failed to add video to playlist', 'Close', { duration: 3000 });
+        this.snackBar.open(error?.error?.message || error?.message || 'Failed to add video to playlist', 'Close', { duration: 3000 });
       }
     });
   }

@@ -145,12 +145,10 @@ export class PlaylistEditDialogComponent {
           this.isSaving = false;
            this.cd.detectChanges();
         },
+        // FE-01: dual-shape reader (raw or normalized error).
         error: (error) => {
           //console.error('Error updating playlist:', error);
-           let errorMessage = 'Server error occurred, please try again.'; // default error message.
-            if (error.error && error.error.message) {
-                errorMessage = error.error.message; // Use backend's error message if available.
-            }  
+           const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
             this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
           this.isSaving = false;
            this.cd.detectChanges();

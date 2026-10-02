@@ -14,7 +14,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { Subscription } from 'rxjs';
 import { UserInterface, UserService } from '../../common/services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
 import { AddPlaylistDialogComponent } from '../playlist/add-video.component';
@@ -373,8 +372,9 @@ export class SavedVideoComponent implements OnInit, OnDestroy {
           this.isLoading = false;
           this.cdRef.markForCheck();
         },
-        error: (error: HttpErrorResponse) => {
-          const errorMessage = error.error?.message || 'Server error occurred, please try again.';
+        // FE-01: dual-shape reader (raw or normalized error).
+        error: (error: any) => {
+          const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
           this.snackBar.open(errorMessage, 'Ok', {duration: 3000});
           this.isLoading = false;
           this.cdRef.markForCheck();
@@ -395,11 +395,12 @@ export class SavedVideoComponent implements OnInit, OnDestroy {
               this.isLoading = false;
               this.cdRef.detectChanges();  
             },
-            error: (error: HttpErrorResponse) => {
-                const errorMessage = error.error?.message || 'Server error occurred, please try again.';
+            // FE-01: dual-shape reader (raw or normalized error).
+            error: (error: any) => {
+                const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
                 this.snackBar.open(errorMessage, 'Ok', {duration: 3000});
                 this.isLoading = false;
-                this.cdRef.detectChanges(); 
+                this.cdRef.detectChanges();
             }
         });
     } else {
@@ -415,13 +416,11 @@ export class SavedVideoComponent implements OnInit, OnDestroy {
           this.snackBar.open(response.message, 'Ok',{duration: 3000});
           this.cdRef.detectChanges(); 
         },
-        error: (error: HttpErrorResponse) => {
-          let errorMessage = 'Server error occurred, please try again.'; // default error message.
-            if (error.error && error.error.message) {
-              errorMessage = error.error.message; // Use backend's error message if available.
-            }  
+        // FE-01: dual-shape reader (raw or normalized error).
+        error: (error: any) => {
+          const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
             this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
-            this.cdRef.detectChanges(); 
+            this.cdRef.detectChanges();
         }
       });
     } else {

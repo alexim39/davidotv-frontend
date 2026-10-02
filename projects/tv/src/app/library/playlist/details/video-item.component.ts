@@ -233,11 +233,9 @@ export class VideoItemComponent implements OnInit, OnDestroy {
           // Emit the video ID to the parent component
           this.videoRemoved.emit(this.video.youtubeVideoId);
         },
+        // FE-01: dual-shape reader (raw or normalized error).
         error: (error) => {
-          let errorMessage = 'Server error occurred, please try again.';
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message;
-          }
+          const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
           this.snackBar.open(errorMessage, 'Ok', { duration: 3000 });
           this.cd.detectChanges();
         }

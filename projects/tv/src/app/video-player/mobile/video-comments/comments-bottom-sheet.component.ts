@@ -7,7 +7,6 @@ import { UserInterface } from '../../../common/services/user.service';
 import { MatButtonModule } from '@angular/material/button';
 import { Subscription } from 'rxjs';
 import { VideoCommentService, Comment } from '../../video-comments.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import { CommonModule } from '@angular/common';
@@ -109,13 +108,11 @@ export class CommentsBottomSheetComponent implements OnInit, OnDestroy {
           this.isLoading = false;
           this.cdr.detectChanges();
         },
-        error: (error: HttpErrorResponse) => {
+        // FE-01: dual-shape reader (raw or normalized error).
+        error: (error: any) => {
           this.comments = this.comments.filter(c => c._id !== tempComment._id);
 
-          let errorMessage = 'Server error occurred, please try again.';
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message;
-          }
+          const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
           this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
             this.isLoading = false;
           this.cdr.detectChanges();
@@ -144,11 +141,9 @@ export class CommentsBottomSheetComponent implements OnInit, OnDestroy {
           this.isLoading = false;
           this.cdr.markForCheck();
         },
-        error: (error: HttpErrorResponse) => {
-          let errorMessage = 'Server error occurred, please try again.';
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message;
-          }
+        // FE-01: dual-shape reader (raw or normalized error).
+        error: (error: any) => {
+          const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
           this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
           this.isLoading = false;
           this.cdr.markForCheck();
@@ -218,7 +213,7 @@ export class CommentsBottomSheetComponent implements OnInit, OnDestroy {
                 this.isLoading = false;
                 this.cdr.markForCheck();
                 },
-                error: (error: HttpErrorResponse) => {
+                error: (error: any) => {
                 console.error('Failed to post reply:', error);
                 this.snackBar.open('Failed to post reply. Please try again.', 'Close', { duration: 3000 });
                 this.isLoading = false;

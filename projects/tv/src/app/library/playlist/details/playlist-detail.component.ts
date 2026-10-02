@@ -562,12 +562,10 @@ export class PlaylistDetailComponent implements OnInit, OnDestroy {
             this.snackBar.open(response.message, 'Ok',{duration: 3000});
             this.router.navigate(['/library']);
           },
+          // FE-01: dual-shape reader (raw or normalized error).
           error: (error) => {
             //console.error('Error deleting playlist:', err);
-            let errorMessage = 'Server error occurred, please try again.'; // default error message.
-            if (error.error && error.error.message) {
-                errorMessage = error.error.message; // Use backend's error message if available.
-            }  
+            const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
             this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
            this.cd.detectChanges();
           }
