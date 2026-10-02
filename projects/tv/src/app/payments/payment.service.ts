@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from '../common/services/api.service';
 
@@ -52,10 +53,24 @@ export class PaymentService {
    * @param formObject The form data.
    * @returns An observable of the submitted form data.
    */
-  withdrawRequest(formObject: WithdrawalRequestData): Observable<any> {
-    console.log('withdrawRequest', formObject);
+   withdrawRequest(formObject: WithdrawalRequestData): Observable<any> {
     return this.apiService.post<any>('transaction/withdraw-request', formObject);
   }
+
+   /**
+    * SEC-03: bank list + account resolution are proxied through the backend
+    * (GET transaction/banks*) so the Paystack secret never ships in the bundle.
+    */
+   getBanks(): Observable<{ status: boolean; data: Array<{ code: string; name: string }> }> {
+     return this.apiService.get<any>('transaction/banks');
+   }
+
+   resolveAccount(accountNumber: string, bankCode: string): Observable<{ status: boolean; data: { account_name: string } }> {
+     const params = new HttpParams()
+       .set('account_number', accountNumber)
+       .set('bank_code', bankCode);
+     return this.apiService.get<any>('transaction/banks/resolve', params);
+   }
 
   
    /**

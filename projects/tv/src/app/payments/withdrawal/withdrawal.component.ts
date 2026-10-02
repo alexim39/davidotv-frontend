@@ -25,7 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { PaymentService, SavedAccountInterface, WithdrawalRequestData } from '../payment.service';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Subject, EMPTY, of } from 'rxjs';
 import { 
   debounceTime, 
@@ -330,7 +330,6 @@ export class WithdrawalComponent implements OnInit {
   // Injected services
   private readonly dialog = inject(MatDialog);
   private readonly fb = inject(FormBuilder);
-  private readonly http = inject(HttpClient);
   private readonly paymentService = inject(PaymentService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
@@ -369,7 +368,8 @@ export class WithdrawalComponent implements OnInit {
   selectedBankName = signal<string>('');
 
   // Constants
-  private readonly PAYSTACK_SECRET_KEY = 'sk_test_2b176cfecf4bf2bf8ed1de53b55f868dc4ed9127';
+  // SEC-03: Paystack secret removed from the bundle — banks + resolution go
+  // through the backend proxy (PaymentService.getBanks/resolveAccount).
   private readonly MIN_WITHDRAWAL_AMOUNT = 100;
 
   ngOnInit(): void {
@@ -485,9 +485,9 @@ export class WithdrawalComponent implements OnInit {
     this.fetchBalance();
   }
 
-  // Bank methods
+  // Bank methods (SEC-03: via backend proxy — no secret in the bundle)
   private loadBanks(): void {
-    this.http.get<{ data: BankInterface[] }>('https://api.paystack.co/bank')
+    this.paymentService.getBanks()
       .pipe(
         catchError(error => {
           console.error('Error loading banks:', error);
@@ -535,13 +535,7 @@ export class WithdrawalComponent implements OnInit {
 
     this.isResolvingAccount.set(true);
 
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.PAYSTACK_SECRET_KEY}`
-    });
-
-    const url = `https://api.paystack.co/bank/resolve?account_number=${accountNumber}&bank_code=${bankCode}`;
-
-    this.http.get<AccountResolutionResponse>(url, { headers })
+    this.paymentService.resolveAccount(accountNumber, bankCode)
       .pipe(
         catchError((error: HttpErrorResponse) => {
           const errorMessage = error.error?.message || 'Failed to resolve account name. Please check account details.';
