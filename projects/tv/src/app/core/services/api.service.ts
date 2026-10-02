@@ -63,10 +63,16 @@ export class ApiService {
       .pipe(catchError(this.handleError));
   }
 
-  private handleError(error: HttpErrorResponse): Observable<never> {
+  private handleError(error: HttpErrorResponse & { requestId?: string | null }): Observable<never> {
     const message =
       error.error?.message ?? error.message ?? 'Unknown server error';
+    // OBS-01: carry the correlation id (body echo preferred, header fallback)
+    // so support can join FE reports to Winston logs.
+    const requestId =
+      error.requestId ??
+      (error.error as { requestId?: string } | null)?.requestId ??
+      error.headers.get('x-request-id');
     // Let Winston on BE handle persistence; FE just normalises
-    return throwError(() => ({ status: error.status, message, raw: error }));
+    return throwError(() => ({ status: error.status, message, requestId, raw: error }));
   }
 }
