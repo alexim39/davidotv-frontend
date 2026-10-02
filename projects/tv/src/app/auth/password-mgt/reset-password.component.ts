@@ -348,15 +348,12 @@ export class ResetPasswordComponent implements OnDestroy {
               this.router.navigate(['/']);
             }, 5000);
           },
-          error: (error: HttpErrorResponse) => {
+          // FE-01: normalized error shape {status,message,requestId}.
+          error: (error: any) => {
             this.loading = false;
-            
-            let errorMessage = 'An error occurred. Please try again later.';
-            if (error.error && error.error.message) {
-              errorMessage = error.error.message;
-            } else if (error.status === 400) {
-              errorMessage = 'Invalid or expired token. Please request a new password reset.';
-            } else if (error.status === 429) {
+
+            let errorMessage = error?.message || 'An error occurred. Please try again later.';
+            if (error?.status === 429) {
               errorMessage = 'Too many requests. Please try again later.';
             }
             

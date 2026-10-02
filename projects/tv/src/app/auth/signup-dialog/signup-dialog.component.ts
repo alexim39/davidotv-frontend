@@ -13,8 +13,8 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule, FormsModule } 
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { AuthService } from '../auth.service';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuthStateService } from '../../core/services/auth-state.service';
 
 
 @Component({
@@ -161,6 +161,7 @@ export class SignupDialogComponent implements OnInit, OnDestroy {
 
   private snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
+  private authState = inject(AuthStateService);
 
   constructor(
     private thisDialogRef: MatDialogRef<AuthComponent>,
@@ -217,17 +218,20 @@ export class SignupDialogComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.isSpinning = false;
           this.thisDialogRef.close()
+          // FE-01: SEC-02 signup issues a session — seed the signal store too.
+          if (response.user) {
+            localStorage.setItem('isAuthenticated', 'true');
+            this.authState.seedSession(response.user, response.token);
+          }
           // notify of success
           this.snackBar.open(response.message, 'Ok',{duration: 3000});
           // show the sign in panel
-        }, 
-        error: (error: HttpErrorResponse) => {
+        },
+        // FE-01: normalized error shape {status,message,requestId}.
+        error: (error: any) => {
           this.isSpinning = false;
 
-          let errorMessage = 'Server error occurred, please try again.'; // default error message.
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message; // Use backend's error message if available.
-          }  
+          const errorMessage = error?.message || 'Server error occurred, please try again.';
           this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
           this.cdr.markForCheck();
         }

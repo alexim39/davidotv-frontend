@@ -105,6 +105,19 @@ export class AuthStateService {
     return this.hydrate();
   }
 
+  /**
+   * FE-01: lets legacy auth flows (dialog login, Google popup, signup) seed
+   * the new signal store so `authGuard`/`adminGuard` see the session without
+   * a reload race. Backend (SEC-02) returns {user,token} on all three.
+   */
+  seedSession(user: AuthUser, token?: string): void {
+    if (user) this.persist(user, token);
+  }
+
+  clearSession(): void {
+    this.clear();
+  }
+
   private persist(user: AuthUser, token?: string) {
     const withToken = token ? { ...user, token } : { ...user };
     localStorage.setItem('davidotv_auth', JSON.stringify(withToken));

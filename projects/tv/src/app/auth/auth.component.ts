@@ -14,6 +14,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 // Firebase Auth imports
 import { Auth, GoogleAuthProvider, signInWithPopup, UserCredential } from '@angular/fire/auth'; // Added UserCredential for type hinting
 import { AuthService } from './auth.service';
+import { AuthStateService } from '../core/services/auth-state.service';
 
 @Component({
   selector: 'async-auth',
@@ -369,6 +370,7 @@ export class AuthComponent implements OnDestroy {
   rightPanelActive: boolean = false;
   private auth: Auth = inject(Auth);
   private apiService: AuthService = inject(AuthService);
+  private authState = inject(AuthStateService);
   private snackBar = inject(MatSnackBar);
   private googleProvider = new GoogleAuthProvider();
 
@@ -396,6 +398,8 @@ export class AuthComponent implements OnDestroy {
             if (response.success) {
               // Save token and update user service
               localStorage.setItem('isAuthenticated', 'true');
+              // FE-01: seed the signal store so guards see the session.
+              if (response.user) this.authState.seedSession(response.user, response.token);
               // Close dialog and optionally navigate
               //this.dialogRef.close();
               window.location.reload();

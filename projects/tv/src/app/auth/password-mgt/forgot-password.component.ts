@@ -248,16 +248,13 @@ export class ForgotPasswordComponent implements OnDestroy {
           //this.snackBar.open(response.message, 'Ok',{duration: 3000});
           // show the sign in panel
         }, 
-         error: (error: HttpErrorResponse) => {
+         // FE-01: normalized error shape {status,message,requestId}.
+         error: (error: any) => {
             this.loading = false;
             this.successMessage = false;
-            
-            let errorMessage = 'An error occurred. Please try again later.';
-            if (error.error && error.error.message) {
-              errorMessage = error.error.message;
-            } else if (error.status === 404) {
-              errorMessage = 'No account found with this email address.';
-            } else if (error.status === 429) {
+
+            let errorMessage = error?.message || 'An error occurred. Please try again later.';
+            if (error?.status === 429) {
               errorMessage = 'Too many requests. Please try again later.';
             }
             

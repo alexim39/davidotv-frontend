@@ -11,9 +11,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { AuthService } from '../auth.service';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserInterface, UserService } from '../../common/services/user.service';
+import { AuthStateService } from '../../core/services/auth-state.service';
 
 
 @Component({
@@ -153,6 +153,7 @@ export class SigninDialogComponent implements OnInit, OnDestroy {
   // Inject services
   private auth = inject(AuthService);
   private userService = inject(UserService);
+  private authState = inject(AuthStateService);
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
   private dialogRef = inject(MatDialogRef<SigninDialogComponent>);
@@ -181,32 +182,33 @@ export class SigninDialogComponent implements OnInit, OnDestroy {
       this.auth.signIn(formObject).subscribe({
         next: (response) => {
           this.isSpinning = false;
-           this.cdr.markForCheck(); 
+           this.cdr.markForCheck();
           if (response.success) {
             // Save token and update user service
             localStorage.setItem('isAuthenticated', 'true');
+            // FE-01: seed the new signal store (SEC-02 returns {user,token})
+            // so guards see the session immediately.
+            if (response.user) this.authState.seedSession(response.user, response.token);
             // Close dialog and optionally navigate
             //this.dialogRef.close();
             window.location.reload();
           }
         },
-        error: (error: HttpErrorResponse) => {
+        error: (error: any) => {
           this.isSpinning = false;
-           this.cdr.markForCheck(); 
+           this.cdr.markForCheck();
           this.handleLoginFailure(error);
         }
       })
     );
   }
 
-  private handleLoginFailure(error: HttpErrorResponse) {
+  // FE-01: normalized error shape {status,message,requestId} (core ApiService).
+  private handleLoginFailure(error: any) {
     // Pass an empty user object to indicate no user is logged in
     this.userService.setCurrentUser({} as UserInterface);
     localStorage.setItem('isAuthenticated', 'false');
-    let errorMessage = 'Server error occurred, please try again.'; // default error message.
-    if (error.error && error.error.message) {
-      errorMessage = error.error.message; // Use backend's error message if available.
-    }  
+    const errorMessage = error?.message || 'Server error occurred, please try again.';
     this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
   }
 

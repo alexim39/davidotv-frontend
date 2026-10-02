@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiService } from '../common/services/api.service';
+// FE-01 auth domain migrated: transport via core (single baseUrl/timeout/
+// request-id). Errors are NORMALIZED {status,message,requestId} — consumers
+// must read error.message, not error.error.message.
+import { ApiService } from '../core/services/api.service';
 
 export interface SignInInterface {
   email: string;
