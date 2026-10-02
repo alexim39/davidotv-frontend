@@ -9,7 +9,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import { Subscription } from 'rxjs';
 import { FooterService } from './footer.service';
-import { HttpErrorResponse } from '@angular/common/http';
+
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserInterface, UserService } from '../../common/services/user.service';
 import { RouterModule } from '@angular/router';
@@ -440,13 +440,11 @@ export class FooterComponent implements OnInit {
           this.subscriptionSuccess = true;
           this.subscriptionForm.reset();
         },
-        error: (error: HttpErrorResponse) => {
+        // FE-01: dual-shape reader (raw or normalized error).
+        error: (error: any) => {
           this.subscriptionSuccess = false;
 
-          let errorMessage = 'Server error occurred, please try again.'; // default error message.
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message; // Use backend's error message if available.
-          }  
+          const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
           this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
           this.isSubmitting = false;
 

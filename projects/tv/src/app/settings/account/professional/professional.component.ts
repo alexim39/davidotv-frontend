@@ -14,7 +14,6 @@ import { Subscription } from 'rxjs';
 import { SettingsService } from '../../settings.service';
 import { UserInterface } from '../../../common/services/user.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
@@ -139,8 +138,9 @@ export class ProfessionalInfoComponent implements OnInit, OnDestroy {
     });
   }
 
-  private handleError(error: HttpErrorResponse): void {
-    const errorMessage = error.error?.message || 'Server error occurred, please try again.';
+  // FE-01: dual-shape reader (raw or normalized error).
+  private handleError(error: any): void {
+    const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
     this.showNotification(errorMessage);
     this.cdr.markForCheck();
   }

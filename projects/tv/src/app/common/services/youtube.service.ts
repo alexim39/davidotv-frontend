@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import { ApiService } from './api.service';
+// FE-01 final batch migrated: transport via core (was legacy adapter).
+import { ApiService } from '../../core/services/api.service';
 
 export interface YoutubeVideoInterface {
   _id?: string;

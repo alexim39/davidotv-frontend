@@ -14,7 +14,6 @@ import { Subscription } from 'rxjs';
 import { ContactFormData, ContactService } from './contacts.service';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { CommonModule } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 /**
@@ -96,12 +95,10 @@ export class ContactComponent implements OnInit, OnDestroy {
         // Uncomment if you want to navigate after a successful submission:
         // this.router.navigateByUrl('get-started/connected-economy');
       },
-      error: (error: HttpErrorResponse) => {
+      // FE-01: dual-shape reader (raw or normalized error).
+      error: (error: any) => {
         this.isSpinning = false;
-        let errorMessage = 'Server error occurred, please try again.'; // default error message.
-        if (error.error && error.error.message) {
-          errorMessage = error.error.message; // Use backend's error message if available.
-        }
+        const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
         this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
         this.cdr.markForCheck();
       }

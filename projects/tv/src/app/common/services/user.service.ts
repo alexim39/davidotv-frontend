@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, } from 'rxjs';
-import { ApiService } from './api.service';
+// FE-01 final batch migrated: transport via core (was legacy adapter).
+import { ApiService } from '../../core/services/api.service';
 import { SavedAccountInterface } from '../../payments/payment.service';
 
 export interface UserInterface {

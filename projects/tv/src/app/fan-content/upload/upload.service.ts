@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from '../../common/services/api.service';
+// FE-01 final batch migrated: transport via core.
+import { ApiService } from '../../core/services/api.service';
 
 
 @Injectable()

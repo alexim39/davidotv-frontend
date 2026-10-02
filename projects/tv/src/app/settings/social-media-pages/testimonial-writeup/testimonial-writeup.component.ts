@@ -7,7 +7,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { AppReviewService } from '../app-review.service';
 import { Subscription } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MatSelectModule } from '@angular/material/select';
 import { UserInterface } from '../../../common/services/user.service';
 import { MatCardModule } from '@angular/material/card';
@@ -445,12 +444,10 @@ export class TestimonialWriteupSettingsComponent implements OnInit, OnDestroy {
                     this.testimonial = response.data;
                     this.cdr.markForCheck();
                 },
-                error: (error: HttpErrorResponse) => {
+                // FE-01: dual-shape reader (raw or normalized error).
+                error: (error: any) => {
                     this.isSpinning = false;
-                    let errorMessage = 'Server error occurred, please try again.';
-                    if (error.error && error.error.message) {
-                        errorMessage = error.error.message;
-                    }  
+                    const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
                     this.snackBar.open(errorMessage, 'Ok', {duration: 3000});
                     this.cdr.markForCheck();
                 }

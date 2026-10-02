@@ -4,7 +4,6 @@ import { Subscription } from 'rxjs';
 import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { SettingsService, NotificationInterface } from '../system.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { UserInterface } from '../../../common/services/user.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -197,13 +196,11 @@ export class NotificationSettingsComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.snackBar.open(response.message, 'Ok',{duration: 3000});
         },
-         error: (error: HttpErrorResponse) => {
+         // FE-01: dual-shape reader (raw or normalized error).
+         error: (error: any) => {
           //this.isSpinning = false;
 
-          let errorMessage = 'Server error occurred, please try again.'; // default error message.
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message; // Use backend's error message if available.
-          }  
+          const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
           this.snackBar.open(errorMessage, 'Ok',{duration: 3000});
           //this.cdr.markForCheck();
         }

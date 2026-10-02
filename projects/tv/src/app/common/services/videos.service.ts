@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
-import { ApiService } from "./api.service";
+// FE-01 final batch migrated: transport via core (was legacy adapter).
+import { ApiService } from "../../core/services/api.service";
 import { Observable } from "rxjs";
 
 export interface VideoInterface {

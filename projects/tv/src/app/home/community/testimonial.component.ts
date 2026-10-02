@@ -5,7 +5,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HomeService, TestimonialInterface } from '../home.service';
 import { UserInterface } from '../../common/services/user.service';
-import { HttpErrorResponse } from '@angular/common/http';
 
 /**
  * @title Indeterminate progress-bar
@@ -367,7 +366,7 @@ export class CommunityTestimonialComponent {
 
     if (this.user)
     this.homeService.addReaction(this.user._id, testimonial._id, newReaction).subscribe({
-      error: (error: HttpErrorResponse) => {
+      error: (error: any) => {
         // Rollback on error
         Object.assign(testimonial, previousState);
         this.cdr.markForCheck();

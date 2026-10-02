@@ -14,7 +14,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { startWith, Subscription } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
 
 import { SettingsService } from '../../settings.service';
 import { UserInterface } from '../../../common/services/user.service';
@@ -217,7 +216,7 @@ export class PersonalInfoComponent implements OnInit, OnDestroy {
             this.showNotification(response.message);
             this.isLoading = false;
           },
-          error: (error: HttpErrorResponse) => {
+          error: (error: any) => {
             this.handleError(error);
             this.isLoading = false;
             this.cdr.markForCheck();
@@ -244,7 +243,7 @@ export class PersonalInfoComponent implements OnInit, OnDestroy {
           this.isLoading = false;
           this.cdr.markForCheck();
         },
-        error: (error: HttpErrorResponse) => {
+        error: (error: any) => {
           this.handleError(error);
           this.isLoading = false;
           this.cdr.markForCheck();
@@ -260,8 +259,9 @@ export class PersonalInfoComponent implements OnInit, OnDestroy {
     });
   }
 
-  private handleError(error: HttpErrorResponse): void {
-    const errorMessage = error.error?.message || 'Server error occurred, please try again.';
+  // FE-01: dual-shape reader (raw or normalized error).
+  private handleError(error: any): void {
+    const errorMessage = error?.error?.message || error?.message || 'Server error occurred, please try again.';
     this.showNotification(errorMessage);
   }
 

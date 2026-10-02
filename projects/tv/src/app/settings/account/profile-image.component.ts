@@ -10,7 +10,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { UserInterface } from '../../common/services/user.service';
-import { ApiService } from '../../common/services/api.service';
+// FE-01 final batch migrated: transport via core.
+import { ApiService } from '../../core/services/api.service';
 
 @Component({
   selector: 'async-profile-image-uploader',

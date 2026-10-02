@@ -16,7 +16,6 @@ import { Router, RouterModule } from '@angular/router';
 import { UserInterface, UserService } from '../../common/services/user.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { AuthService } from '../../auth/auth.service';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'async-navbar',
@@ -115,7 +114,7 @@ export class NavbarComponent implements OnDestroy, OnInit {
             window.location.reload();
           }
         },
-        error: (error: HttpErrorResponse) => {
+        error: (error: any) => {
           console.error('Error during sign out:', error);
           this.router.navigate(['/'], { replaceUrl: true });
         }

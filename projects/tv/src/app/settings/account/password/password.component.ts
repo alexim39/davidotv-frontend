@@ -9,7 +9,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Subscription } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
 
 import { SettingsService } from '../../settings.service';
 import { UserInterface } from '../../../common/services/user.service';
@@ -127,8 +126,9 @@ export class PasswordChangeComponent implements OnInit, OnDestroy {
           this.isLoading = false;
           this.cdr.detectChanges(); // Trigger change detection after async operation
         },
-        error: (error: HttpErrorResponse) => {
-          const errorMessage = error.error?.message || 'Failed to change password. Please try again.';
+        // FE-01: dual-shape reader (raw or normalized error).
+        error: (error: any) => {
+          const errorMessage = error?.error?.message || error?.message || 'Failed to change password. Please try again.';
           this.showNotification(errorMessage, 'error');
           this.isLoading = false;
           this.cdr.detectChanges(); // Trigger change detection after error
