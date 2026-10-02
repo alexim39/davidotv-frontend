@@ -34,30 +34,34 @@ export class TalentService {
   readonly uploads = signal<TalentUpload[]>([]);
   readonly loading = signal(false);
 
+  // API-01: versioned prefix. Bare /talent-upload mounts the SAME router, so
+  // behavior is identical — this only exercises the canonical path.
+  private static readonly BASE = 'api/v1/talent-upload';
+
   list(params: { page?: number; limit?: number; sort?: string; genre?: string; status?: string } = {}): Observable<PaginatedTalent> {
     let hp = new HttpParams();
     Object.entries(params).forEach(([k,v]) => { if(v!=null) hp = hp.set(k, String(v)); });
     this.loading.set(true);
-    return this.api.get<PaginatedTalent>('talent-upload', hp).pipe(
+    return this.api.get<PaginatedTalent>(TalentService.BASE, hp).pipe(
       tap(res => { this.uploads.set(res.data); this.loading.set(false); })
     );
   }
 
   curatedQueue(page = 1, limit = 12): Observable<PaginatedTalent> {
     const params = new HttpParams().set('sort', '-likeCount,-plays,-createdAt').set('page', String(page)).set('limit', String(limit));
-    return this.api.get<PaginatedTalent>('talent-upload/curated', params);
+    return this.api.get<PaginatedTalent>(`${TalentService.BASE}/curated`, params);
   }
 
   upload(formData: FormData): Observable<{ data: TalentUpload }> {
-    return this.api.upload<{ data: TalentUpload }>('talent-upload', formData);
+    return this.api.upload<{ data: TalentUpload }>(TalentService.BASE, formData);
   }
 
-  like(id: string): Observable<any> { return this.api.post(`talent-upload/${id}/like`, {}); }
-  share(id: string): Observable<any> { return this.api.post(`talent-upload/${id}/share`, {}); }
-  play(id: string): Observable<any> { return this.api.post(`talent-upload/${id}/play`, {}); }
-  comment(id: string, text: string): Observable<any> { return this.api.post(`talent-upload/${id}/comments`, { text }); }
+  like(id: string): Observable<any> { return this.api.post(`${TalentService.BASE}/${id}/like`, {}); }
+  share(id: string): Observable<any> { return this.api.post(`${TalentService.BASE}/${id}/share`, {}); }
+  play(id: string): Observable<any> { return this.api.post(`${TalentService.BASE}/${id}/play`, {}); }
+  comment(id: string, text: string): Observable<any> { return this.api.post(`${TalentService.BASE}/${id}/comments`, { text }); }
 
   /** Admin: trigger Call-Up */
-  callUp(id: string): Observable<any> { return this.api.post(`talent-upload/${id}/call-up`, {}); }
-  flag(id: string, reason: string): Observable<any> { return this.api.post(`talent-upload/${id}/flag`, { reason }); }
+  callUp(id: string): Observable<any> { return this.api.post(`${TalentService.BASE}/${id}/call-up`, {}); }
+  flag(id: string, reason: string): Observable<any> { return this.api.post(`${TalentService.BASE}/${id}/flag`, { reason }); }
 }

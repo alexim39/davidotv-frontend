@@ -76,9 +76,9 @@ export class AuthStateService {
     );
   }
 
-  /** SEC-02 identity check: new /api/identity/me, fallback legacy GET auth. */
+  /** SEC-02 identity check: canonical /api/v1/identity/me, fallback legacy GET auth. */
   me() {
-    return this.api.get<any>('api/identity/me').pipe(
+    return this.api.get<any>('api/v1/identity/me').pipe(
       tap(res => {
         const user = res?.data ?? res?.user ?? null;
         if (user) this.persist(user, user.token ?? this._user()?.token);
