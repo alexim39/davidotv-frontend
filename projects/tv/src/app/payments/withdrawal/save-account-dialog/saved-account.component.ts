@@ -22,7 +22,6 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PaymentService, SavedAccountInterface } from '../../payment.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { EMPTY, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
@@ -541,9 +540,10 @@ export class SavedAccountsComponent {
 
     this.paymentService.removeSavedAccount(account._id, this.data.userId)
       .pipe(
-        catchError((error: HttpErrorResponse) => {
+        // FE-01: normalized error shape {status,message,requestId}.
+        catchError((error: any) => {
           console.error('Error removing account:', error);
-          const errorMessage = error.error?.message || 'Failed to remove account. Please try again.';
+          const errorMessage = error?.message || 'Failed to remove account. Please try again.';
           this.showErrorMessage(errorMessage);
           return EMPTY;
         }),

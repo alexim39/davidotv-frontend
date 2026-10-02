@@ -25,7 +25,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { PaymentService, SavedAccountInterface, WithdrawalRequestData } from '../payment.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Subject, EMPTY, of } from 'rxjs';
 import { 
   debounceTime, 
@@ -537,8 +536,9 @@ export class WithdrawalComponent implements OnInit {
 
     this.paymentService.resolveAccount(accountNumber, bankCode)
       .pipe(
-        catchError((error: HttpErrorResponse) => {
-          const errorMessage = error.error?.message || 'Failed to resolve account name. Please check account details.';
+        // FE-01: normalized error shape {status,message,requestId}.
+        catchError((error: any) => {
+          const errorMessage = error?.message || 'Failed to resolve account name. Please check account details.';
           this.showErrorMessage(errorMessage);
           return EMPTY;
         }),
@@ -618,8 +618,9 @@ export class WithdrawalComponent implements OnInit {
 
     this.paymentService.withdrawRequest(formData)
       .pipe(
-        catchError((error: HttpErrorResponse) => {
-          const errorMessage = error.error?.message || 'Server error occurred, please try again.';
+        // FE-01: normalized error shape {status,message,requestId}.
+        catchError((error: any) => {
+          const errorMessage = error?.message || 'Server error occurred, please try again.';
           this.showErrorMessage(errorMessage);
           return EMPTY;
         }),

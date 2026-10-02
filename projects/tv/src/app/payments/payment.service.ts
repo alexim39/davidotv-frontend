@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiService } from '../common/services/api.service';
+// FE-01 payments domain migrated: transport via core. Errors are NORMALIZED
+// {status,message,requestId} — consumers must read error.message.
+import { ApiService } from '../core/services/api.service';
 
 export interface TransactionInterface {
   message: string;
