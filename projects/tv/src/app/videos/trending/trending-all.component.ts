@@ -308,7 +308,7 @@ export class TrendingAllComponent implements OnInit, OnDestroy {
 
   goToVideo(videoId: string | undefined) {
     if (videoId) {
-      this.router.navigate(['/watch', videoId]);
+      this.router.navigate(['/media/watch', videoId]);
     }
   }
 

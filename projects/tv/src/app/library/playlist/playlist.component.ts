@@ -51,7 +51,7 @@ import { PlaylistEditDialogComponent } from './details/playlist-edit.component';
             <button mat-raised-button color="primary" (click)="router.navigate(['/auth/login'])">
               SIGN IN
             </button>
-            <button mat-stroked-button (click)="router.navigate(['/videos'])">
+            <button mat-stroked-button (click)="router.navigate(['/media/trending'])">
               BROWSE VIDEOS
             </button>
           </div>

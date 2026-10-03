@@ -334,7 +334,7 @@ export class OfficialComponent implements OnInit, OnDestroy {
   }
 
   goToVideo(videoId: string) {
-    this.router.navigate(['/watch', videoId]);
+    this.router.navigate(['/media/watch', videoId]);
   }
 
   clearSearch() {

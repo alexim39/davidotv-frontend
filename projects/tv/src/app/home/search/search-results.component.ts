@@ -97,7 +97,7 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
           <button 
             mat-flat-button 
             color="primary" 
-            routerLink="/videos/trending"
+            routerLink="/media/trending"
             aria-label="Browse trending videos"
           >
             <mat-icon>explore</mat-icon>
@@ -288,7 +288,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
 
   goToVideo(videoId: string | undefined) {
     if (videoId) {
-      this.router.navigate(['/watch', videoId]);
+      this.router.navigate(['/media/watch', videoId]);
     }
   }
 

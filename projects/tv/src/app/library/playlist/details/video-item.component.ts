@@ -244,7 +244,7 @@ export class VideoItemComponent implements OnInit, OnDestroy {
   }
 
   playVideo(video: any) {
-    this.router.navigate(['/watch', video.youtubeVideoId]);
+    this.router.navigate(['/media/watch', video.youtubeVideoId]);
   }
   
   shareVideo(video: any) {

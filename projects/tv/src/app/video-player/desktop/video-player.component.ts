@@ -596,7 +596,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       }
       const nextVideo = this.davidoVideos[nextIndex];
       this.currentVideoIndex = nextIndex;
-      this.router.navigate(['/watch', nextVideo.youtubeVideoId]);
+      this.router.navigate(['/media/watch', nextVideo.youtubeVideoId]);
       this.loadVideo(nextVideo.youtubeVideoId);
       this.playVideo();
     }
@@ -610,7 +610,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       }
       const prevVideo = this.davidoVideos[prevIndex];
       this.currentVideoIndex = prevIndex;
-      this.router.navigate(['/watch', prevVideo.youtubeVideoId]);
+      this.router.navigate(['/media/watch', prevVideo.youtubeVideoId]);
       this.loadVideo(prevVideo.youtubeVideoId);
       this.playVideo();
     }
@@ -865,7 +865,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   }
 
   navigateToVideo(videoId: string) {
-    this.router.navigate(['/watch', videoId]).then(() => {
+    this.router.navigate(['/media/watch', videoId]).then(() => {
       this.loadVideo(videoId);
       if (this.user?.preferences?.autoplay) {
         const checkPlayer = setInterval(() => {

@@ -166,6 +166,6 @@ export class BannerComponent {
    }
 
   loadVideos(): void {
-    this.router.navigate(['/videos']);
+    this.router.navigate(['/media/trending']);
   }
 }

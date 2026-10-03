@@ -78,7 +78,7 @@ interface WatchedVideo {
     <ng-container *ngIf="!isLoading; else loadingTpl">
       <div class="video-grid" *ngIf="watchedVideos.length > 0 && isAuthenticated; else emptyStateTpl">
         <!-- Video Cards -->
-        <mat-card class="video-card" *ngFor="let video of watchedVideos" [routerLink]="['/watch', video.videoId]">
+        <mat-card class="video-card" *ngFor="let video of watchedVideos" [routerLink]="['/media/watch', video.videoId]">
         <div class="thumbnail-container">
           <img [src]="'https://i.ytimg.com/vi/' + video.videoId + '/mqdefault.jpg'" 
               alt="{{ video.title  }}" 

@@ -275,7 +275,7 @@ export class MobileVideoPlayerComponent implements OnInit, OnDestroy, AfterViewI
     if (nextVideo) {
       // You've already correctly updated this to use the single isLoading state
       this.isLoading.set(true); 
-      this.router.navigate(['/watch', nextVideo.youtubeVideoId]);
+      this.router.navigate(['/media/watch', nextVideo.youtubeVideoId]);
     }
   }
 
@@ -284,7 +284,7 @@ export class MobileVideoPlayerComponent implements OnInit, OnDestroy, AfterViewI
     const prevVideo = this.getPreviousVideo();
     if (prevVideo) {
       this.isLoading.set(true); // Now uses the single loading state
-      this.router.navigate(['/watch', prevVideo.youtubeVideoId]);
+      this.router.navigate(['/media/watch', prevVideo.youtubeVideoId]);
     }
   }
 

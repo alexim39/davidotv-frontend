@@ -43,15 +43,15 @@ import { MatDialog } from '@angular/material/dialog';
               <mat-icon>home</mat-icon>
               <span>Home</span>
             </a>
-            <a mat-list-item routerLink="/videos/trending" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/media/trending" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
               <mat-icon>local_fire_department</mat-icon>
               <span>Trending</span>
             </a>
-            <a mat-list-item routerLink="/official/videos" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/media/official" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
               <mat-icon>play_circle</mat-icon>
               <span>Official</span>
             </a>
-            <a mat-list-item routerLink="/videos" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/media/trending" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
               <mat-icon>music_video</mat-icon>
               <span>Videos</span>
             </a>
@@ -357,7 +357,7 @@ export class HomeContainerComponent implements OnInit, OnDestroy {
 
   uploadContent(): void {    
     if (this.isAuthenticated) {
-      this.router.navigateByUrl('upload');
+      this.router.navigateByUrl('/talent/upload');
     } else {
       this.authDialog();
     }

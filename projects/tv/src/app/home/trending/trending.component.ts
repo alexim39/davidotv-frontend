@@ -51,7 +51,7 @@ import { YoutubeService } from "../../common/services/youtube.service";
             <mat-icon class="section-icon" aria-hidden="false" aria-label="Trending now">local_fire_department</mat-icon>
             <h2 class="section-title">Trending Now</h2>
           </div>
-          <a mat-button routerLink="videos/trending" class="see-all" aria-label="See all trending videos">
+          <a mat-button routerLink="/media/trending" class="see-all" aria-label="See all trending videos">
             See all
             <mat-icon>arrow_forward</mat-icon>
           </a>
@@ -289,7 +289,7 @@ export class TrendingComponent implements OnInit, OnDestroy {
 
   goToVideo(videoId: string | undefined) {
     if (videoId) {
-      this.router.navigate(['/watch', videoId]);
+      this.router.navigate(['/media/watch', videoId]);
     }
   }
 

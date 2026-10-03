@@ -2,6 +2,14 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
+  // ── IA canonicalization (docs/design/03-ia-and-navigation.md) ──
+  // Legacy video stack -> canonical /media/* (full match: no segment bleed).
+  // Legacy components remain in HomeRoutes as fallback; delete after parity.
+  { path: 'videos', redirectTo: '/media/trending', pathMatch: 'full' },
+  { path: 'videos/trending', redirectTo: '/media/trending', pathMatch: 'full' },
+  { path: 'official', redirectTo: '/media/official', pathMatch: 'full' },
+  { path: 'official/videos', redirectTo: '/media/official', pathMatch: 'full' },
+  { path: 'watch/:id', redirectTo: '/media/watch/:id', pathMatch: 'full' },
   { path: '', loadChildren: () => import('./home/home.route').then(r => r.HomeRoutes) },
   { path: 'legal', loadChildren: () => import('./legal/legal-routes').then(r => r.legalRoutes) },
 

@@ -25,7 +25,7 @@ export interface VideoCardData {
   imports: [RouterModule, MatIconModule, ShortNumberPipe, TruncatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <a class="video-card" [routerLink]="['/watch', data.youtubeVideoId]" [attr.aria-label]="'Watch ' + data.title">
+    <a class="video-card" [routerLink]="['/media/watch', data.youtubeVideoId]" [attr.aria-label]="'Watch ' + data.title">
       <div class="thumb-wrap">
         <img
           [src]="data.thumbnail || ('https://i.ytimg.com/vi/' + data.youtubeVideoId + '/mqdefault.jpg')"
