@@ -45,7 +45,7 @@ import { EnterChallengeDialogComponent } from '../../challenges/enter-dialog.com
                 <p class="artist">{{t.artistName}} • &#64;{{t.uploader.username}}</p>
                 <audio controls [src]="t.fileUrl" preload="metadata" (play)="play(t)"></audio>
                 <div class="eng">
-                  <button mat-stroked-button (click)="like(t)"><mat-icon [style.color]="likedSet.has(t._id) ? '#FB7185':''">favorite</mat-icon> {{t.likeCount | shortNumber}}</button>
+                  <button mat-stroked-button (click)="like(t)"><mat-icon [style.color]="likedSet().has(t._id) ? '#FB7185':''">favorite</mat-icon> {{t.likeCount | shortNumber}}</button>
                   <button mat-stroked-button (click)="share(t)"><mat-icon>share</mat-icon> {{t.shareCount | shortNumber}}</button>
                   @if (isMine(t)) {
                     <button mat-stroked-button (click)="enterChallenge(t)"><mat-icon>emoji_events</mat-icon> Enter</button>
@@ -91,7 +91,8 @@ export class TalentFeedComponent implements OnInit {
   loading = signal(true);
   loadingMore = signal(false);
   page = signal(1);
-  likedSet = new Set<string>();
+  /** Signal so OnPush re-renders the heart state (a plain Set never surfaces). */
+  likedSet = signal<Set<string>>(new Set());
 
   ngOnInit(): void { this.loadMore(); }
 
@@ -111,18 +112,39 @@ export class TalentFeedComponent implements OnInit {
     });
   }
   like(t: TalentUpload): void {
-    if (this.likedSet.has(t._id)) return;
+    if (this.likedSet().has(t._id)) return;
     this.analytics.track('like', t._id);
-    this.talent.like(t._id).subscribe(()=>{ t.likeCount++; this.likedSet.add(t._id); });
+    this.talent.like(t._id).subscribe({
+      next: () => {
+        this.patchItem(t._id, { likeCount: (t.likeCount || 0) + 1 });
+        this.likedSet.update((s) => new Set(s).add(t._id));
+      },
+      error: (err) => {
+        const msg = err?.error?.message || err?.message || 'Like failed. Please try again.';
+        this.snack.open(msg, 'Close', { duration: 3000 });
+      }
+    });
   }
   share(t: TalentUpload): void {
     this.analytics.track('share', t._id);
-    this.talent.share(t._id).subscribe(()=> t.shareCount++);
-    if (navigator.share) navigator.share({ title: t.title, url: location.href }).catch(()=>{});
+    this.talent.share(t._id).subscribe({
+      next: () => this.patchItem(t._id, { shareCount: (t.shareCount || 0) + 1 }),
+      error: () => {}
+    });
+    if (navigator.share) {
+      navigator.share({ title: t.title, text: `${t.title} by ${t.artistName} — Next Global Star on DavidoTV`, url: location.href }).catch(()=>{});
+    }
   }
   play(t: TalentUpload): void {
     this.analytics.track('talent_view', t._id);
-    this.talent.play(t._id).subscribe(()=> t.plays++);
+    this.talent.play(t._id).subscribe({
+      next: () => this.patchItem(t._id, { plays: (t.plays || 0) + 1 }),
+      error: () => {}
+    });
+  }
+  /** Immutable patch so OnPush re-renders counts (plain mutation never surfaces). */
+  private patchItem(id: string, patch: Partial<TalentUpload>): void {
+    this.items.update((list) => list.map((i) => (i._id === id ? { ...i, ...patch } : i)));
   }
   /** Own uploads only — the backend enforces ownership too. */
   isMine(t: TalentUpload): boolean {
