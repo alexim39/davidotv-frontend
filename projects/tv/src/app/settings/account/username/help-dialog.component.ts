@@ -60,7 +60,7 @@ import { MatDividerModule } from '@angular/material/divider';
 
           .header-icon {
             margin-right: 12px;
-            color: #8f0045;
+            color: var(--dt-accent-2);
           }
         }
 
@@ -76,7 +76,7 @@ import { MatDividerModule } from '@angular/material/divider';
         color: var(--dt-text-2);
 
         h4 {
-          color: #8f0045;
+          color: var(--dt-accent-2);
           margin: 20px 0 10px;
           font-size: 16px;
         }

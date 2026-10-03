@@ -156,7 +156,7 @@ interface DialogData {
         h1 {
           margin: 0 0 1rem 0;
           font-size: 1.8rem;
-          color: #8f0045;
+          color: var(--dt-accent-2);
         }
         
         .event-meta {
@@ -171,7 +171,7 @@ interface DialogData {
             gap: 1rem;
             
             mat-icon {
-              color: #8f0045;
+              color: var(--dt-accent-2);
               margin-top: 2px;
             }
             
@@ -190,7 +190,7 @@ interface DialogData {
           margin: 2rem 0;
           
           h3 {
-            color: #8f0045;
+            color: var(--dt-accent-2);
             margin-bottom: 0.5rem;
           }
           
@@ -204,7 +204,7 @@ interface DialogData {
           margin: 2rem 0;
           
           h3 {
-            color: #8f0045;
+            color: var(--dt-accent-2);
             margin-bottom: 1rem;
           }
           

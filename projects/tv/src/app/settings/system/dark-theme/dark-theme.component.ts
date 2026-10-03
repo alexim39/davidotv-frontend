@@ -86,7 +86,7 @@ import { MatIconModule } from '@angular/material/icon';
           align-items: center;
 
           mat-icon {
-            color: #8f0045;
+            color: var(--dt-accent-2);
             margin-right: 16px;
             font-size: 24px;
             width: 24px;
@@ -120,7 +120,7 @@ import { MatIconModule } from '@angular/material/icon';
           }
 
           &.mat-checked .mat-slide-toggle-thumb {
-            background-color: #8f0045;
+            background-color: var(--dt-accent-2);
           }
         }
       }
@@ -144,7 +144,7 @@ import { MatIconModule } from '@angular/material/icon';
 
         .preview-header {
           height: 40px;
-          background: #8f0045;
+          background: var(--dt-accent-2);
         }
 
         .preview-content {

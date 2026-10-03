@@ -113,7 +113,7 @@ import { MatDialog } from '@angular/material/dialog';
   styles: [`
     /* Variables */
     /* :root {
-      --primary: #8f0045;
+      --primary: var(--dt-accent-2);
       --accent: #282828;
       --background: #f9f9f9;
       --desktop-sidenav-width: 240px;
@@ -161,7 +161,7 @@ import { MatDialog } from '@angular/material/dialog';
       color: var(--dt-text-2, #C9C9D1);
       border-radius: var(--dt-radius-card, var(--dt-radius-card));
       margin: 2px 8px;
-      //color: #8f0045;
+      //color: var(--dt-accent-2);
       transition: background-color 0.2s;
 
       mat-icon {

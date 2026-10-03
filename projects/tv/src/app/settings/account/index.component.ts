@@ -203,12 +203,12 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
       align-items: center;
       gap: 4px;
       text-decoration: none;
-      color: #8f0045;
+      color: var(--dt-accent-2);
       transition: color 0.2s;
     }
 
     .breadcrumb a:hover {
-      color: #8f0045;
+      color: var(--dt-accent-2);
     }
 
     .breadcrumb .current {
@@ -227,7 +227,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
     }
 
     .transactions-icon {
-      color: #8f0045;
+      color: var(--dt-accent-2);
       font-size: 32px;
     }
 
@@ -250,7 +250,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
     font-weight: 600;
 
     .header-icon {
-      color: #8f0045;
+      color: var(--dt-accent-2);
       margin-right: 16px;
       font-size: 32px;
       height: 32px;
@@ -262,7 +262,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
       transition: all 0.2s ease;
 
       &:hover {
-        color: #8f0045;
+        color: var(--dt-accent-2);
         transform: scale(1.1);
       }
     }
@@ -302,7 +302,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
   }
 
   .menu-toggle {
-    color: #8f0045;
+    color: var(--dt-accent-2);
     border-color: #e2e8f0;
     font-weight: 500;
     transition: all 0.2s ease;
@@ -349,7 +349,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
       margin: 0;
       font-size: 18px;
       font-weight: 600;
-      color: #8f0045;
+      color: var(--dt-accent-2);
       letter-spacing: 0.5px;
     }
 
@@ -357,7 +357,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
       transition: all 0.2s ease;
 
       &:hover {
-        color: #8f0045;
+        color: var(--dt-accent-2);
         transform: rotate(90deg);
       }
     }
@@ -381,7 +381,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
     margin-right: 16px;
 
     mat-icon {
-      color: #8f0045;
+      color: var(--dt-accent-2);
       font-size: 32px;
       width: 32px;
       height: 32px;
@@ -422,7 +422,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
     .nav-icon {
       margin-right: 16px;
-      color: #8f0045;
+      color: var(--dt-accent-2);
       font-size: 22px;
       width: 22px;
       height: 22px;
@@ -440,7 +440,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
     }
 
     &:hover {
-      color: #8f0045;
+      color: var(--dt-accent-2);
       transform: translateX(4px);
 
       .nav-chevron {
@@ -450,9 +450,9 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
     }
 
     &.active {
-      color: #8f0045;
+      color: var(--dt-accent-2);
       font-weight: 500;
-      box-shadow: inset 4px 0 0 #8f0045;
+      box-shadow: inset 4px 0 0 var(--dt-accent-2);
 
       .nav-chevron {
         opacity: 1;
@@ -481,8 +481,8 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
     }
 
     &:hover {
-      color: #8f0045;
-      border-color: #8f0045;
+      color: var(--dt-accent-2);
+      border-color: var(--dt-accent-2);
     }
   }
 }
@@ -565,7 +565,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
       }
       
       .nav-icon {
-        color: #8f0045;
+        color: var(--dt-accent-2);
       }
     }
     
@@ -573,17 +573,17 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
       background-color: rgba(143, 0, 69, 0.08);
       
       .nav-label {
-        color: #8f0045;
+        color: var(--dt-accent-2);
         font-weight: 500;
       }
       
       .nav-icon {
-        color: #8f0045;
+        color: var(--dt-accent-2);
       }
       
       .nav-chevron {
         opacity: 1;
-        color: #8f0045;
+        color: var(--dt-accent-2);
       }
     }
   }

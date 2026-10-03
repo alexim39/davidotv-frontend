@@ -311,7 +311,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
         margin-bottom: 24px;
 
         mat-icon {
-          color: #8f0045;
+          color: var(--dt-accent-2);
           font-size: 40px;
           width: 40px;
           height: 40px;
@@ -458,7 +458,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       }
 
       &.cart-btn:hover {
-        color: #8f0045;
+        color: var(--dt-accent-2);
       }
     }
 
@@ -482,7 +482,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       transition: color 0.2s ease;
 
       &:hover {
-        color: #8f0045;
+        color: var(--dt-accent-2);
       }
     }
 
@@ -503,7 +503,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     .current-price {
       font-size: 18px;
       font-weight: 700;
-      color: #8f0045;
+      color: var(--dt-accent-2);
     }
 
     .original-price {
@@ -661,7 +661,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       font-size: 16px;
       font-weight: 600;
       margin-bottom: 12px;
-      color: #8f0045;
+      color: var(--dt-accent-2);
 
       span:last-child {
         color: var(--dt-text-2);

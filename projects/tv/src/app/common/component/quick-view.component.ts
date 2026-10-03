@@ -130,7 +130,7 @@ import { ProductInterface } from '../../store/services/store.service';
           transition: all 0.2s ease;
 
           &:hover {
-            color: #8f0045;
+            color: var(--dt-accent-2);
             background-color: rgba(143, 0, 69, 0.08);
           }
         }
@@ -178,7 +178,7 @@ import { ProductInterface } from '../../store/services/store.service';
         .price {
           font-size: 1.5rem;
           font-weight: 700;
-          color: #8f0045;
+          color: var(--dt-accent-2);
         }
 
         .discount-price {
@@ -195,7 +195,7 @@ import { ProductInterface } from '../../store/services/store.service';
           .current-price {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #8f0045;
+            color: var(--dt-accent-2);
           }
 
           .discount-percent {

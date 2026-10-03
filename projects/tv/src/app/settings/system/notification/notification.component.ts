@@ -85,7 +85,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
           align-items: center;
 
           mat-icon {
-            color: #8f0045;
+            color: var(--dt-accent-2);
             margin-right: 16px;
             font-size: 24px;
             width: 24px;
@@ -119,7 +119,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
           }
 
           &.mat-checked .mat-slide-toggle-thumb {
-            background-color: #8f0045;
+            background-color: var(--dt-accent-2);
           }
         }
       }

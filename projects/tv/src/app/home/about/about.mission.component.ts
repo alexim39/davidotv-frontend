@@ -70,7 +70,7 @@ import { CommonModule } from '@angular/common';
     .hero {
       text-align: center;
       padding: 4rem 0;
-      background: linear-gradient(135deg, #8f0045 0%, #000000 100%);
+      background: linear-gradient(135deg, var(--dt-accent-2) 0%, #000000 100%);
       color: white;
       border-radius: var(--dt-radius-sm);
       margin-bottom: 4rem;
@@ -124,7 +124,7 @@ import { CommonModule } from '@angular/common';
       height: 2rem;
       width: 2rem;
       margin-right: 0.5rem;
-      color: #8f0045;
+      color: var(--dt-accent-2);
       margin-left:10px;
     }
 

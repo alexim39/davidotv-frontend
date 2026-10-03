@@ -148,7 +148,7 @@ import { Subscription } from 'rxjs';
           h1 {
             font-weight: 700;
             margin-bottom: 1rem;
-            //color: #8f0045;
+            //color: var(--dt-accent-2);
             font-size: 3.5rem;
           }
           
@@ -195,7 +195,7 @@ import { Subscription } from 'rxjs';
         .section-title {
           text-align: center;
           margin-bottom: 2rem;
-          color: #8f0045;
+          color: var(--dt-accent-2);
         }
       }
       

@@ -24,7 +24,7 @@ imports: [MatButtonModule, RouterModule, MatDividerModule, FormsModule, FilterPi
 styles: [`
     
 .head {
-  background: #8f0045;
+  background: var(--dt-accent-2);
   padding: 2em;
   font-family: Garamond, serif;
 

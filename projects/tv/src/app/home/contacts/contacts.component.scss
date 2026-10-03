@@ -1,5 +1,5 @@
 .head {
-  background: #8f0045;
+  background: var(--dt-accent-2);
   padding: 2em;
 
   article {
@@ -85,7 +85,7 @@
       align-items: center; /* Align items vertically center */
       .fa {
         font-size: 2em;
-        color: #8f0045;
+        color: var(--dt-accent-2);
       }
       .fa-icon {
         margin-right: 10px; /* Add spacing between the icon and text */

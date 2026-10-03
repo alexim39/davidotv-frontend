@@ -75,7 +75,7 @@ mat-nav-list {
     }
 
     mat-icon:not([matListAvatar]) {
-      color: #8f0045;
+      color: var(--dt-accent-2);
     }
   }
 }

@@ -69,7 +69,7 @@ import { TestimonialInterface } from '../../home/home.service';
 
     button {
       //background-color: white;
-      color: #8f0045;
+      color: var(--dt-accent-2);
       border: 1px solid #e5e5e5;
       border-radius: var(--dt-radius-sm);
       padding: 8px 16px;
@@ -112,16 +112,16 @@ import { TestimonialInterface } from '../../home/home.service';
         opacity: 1;
 
         &:hover {
-          color: #8f0045;
+          color: var(--dt-accent-2);
         }
       }
 
       .mat-tab-label-active {
-        color: #8f0045;
+        color: var(--dt-accent-2);
       }
 
       .mat-ink-bar {
-        background-color: #8f0045;
+        background-color: var(--dt-accent-2);
         height: 3px;
       }
 

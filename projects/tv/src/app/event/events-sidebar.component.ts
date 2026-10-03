@@ -130,7 +130,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
           mat-card-title {
             font-size: 1.1rem;
             font-weight: 500;
-            //color: #8f0045; /* Primary color */
+            //color: var(--dt-accent-2); /* Primary color */
           }
         }
         
@@ -261,7 +261,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         //vertical-align: middle;
       }
       .event-title {
-        //color: #8f0045;
+        //color: var(--dt-accent-2);
         margin-right: 0.3em;
       }
       .event-location {
@@ -286,7 +286,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 }
 
 mat-list-item {
-  border-bottom: 1px solid #8f0045;
+  border-bottom: 1px solid var(--dt-accent-2);
   
   &:last-child {
     border-bottom: none;
@@ -317,7 +317,7 @@ mat-list-item {
   display: flex;
   align-items: center;
   gap: 0.7em;
-  color: #8f0045;
+  color: var(--dt-accent-2);
   font-size: 1em;
   margin: 1em 0;
   justify-content: center;
@@ -327,7 +327,7 @@ mat-list-item {
   display: flex;
   align-items: center;
   gap: 0.5em;
-  color: #8f0045;
+  color: var(--dt-accent-2);
   font-size: 1em;
   margin: 1em 0;
   justify-content: center;

@@ -156,7 +156,7 @@ import { EventDetailDialogComponent } from './event-detail-dialog.component';
 
     .event-card.paused {
       animation: pulse 1.5s infinite;
-      box-shadow: 0 0 0 3px #8f0045;
+      box-shadow: 0 0 0 3px var(--dt-accent-2);
     }
 
     @keyframes pulse {
@@ -224,7 +224,7 @@ import { EventDetailDialogComponent } from './event-detail-dialog.component';
 
     .no-events-message, .error-message {
       text-align: center;
-      color: #8f0045;
+      color: var(--dt-accent-2);
       margin: 2rem 0;
       font-size: 1.1rem;
       display: flex;

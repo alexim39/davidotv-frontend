@@ -43,7 +43,7 @@ import { MatIconModule } from '@angular/material/icon';
       .text-content {
         text-align: center;
         h1 {
-          color: #8f0045;
+          color: var(--dt-accent-2);
           font-size: 2em;
         }
         h5 {

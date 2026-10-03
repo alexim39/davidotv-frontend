@@ -102,7 +102,7 @@ import { MatCardModule } from '@angular/material/card';
         }
 
         mat-icon {
-          color: #8f0045;
+          color: var(--dt-accent-2);
           margin-right: 16px;
         }
 

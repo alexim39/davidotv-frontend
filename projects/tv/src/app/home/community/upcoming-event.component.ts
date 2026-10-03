@@ -161,7 +161,7 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
         transition: all 0.2s ease;
 
         &:hover {
-          color: #8f0045;
+          color: var(--dt-accent-2);
           transform: translateX(4px);
         }
 
@@ -321,7 +321,7 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
     }
 
     .mobile-indicators span.active {
-      background: #8f0045;
+      background: var(--dt-accent-2);
     }
 
     .no-events {

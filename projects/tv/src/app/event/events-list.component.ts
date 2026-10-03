@@ -165,7 +165,7 @@ import { ErrorStateComponent } from '../shared/components/error-state/error-stat
       font-weight: 500;
       color: white;
     }
-    .event-badge .badge-primary { background-color: #8f0045; }
+    .event-badge .badge-primary { background-color: var(--dt-accent-2); }
     .event-badge .badge-accent { background-color: #ff4081; }
     .event-badge .badge-warn { background-color: #f44336; }
     .event-actions {
@@ -217,7 +217,7 @@ import { ErrorStateComponent } from '../shared/components/error-state/error-stat
       width: 1rem;
       height: 1rem;
       margin-right: 0.5rem;
-      color: #8f0045;
+      color: var(--dt-accent-2);
     }
     mat-card-actions {
       padding: 0 1rem 1rem;

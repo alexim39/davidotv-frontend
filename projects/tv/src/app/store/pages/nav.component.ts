@@ -247,7 +247,7 @@ import { CartInterface, CartService } from './cart/cart.service';
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: linear-gradient(135deg, #3a2b63, #8f0045);
+      background: linear-gradient(135deg, #3a2b63, var(--dt-accent-2));
       color: white;
       font-family: 'Roboto', sans-serif;
     }
@@ -416,7 +416,7 @@ import { CartInterface, CartService } from './cart/cart.service';
 
       .cart-header {
         padding: 20px 24px;
-        background: linear-gradient(135deg, #3a2b63, #8f0045);
+        background: linear-gradient(135deg, #3a2b63, var(--dt-accent-2));
         color: white;
         display: flex;
         flex-direction: column;
@@ -493,12 +493,12 @@ import { CartInterface, CartService } from './cart/cart.service';
           transition: all 0.2s ease;
 
           &.active {
-            color: #8f0045;
-            border-bottom-color: #8f0045;
+            color: var(--dt-accent-2);
+            border-bottom-color: var(--dt-accent-2);
             font-weight: 600;
 
             mat-icon {
-              color: #8f0045;
+              color: var(--dt-accent-2);
             }
           }
 
@@ -546,7 +546,7 @@ import { CartInterface, CartService } from './cart/cart.service';
             margin-bottom: 16px;
 
             mat-icon {
-              color: #8f0045;
+              color: var(--dt-accent-2);
               font-size: 32px;
               width: 32px;
               height: 32px;
@@ -589,7 +589,7 @@ import { CartInterface, CartService } from './cart/cart.service';
           font-weight: 600;
 
           .amount {
-            color: #8f0045;
+            color: var(--dt-accent-2);
             font-size: 18px;
           }
         }
@@ -646,7 +646,7 @@ import { CartInterface, CartService } from './cart/cart.service';
             cursor: pointer;
 
             mat-icon {
-              color: #8f0045;
+              color: var(--dt-accent-2);
               font-size: 24px;
               width: 24px;
               height: 24px;
@@ -690,7 +690,7 @@ import { CartInterface, CartService } from './cart/cart.service';
             transition: all 0.2s ease;
 
             mat-icon {
-              color: #8f0045;
+              color: var(--dt-accent-2);
               font-size: 20px;
               width: 20px;
               height: 20px;

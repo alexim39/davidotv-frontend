@@ -313,7 +313,7 @@ import { MatIconModule } from '@angular/material/icon';
       gap: 16px;
 
       mat-icon {
-        color: #8f0045;
+        color: var(--dt-accent-2);
         font-size: 32px;
         height: 32px;
         width: 32px;

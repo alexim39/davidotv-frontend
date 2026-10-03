@@ -93,7 +93,7 @@ import { AuthService } from '../auth.service';
     }
 
     .submit-button {
-      background-color: #8f0045;
+      background-color: var(--dt-accent-2);
       color: white;
       &:hover {
         background-color: #6f0036;
@@ -104,7 +104,7 @@ import { AuthService } from '../auth.service';
     }
 
     .back-button {
-      color: #8f0045;
+      color: var(--dt-accent-2);
       margin-bottom: 1em;
     }
 

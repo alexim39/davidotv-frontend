@@ -208,11 +208,11 @@ export class ConfirmationDialogComponent {
       align-items: center;
       gap: 8px;
       margin: 0;
-      color: #8f0045;
+      color: var(--dt-accent-2);
     }
 
     .dialog-icon {
-      color: #8f0045;
+      color: var(--dt-accent-2);
     }
 
     .close-button {
@@ -293,7 +293,7 @@ export class ConfirmationDialogComponent {
     }
 
     .account-icon mat-icon {
-      color: #8f0045;
+      color: var(--dt-accent-2);
     }
 
     .account-details {

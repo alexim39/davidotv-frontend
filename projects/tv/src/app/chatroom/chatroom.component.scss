@@ -24,7 +24,7 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #eee;
-      background-color: #8f0045;
+      background-color: var(--dt-accent-2);
       color: white;
 
       h2 {
@@ -60,7 +60,7 @@
 
             &.active {
               background-color: rgba(143, 0, 69, 0.1);
-              color: #8f0045;
+              color: var(--dt-accent-2);
             }
 
             .room-name {
@@ -69,7 +69,7 @@
 
             .unread-badge {
               margin-left: auto;
-              background-color: #8f0045;
+              background-color: var(--dt-accent-2);
               color: white;
               border-radius: 50%;
               width: 20px;
@@ -105,7 +105,7 @@
 
       h2 {
         margin: 0;
-        color: #8f0045;
+        color: var(--dt-accent-2);
         text-align: center;
       }
 
@@ -199,7 +199,7 @@
       width: 48px;
       height: 48px;
       margin-bottom: 16px;
-      color: #8f0045;
+      color: var(--dt-accent-2);
     }
 
     h3 {

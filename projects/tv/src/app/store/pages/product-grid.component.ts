@@ -390,7 +390,7 @@ import { Subscription } from 'rxjs';
         .current-price {
           font-size: 18px;
           font-weight: 700;
-          color: #8f0045;
+          color: var(--dt-accent-2);
         }
 
         .original-price {

@@ -174,7 +174,7 @@ styles: [`
       font-size: 1.5em;
       margin-right: 1em;
       background: #fff0fa;
-      color: #8f0045;
+      color: var(--dt-accent-2);
       padding: 0.2em;
     }
   }

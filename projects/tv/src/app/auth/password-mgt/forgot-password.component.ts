@@ -90,7 +90,7 @@ import { Subscription } from 'rxjs';
     }
 
     .submit-button {
-      background-color: #8f0045;
+      background-color: var(--dt-accent-2);
       color: white;
       &:hover {
         background-color: #6f0036;
@@ -101,7 +101,7 @@ import { Subscription } from 'rxjs';
     }
 
     .back-button {
-      color: #8f0045;
+      color: var(--dt-accent-2);
       margin-bottom: 1em;
     }
 
@@ -110,7 +110,7 @@ import { Subscription } from 'rxjs';
       justify-content: space-between;
       margin-top: 1rem;
       a {
-        color: #8f0045;
+        color: var(--dt-accent-2);
         font-size: 0.9rem;
         font-weight: 500;
         text-decoration: none;

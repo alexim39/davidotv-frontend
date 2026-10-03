@@ -350,12 +350,12 @@ interface ApiTransactionData {
       align-items: center;
       gap: 4px;
       text-decoration: none;
-      color: #8f0045;
+      color: var(--dt-accent-2);
       transition: color 0.2s;
     }
 
     .breadcrumb a:hover {
-      color: #8f0045;
+      color: var(--dt-accent-2);
     }
 
     .breadcrumb .current {
@@ -374,7 +374,7 @@ interface ApiTransactionData {
     }
 
     .transactions-icon {
-      color: #8f0045;
+      color: var(--dt-accent-2);
       font-size: 32px;
     }
 
@@ -420,7 +420,7 @@ interface ApiTransactionData {
 
     .summary-icon,
     .table-icon {
-      color: #8f0045;
+      color: var(--dt-accent-2);
     }
 
     .summary-content {
@@ -497,7 +497,7 @@ interface ApiTransactionData {
       //background: #e3f2fd;
       padding: 4px 8px;
       border-radius: var(--dt-radius-sm);
-      color: #8f0045;
+      color: var(--dt-accent-2);
     }
 
     .amount {

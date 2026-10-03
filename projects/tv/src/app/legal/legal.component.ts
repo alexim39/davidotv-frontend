@@ -53,7 +53,7 @@ import { RouterModule } from '@angular/router';
               text-decoration: none;
               //color: rgb(56, 56, 56);
               font-weight: bold;
-              color: #8f0045;
+              color: var(--dt-accent-2);
             }
             a:hover {
               //color: rgb(151, 149, 149);
