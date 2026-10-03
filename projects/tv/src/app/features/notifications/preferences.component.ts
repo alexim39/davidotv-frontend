@@ -26,30 +26,32 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
       </div>
 
       @if (loading() && !prefs()) { <async-skeleton-loader [count]="2"/> }
-      @else if (prefs(); as p) {
-        <div class="card glass-surface">
-          <mat-slide-toggle [checked]="p.push" (change)="save({ push: $event.checked })">
-            Push notifications
-          </mat-slide-toggle>
-          <mat-slide-toggle [checked]="p.email" (change)="save({ email: $event.checked })">
-            Email notifications
-          </mat-slide-toggle>
+      @else {
+        @if (prefs(); as p) {
+          <div class="card glass-surface">
+            <mat-slide-toggle [checked]="p.push" (change)="save({ push: $event.checked })">
+              Push notifications
+            </mat-slide-toggle>
+            <mat-slide-toggle [checked]="p.email" (change)="save({ email: $event.checked })">
+              Email notifications
+            </mat-slide-toggle>
 
-          <h3 class="sec">Mute by type</h3>
-          <mat-chip-set>
-            @for (t of types; track t) {
-              <mat-chip
-                [highlighted]="!p.mutedTypes.includes(t)"
-                (click)="toggleType(t, p)">
-                <mat-icon matChipAvatar>{{ p.mutedTypes.includes(t) ? 'notifications_off' : 'notifications' }}</mat-icon>
-                {{ label(t) }}
-              </mat-chip>
-            }
-          </mat-chip-set>
+            <h3 class="sec">Mute by type</h3>
+            <mat-chip-set>
+              @for (t of types; track t) {
+                <mat-chip
+                  [highlighted]="!p.mutedTypes.includes(t)"
+                  (click)="toggleType(t, p)">
+                  <mat-icon matChipAvatar>{{ p.mutedTypes.includes(t) ? 'notifications_off' : 'notifications' }}</mat-icon>
+                  {{ label(t) }}
+                </mat-chip>
+              }
+            </mat-chip-set>
 
-          @if (saving()) { <p class="hint">Saving…</p> }
-          @if (savedFlash()) { <p class="ok">Saved ✓</p> }
-        </div>
+            @if (saving()) { <p class="hint">Saving…</p> }
+            @if (savedFlash()) { <p class="ok">Saved ✓</p> }
+          </div>
+        }
       }
     </section>
   `,
