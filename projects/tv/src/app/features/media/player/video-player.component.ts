@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, effect, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -14,6 +14,24 @@ import { VideoCommentsComponent } from './comments/video-comments.component';
 import { VideoService } from '../../../common/services/videos.service';
 import { Subscription } from 'rxjs';
 
+/** Loads the official YouTube IFrame API once (deterministic player events). */
+let ytApiPromise: Promise<void> | null = null;
+function loadYouTubeApi(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  const w = window as unknown as { YT?: { Player?: unknown }; onYouTubeIframeAPIReady?: () => void };
+  if (w.YT?.Player) return Promise.resolve();
+  if (!ytApiPromise) {
+    ytApiPromise = new Promise<void>((resolve) => {
+      w.onYouTubeIframeAPIReady = () => resolve();
+      const s = document.createElement('script');
+      s.src = 'https://www.youtube.com/iframe_api';
+      s.async = true;
+      document.head.appendChild(s);
+    });
+  }
+  return ytApiPromise;
+}
+
 /**
  * Premium watch page - responsive 16:9 + glass meta + engagement bar.
  */
@@ -27,6 +45,7 @@ import { Subscription } from 'rxjs';
       <div class="player-wrap obsidian-bg">
         <div class="stage">
           <iframe
+            #ytFrame
             *ngIf="embedSrc()"
             [src]="embedSrc()"
             title="{{v.title}}"
@@ -164,14 +183,25 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   autoplayNext = signal(this.readAutoplayPref());
   repeatOne = signal(this.readRepeatPref());
   descExpanded = signal(false);
-  private readonly onYTMessage = (e: MessageEvent) => this.handleYTMessage(e);
   // Stable trusted URL: embedUrl() mints a NEW SafeResourceUrl object per
   // call, and rebinding [src] reloads the iframe — so compute once per video.
   // (This was the "player restarts on like" bug.)
   embedSrc = signal<SafeResourceUrl | null>(null);
   private readonly currentId = signal('');
+  private ytPlayer: { destroy?: () => void } | null = null;
 
   @Input() videoId?: string;
+  @ViewChild('ytFrame') private frame?: ElementRef<HTMLIFrameElement>;
+
+  constructor() {
+    // Bind the official player API whenever a fresh iframe mounts
+    // (initial load, rail hops, repeat replays).
+    effect(() => {
+      if (this.embedSrc()) {
+        setTimeout(() => this.attachPlayer(), 0);
+      }
+    });
+  }
 
   ngOnInit(): void {
     // Rail taps reuse this component: reload on param change, not just init.
@@ -179,8 +209,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       const id = this.videoId ?? params.get('id') ?? '';
       if (id) this.loadVideo(id);
     });
-    window.addEventListener('message', this.onYTMessage);
-    this.media.getTrending(12).subscribe({
+    // Rail pages are 1-based (page 0 returns empty and starves prev/next).
+    this.media.getTrending(12, 1).subscribe({
       next: (res) => {
         const list = res?.data ?? [];
         this.upNext.set((Array.isArray(list) ? list : []).filter((v) => v?.youtubeVideoId).slice(0, 9));
@@ -257,26 +287,38 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }, 60);
   }
 
-  /** YouTube IFrame API posts {event:'onStateChange', info} — info 0 = ended. */
-  private handleYTMessage(e: MessageEvent): void {
-    if (e.origin !== 'https://www.youtube.com') return;
-    let data: any = e.data;
-    if (typeof data === 'string') {
+  /** Official YT.Player binding (deterministic ended events). */
+  private attachPlayer(): void {
+    const iframe = this.frame?.nativeElement;
+    if (!iframe || !iframe.isConnected) return;
+    loadYouTubeApi().then(() => {
       try {
-        data = JSON.parse(data);
+        this.ytPlayer?.destroy?.();
       } catch {
-        return;
+        // stale player already gone
       }
-    }
-    if (data?.event === 'onStateChange' && Number(data?.info) === 0) {
-      // Repeat wins over autoplay-next; both off means sit on the end screen.
-      if (this.repeatOne()) this.replayCurrent(this.currentId());
-      else if (this.autoplayNext()) this.playNext();
-    }
+      const YT = (window as unknown as { YT?: any }).YT;
+      if (!YT?.Player || !iframe.isConnected) return;
+      this.ytPlayer = new YT.Player(iframe, {
+        events: { onStateChange: (e: { data: number }) => this.onPlayerState(e?.data) },
+      });
+    });
+  }
+
+  /** YT.PlayerState.ENDED === 0. Repeat wins; both off sits on end screen. */
+  private onPlayerState(state: number): void {
+    if (state !== 0) return;
+    if (this.repeatOne()) this.replayCurrent(this.currentId());
+    else if (this.autoplayNext()) this.playNext();
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('message', this.onYTMessage);
+    try {
+      this.ytPlayer?.destroy?.();
+    } catch {
+      // already gone
+    }
+    this.ytPlayer = null;
     this.sub?.unsubscribe();
   }
 
