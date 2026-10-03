@@ -57,10 +57,10 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
   `,
   styles: [`
     .prefs{ padding:24px; background:#0B0B0C; min-height:70vh; display:grid; gap:16px; align-content:start; }
-    .head{ padding:var(--dt-radius-card); border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(var(--dt-radius-card)); }
+    .head{ padding:18px; border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(16px); }
     .title{ margin:0; color:#F8F7F8; font-size:20px; font-weight:800; }
     .sub{ margin:6px 0 0; color:#A1A1AA; font-size:12px; }
-    .card{ padding:var(--dt-radius-sheet); border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(14px); display:grid; gap:14px; max-width:560px; color:#F8F7F8; }
+    .card{ padding:20px; border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(14px); display:grid; gap:14px; max-width:560px; color:#F8F7F8; }
     .sec{ margin:4px 0 0; font-size:13px; font-weight:700; color:#A1A1AA; text-transform:uppercase; letter-spacing:0.06em; }
     .hint{ color:#71717A; font-size:12px; margin:0; }
     .ok{ color:#4ADE80; font-size:12px; margin:0; }

@@ -132,7 +132,7 @@
   .user-name { font-size: 13px; font-weight: 600; color: #F8F7F8; margin-right: 4px; max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* User menu polish (global also covers) */
-  .user-menu { margin-top: var(--dt-radius-sm); min-width: 280px; padding: 0; border-radius: var(--dt-radius-card, var(--dt-radius-card)); overflow: hidden; background: var(--dt-card, #1A1A1E); }
+  .user-menu { margin-top: 8px; min-width: 280px; padding: 0; border-radius: var(--dt-radius-card, var(--dt-radius-card)); overflow: hidden; background: var(--dt-card, #1A1A1E); }
   .menu-user-info-toned { padding: 1em; text-align: center; color: var(--dt-text-2, #C9C9D1); }
 
   .mobile-toggle { display: none; color: #A1A1AA; min-width: 44px; min-height: 44px; }

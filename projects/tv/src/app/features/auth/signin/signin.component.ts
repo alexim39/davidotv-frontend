@@ -48,12 +48,12 @@ import { AuthStateService } from '../../../core/services/auth-state.service';
   `,
   styles: [`
     .auth-wrap { min-height: 100vh; display:grid; place-items:center; padding:24px; background:#0B0B0C; }
-    .auth-card { max-width: 440px; width:100%; padding:32px; background: rgba(255,255,255,0.06); backdrop-filter: blur(var(--dt-radius-card)); border:1px solid rgba(255,255,255,0.10); border-radius:var(--dt-radius-sheet); }
+    .auth-card { max-width: 440px; width:100%; padding:32px; background: rgba(255,255,255,0.06); backdrop-filter: blur(16px); border:1px solid rgba(255,255,255,0.10); border-radius:var(--dt-radius-sheet); }
     .title { font-size:28px; font-weight:800; margin:0 0 6px; color:#F8F7F8; }
     .subtitle { color:#A1A1AA; margin:0 0 20px; font-size:14px; }
     .form { display:grid; gap:12px; }
     .full { width:100%; }
-    .rose-btn { background: linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; height:48px; border-radius:var(--dt-radius-pill); font-weight:600; box-shadow:0 var(--dt-radius-sm) 24px rgba(225,29,72,0.35); }
+    .rose-btn { background: linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; height:48px; border-radius:var(--dt-radius-pill); font-weight:600; box-shadow:0 8px 24px rgba(225,29,72,0.35); }
     .error { color:#FB7185; font-size:13px; margin:0; }
     .hint { margin-top:16px; text-align:center; color:#71717A; font-size:13px; }
     .hint a { color:#FB7185; text-decoration:none; }

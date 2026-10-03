@@ -34,7 +34,7 @@ import { MembershipService } from './membership.service';
   `,
   styles: [`
     .wrap{ min-height:70vh; display:grid; place-items:center; padding:24px; background:#0B0B0C; }
-    .card{ text-align:center; padding:32px; border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(var(--dt-radius-card)); max-width:420px; }
+    .card{ text-align:center; padding:32px; border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(16px); max-width:420px; }
     .ok{ color:#4ADE80; font-size:40px; width:40px; height:40px; }
     .bad{ color:#FB7185; font-size:40px; width:40px; height:40px; }
     h2{ margin:12px 0 4px; color:#F8F7F8; font-size:20px; font-weight:800; }

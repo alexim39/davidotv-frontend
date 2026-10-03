@@ -194,7 +194,7 @@ body:not(.dark-mode) {
 .product-price .discount-percent { color: #4ADE80 !important; }
 .add-to-cart, .product-actions .add-to-cart {
   background: linear-gradient(135deg,#BE123C,#FB7185) !important; color: white !important;
-  border-radius: var(--dt-radius-pill) !important; box-shadow: 0 var(--dt-radius-sm) 24px rgba(225,29,72,0.35);
+  border-radius: var(--dt-radius-pill) !important; box-shadow: 0 8px 24px rgba(225,29,72,0.35);
 }
 
 // Forum / Feed / Community cards

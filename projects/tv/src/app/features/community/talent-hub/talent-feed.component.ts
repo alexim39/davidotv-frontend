@@ -63,7 +63,7 @@ import { EnterChallengeDialogComponent } from '../../challenges/enter-dialog.com
   `,
   styles: [`
     .feed{ padding:24px; background:#0B0B0C; min-height:70vh; }
-    .hero{ padding:22px; border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(var(--dt-radius-card)); display:flex; flex-wrap:wrap; gap:var(--dt-radius-card); align-items:center; margin-bottom:var(--dt-radius-card); }
+    .hero{ padding:22px; border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(16px); display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:18px; }
     .hero-title{ margin:0; font-size:22px; font-weight:800; color:#F8F7F8; flex:1 1 100%; }
     .hero-sub{ color:#A1A1AA; font-size:13px; margin:0; flex:1 1 100%; }
     .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:var(--dt-radius-pill); }
@@ -71,7 +71,7 @@ import { EnterChallengeDialogComponent } from '../../challenges/enter-dialog.com
     .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
     .card{ overflow:hidden; border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(14px); }
     .cover{ height:160px; display:grid; place-items:center; position:relative; }
-    .play-fab{ width:56px; height:56px; border-radius:50%; border:0; background:rgba(255,255,255,0.92); display:grid; place-items:center; cursor:pointer; box-shadow:0 var(--dt-radius-sm) 24px rgba(0,0,0,0.35); }
+    .play-fab{ width:56px; height:56px; border-radius:50%; border:0; background:rgba(255,255,255,0.92); display:grid; place-items:center; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
     .body{ padding:14px; display:grid; gap:8px; }
     .t-title{ margin:0; color:#F8F7F8; font-size:16px; font-weight:700; }
     .artist{ margin:0; color:#A1A1AA; font-size:12px; }

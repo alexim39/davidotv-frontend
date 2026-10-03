@@ -73,14 +73,14 @@ export interface VideoCardData {
     }
     .badge {
       position: absolute; top: 8px; left: 8px; font-size: 10px; letter-spacing: 0.08em; font-weight: 700;
-      padding: var(--dt-radius-sm) var(--dt-radius-sm); border-radius: var(--dt-radius-pill); background: linear-gradient(135deg,#BE123C,#FB7185); color: white;
+      padding: 4px 8px; border-radius: var(--dt-radius-pill); background: linear-gradient(135deg,#BE123C,#FB7185); color: white;
     }
     .play-overlay {
       position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transition: opacity 180ms;
       background: radial-gradient(ellipse at center, rgba(0,0,0,0.35), transparent 60%);
     }
     .video-card:hover .play-overlay { opacity: 1; }
-    .play-overlay mat-icon { background: rgba(255,255,255,0.92); border-radius: 50%; padding: var(--dt-radius-sm); width: 44px; height: 44px; display: grid; place-items: center; }
+    .play-overlay mat-icon { background: rgba(255,255,255,0.92); border-radius: 50%; padding: 8px; width: 44px; height: 44px; display: grid; place-items: center; }
     .meta { padding: 12px; display: grid; gap: 4px; }
     .title { font-size: 14px; font-weight: 600; line-height: 1.35; color: #F8F7F8; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 38px; }
     .channel { font-size: 12px; color: #A1A1AA; margin: 0; }
