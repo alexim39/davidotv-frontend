@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MediaService, YoutubeVideo } from '../media.service';
 import { AuthStateService } from '../../../core/services/auth-state.service';
 import { AnalyticsService } from '../../../core/services/analytics.service';
@@ -24,7 +25,6 @@ import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
           <iframe
             [src]="embedUrl(v.youtubeVideoId)"
             title="{{v.title}}"
-            frameborder="0"
             allow="autoplay; encrypted-media"
             allowfullscreen
             class="iframe"
@@ -41,7 +41,7 @@ import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
           <div class="actions">
             <button mat-stroked-button (click)="like(v)"><mat-icon>favorite</mat-icon> {{ likes() }}</button>
             <button mat-stroked-button (click)="dislike(v)"><mat-icon>thumb_down</mat-icon></button>
-            <button mat-flat-button class="rose-btn"><mat-icon>share</mat-icon> Share</button>
+            <button mat-flat-button class="rose-btn" (click)="share(v)"><mat-icon>share</mat-icon> Share</button>
           </div>
         </div>
       </div>
@@ -70,6 +70,7 @@ export class VideoPlayerComponent implements OnInit {
   private readonly media = inject(MediaService);
   private readonly auth = inject(AuthStateService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   video = signal<YoutubeVideo | null>(null);
   likes = signal(0);
@@ -100,20 +101,40 @@ export class VideoPlayerComponent implements OnInit {
     });
   }
 
-  embedUrl(id: string): string {
-    // Use sanitized trusted url via string - caller should use DomSanitizer in production
-    return `https://www.youtube.com/embed/${id}?autoplay=0&rel=0`;
+  embedUrl(id: string): SafeResourceUrl {
+    // Bypass is safe: id is validated to video-id characters only, and the
+    // host + path are fixed (plain-string binding blanks the iframe).
+    const clean = /^[\w-]{6,}$/.test(id || '') ? id : '';
+    return this.sanitizer.bypassSecurityTrustResourceUrl(
+      `https://www.youtube.com/embed/${clean}?autoplay=0&rel=0`
+    );
   }
 
   like(v: YoutubeVideo): void {
     const user = this.auth.user();
-    if(!user) return;
+    if (!user) {
+      this.snack.open('Sign in to like videos.', 'Dismiss', { duration: 3000 });
+      return;
+    }
     this.analytics.track('like', v.youtubeVideoId);
     this.media.like(v.youtubeVideoId, user._id).subscribe((r:any)=> this.likes.set(r?.appLikes ?? this.likes()+1));
   }
   dislike(v: YoutubeVideo): void {
     const user = this.auth.user();
-    if(!user) return;
+    if (!user) {
+      this.snack.open('Sign in to rate videos.', 'Dismiss', { duration: 3000 });
+      return;
+    }
     this.media.dislike(v.youtubeVideoId, user._id).subscribe();
+  }
+  share(v: YoutubeVideo): void {
+    this.analytics.track('share', v.youtubeVideoId);
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({ title: v.title, text: `${v.title} — Watch on DavidoTV`, url }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(url);
+      this.snack.open('Video link copied to clipboard.', 'Close', { duration: 2000 });
+    }
   }
 }
