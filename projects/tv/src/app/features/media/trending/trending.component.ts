@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MediaService, YoutubeVideo } from '../media.service';
 import { VideoCardComponent } from '../../../shared/components/video-card/video-card.component';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader.component';
+import { MediaTabsComponent } from '../../../shared/components/media-tabs/media-tabs.component';
 import { IntersectionDirective } from '../../../shared/directives/intersection.directive';
 
 /**
@@ -13,7 +14,7 @@ import { IntersectionDirective } from '../../../shared/directives/intersection.d
 @Component({
   selector: 'async-feature-trending',
   standalone: true,
-  imports: [CommonModule, MatIconModule, VideoCardComponent, SkeletonLoaderComponent, IntersectionDirective],
+  imports: [CommonModule, MatIconModule, MediaTabsComponent, VideoCardComponent, SkeletonLoaderComponent, IntersectionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="trending obsidian-bg">
@@ -21,6 +22,7 @@ import { IntersectionDirective } from '../../../shared/directives/intersection.d
         <h2 class="headline"><mat-icon class="fire" aria-hidden="true">local_fire_department</mat-icon> Trending Now</h2>
         <p class="sub">Most loved Davido moments, refreshed daily by our YouTube pipeline.</p>
       </div>
+      <async-media-tabs active="trending" />
 
       @if (loading() && videos().length === 0) {
         <async-skeleton-loader [count]="8" />

@@ -6,20 +6,27 @@ import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loa
 import { MediaTabsComponent } from '../../../shared/components/media-tabs/media-tabs.component';
 import { IntersectionDirective } from '../../../shared/directives/intersection.directive';
 
+/**
+ * Full catalog (menuType=videos): everything the pipeline scraped that
+ * isn't surfaced by the Trending/Official rails. Same paging contract
+ * as trending (1-based, dedupe, loop guard).
+ */
 @Component({
-  selector: 'async-feature-official',
+  selector: 'async-feature-videos',
   standalone: true,
   imports: [CommonModule, MediaTabsComponent, VideoCardComponent, SkeletonLoaderComponent, IntersectionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="official obsidian-bg">
-      <div class="hero glass-surface">
-        <h2>Official Music</h2>
-        <p>Direct from Davido's verified channels — curated by our YouTube pipeline.</p>
+    <section class="videos obsidian-bg">
+      <div class="header">
+        <h2 class="headline">All Videos</h2>
+        <p class="sub">Every Davido moment in the catalog — deep cuts included.</p>
       </div>
-      <async-media-tabs active="official" />
-      @if (loading() && videos().length === 0) { <async-skeleton-loader [count]="6"/> }
-      @else {
+      <async-media-tabs active="videos" />
+
+      @if (loading() && videos().length === 0) {
+        <async-skeleton-loader [count]="8" />
+      } @else {
         <div class="grid">
           @for (v of videos(); track v.youtubeVideoId) {
             <async-video-card [data]="{
@@ -27,8 +34,9 @@ import { IntersectionDirective } from '../../../shared/directives/intersection.d
               title: v.title,
               channel: v.channel,
               views: v.views,
+              publishedAt: v.publishedAt,
               duration: v.duration,
-              isOfficialContent: true
+              isOfficialContent: v.isOfficialContent
             }"/>
           }
         </div>
@@ -39,16 +47,16 @@ import { IntersectionDirective } from '../../../shared/directives/intersection.d
     </section>
   `,
   styles: [`
-    .official{padding:24px;background:#0B0B0C;min-height:60vh}
-    .hero{padding:20px;border-radius:var(--dt-radius-sheet);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);backdrop-filter:blur(16px);margin-bottom:18px}
-    .hero h2{margin:0;color:#F8F7F8;font-size:22px;font-weight:800}
-    .hero p{margin:6px 0 0;color:#A1A1AA;font-size:13px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-    .sentinel{height:1px}
-    .end{text-align:center;color:var(--dt-text-3);font-size:13px;margin-top:16px}
+    .videos { padding: 24px; background: #0B0B0C; min-height: 60vh; }
+    .header { margin-bottom: 18px; }
+    .headline { font-size: 24px; font-weight: 800; color:#F8F7F8; margin:0; }
+    .sub { color:#A1A1AA; font-size:13px; margin:6px 0 0; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap:16px; }
+    .sentinel { height:1px; }
+    .end { text-align:center; color:var(--dt-text-3); font-size:13px; margin-top:16px; }
   `]
 })
-export class OfficialComponent implements OnInit {
+export class VideosComponent implements OnInit {
   private readonly media = inject(MediaService);
   videos = signal<YoutubeVideo[]>([]);
   loading = signal(false);
@@ -61,8 +69,8 @@ export class OfficialComponent implements OnInit {
     if (this.loading() || !this.hasMore()) return;
     this.loading.set(true);
     const next = this.page();
-    this.media.getOfficial(12, next).subscribe({
-      next: (res:any)=>{
+    this.media.getVideos(12, next).subscribe({
+      next: (res: any) => {
         const list: YoutubeVideo[] = res?.data ?? res ?? [];
         const seen = new Set(this.videos().map((v) => v.youtubeVideoId));
         const fresh = list.filter((v) => v?.youtubeVideoId && !seen.has(v.youtubeVideoId));
@@ -75,7 +83,7 @@ export class OfficialComponent implements OnInit {
         }
         this.loading.set(false);
       },
-      error: ()=> this.loading.set(false)
+      error: () => this.loading.set(false)
     });
   }
 }

@@ -11,6 +11,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader.component';
 import { VideoCommentsComponent } from './comments/video-comments.component';
+import { VideoService } from '../../../common/services/videos.service';
 import { Subscription } from 'rxjs';
 
 /**
@@ -43,8 +44,11 @@ import { Subscription } from 'rxjs';
           </div>
           <p class="desc">{{v.description}}</p>
           <div class="actions">
-            <button mat-stroked-button (click)="like(v)"><mat-icon>favorite</mat-icon> {{ likes() }}</button>
-            <button mat-stroked-button (click)="dislike(v)"><mat-icon>thumb_down</mat-icon></button>
+            <button mat-stroked-button (click)="like(v)" [attr.aria-pressed]="liked()"><mat-icon>favorite</mat-icon> {{ likes() }}</button>
+            <button mat-stroked-button (click)="toggleSave(v)" [attr.aria-pressed]="saved()">
+              <mat-icon>{{ saved() ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+              <span>{{ saved() ? 'Saved' : 'Save' }}</span>
+            </button>
             <button mat-flat-button class="rose-btn" (click)="share(v)"><mat-icon>share</mat-icon> Share</button>
           </div>
         </div>
@@ -115,10 +119,13 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   private readonly auth = inject(AuthStateService);
   private readonly analytics = inject(AnalyticsService);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly library = inject(VideoService);
   private sub: Subscription | null = null;
 
   video = signal<YoutubeVideo | null>(null);
   likes = signal(0);
+  liked = signal(false);
+  saved = signal(false);
   upNext = signal<YoutubeVideo[]>([]);
   upNextLoading = signal(true);
   // Stable trusted URL: embedUrl() mints a NEW SafeResourceUrl object per
@@ -159,6 +166,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.video.set(null);
     this.embedSrc.set(this.trustedEmbed(id));
     this.currentId.set(id);
+    this.liked.set(false);
+    this.saved.set(false);
     // WEF-01: consumption signal (anon-safe: service skips when signed out).
     this.analytics.track('video_watch', id);
     this.media.getById(id).subscribe({
@@ -166,6 +175,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         const v = res?.data ?? res;
         this.video.set(v);
         this.likes.set(v?.appLikes ?? v?.likes ?? 0);
+        this.refreshSavedState(v?.youtubeVideoId);
       },
       // Paywall: exclusive videos 403 with upgradeRequired for non-members.
       // Core ApiService normalizes to {status,message,requestId,raw}.
@@ -200,15 +210,53 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       return;
     }
     this.analytics.track('like', v.youtubeVideoId);
-    this.media.like(v.youtubeVideoId, user._id).subscribe((r:any)=> this.likes.set(r?.appLikes ?? this.likes()+1));
+    this.media.like(v.youtubeVideoId, user._id).subscribe({
+      next: (r: any) => {
+        this.likes.set(r?.appLikes ?? this.likes() + 1);
+        this.liked.set(true);
+      },
+      error: (e) => this.snack.open(e?.message ?? 'Like failed.', 'Dismiss', { duration: 3000 }),
+    });
   }
-  dislike(v: YoutubeVideo): void {
+  /** Library save toggle: retention loop with real state (replaces the
+   *  feedback-less dislike, which has no count field to display). */
+  toggleSave(v: YoutubeVideo): void {
     const user = this.auth.user();
     if (!user) {
-      this.snack.open('Sign in to rate videos.', 'Dismiss', { duration: 3000 });
+      this.snack.open('Sign in to save videos.', 'Dismiss', { duration: 3000 });
       return;
     }
-    this.media.dislike(v.youtubeVideoId, user._id).subscribe();
+    if (this.saved()) {
+      this.library.removeVideoFromLibrary(user._id, v.youtubeVideoId).subscribe({
+        next: () => {
+          this.saved.set(false);
+          this.snack.open('Removed from your library.', 'Close', { duration: 2000 });
+        },
+        error: (e) => this.snack.open(e?.message ?? 'Could not unsave.', 'Dismiss', { duration: 3000 }),
+      });
+      return;
+    }
+    this.library.saveVideoToLibrary(user._id, {
+      videoId: v.youtubeVideoId, title: v.title, channel: v.channel,
+    }).subscribe({
+      next: () => {
+        this.saved.set(true);
+        this.snack.open('Saved to your library.', 'View', { duration: 3000 })
+          .onAction().subscribe(() => this.router.navigate(['/library']));
+      },
+      error: (e) => this.snack.open(e?.message ?? 'Could not save.', 'Dismiss', { duration: 3000 }),
+    });
+  }
+  private refreshSavedState(youtubeVideoId?: string): void {
+    const user = this.auth.user();
+    if (!user || !youtubeVideoId) return;
+    this.library.getSavedVideos(user._id).subscribe({
+      next: (res: any) => {
+        const list = res?.data ?? res ?? [];
+        this.saved.set(Array.isArray(list) && list.some((s: any) => (s?.videoId ?? s?.youtubeVideoId) === youtubeVideoId));
+      },
+      error: () => {},
+    });
   }
   share(v: YoutubeVideo): void {
     this.analytics.track('share', v.youtubeVideoId);
