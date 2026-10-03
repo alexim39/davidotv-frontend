@@ -425,8 +425,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       border-radius: 4px;
 
       &.mat-radio-checked {
-        border-color: #3f51b5;
-        background: rgba(63, 81, 181, 0.05);
+        border-color: var(--dt-accent-3);
+        background: rgba(225, 29, 72, 0.08);
       }
 
       .option-content {
@@ -463,8 +463,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       border-radius: 4px;
 
       &.mat-radio-checked {
-        border-color: #3f51b5;
-        background: rgba(63, 81, 181, 0.05);
+        border-color: var(--dt-accent-3);
+        background: rgba(225, 29, 72, 0.08);
       }
 
       .option-content {
@@ -550,8 +550,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
           position: absolute;
           top: -5px;
           right: -5px;
-          background: #3f51b5;
-          //color: white;
+          background: var(--dt-gradient);
+          color: white;
           width: 20px;
           height: 20px;
           border-radius: 50%;

@@ -1,0 +1,53 @@
+// 30BG Midnight — Design tokens v1 (see docs/design/01-design-system.md).
+// Single source of truth: migrate literals here, never the reverse.
+
+:root {
+  // Text ramp (all pass AA on --dt-base; verified in design doc)
+  --dt-text-1: #F8F7F8;
+  --dt-text-2: #C9C9D1;
+  --dt-text-3: #8E8E96;
+
+  // Brand accents
+  --dt-accent-1: #BE123C;
+  --dt-accent-2: #E11D48;
+  --dt-accent-3: #FB7185;
+  --dt-gradient: linear-gradient(135deg, #BE123C 0%, #E11D48 50%, #FB7185 100%);
+  --dt-glow: 0 8px 24px rgba(225, 29, 72, 0.35);
+
+  // Surfaces + lines
+  --dt-base: #0B0B0C;
+  --dt-raised: rgba(20, 20, 23, 0.72);
+  --dt-card: #1A1A1E;
+  --dt-overlay: #1E1E22;
+  --dt-line: rgba(255, 255, 255, 0.08);
+
+  // Type
+  --dt-display: 800 32px/1.1 Roboto, sans-serif;
+  --dt-title: 800 20px/1.25 Roboto, sans-serif;
+  --dt-body: 400 14px/1.5 Roboto, sans-serif;
+  --dt-caption: 600 12px/1.4 Roboto, sans-serif;
+  --dt-cta: 700 14px/1 Roboto, sans-serif;
+
+  // Shape + motion
+  --dt-radius-card: 16px;
+  --dt-radius-sheet: 20px;
+  --dt-radius-pill: 999px;
+  --dt-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dt-t-micro: 180ms;
+  --dt-t-layout: 300ms;
+}
+
+// Accessible focus for keyboard users (WCAG 2.4.7).
+:focus-visible {
+  outline: 2px solid var(--dt-accent-2);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+// Global reduced-motion guard (splash already had one; this covers the app).
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

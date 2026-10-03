@@ -1,4 +1,5 @@
 @use '@angular/material' as mat;
+@use 'app/shared/styles/tokens' as *; // 30BG Midnight tokens v1 (docs/design/01-design-system.md)
 
 // ── Material theme: Rose palette on obsidian ─────────────────────
 html {
