@@ -1,8 +1,6 @@
 import { Routes } from "@angular/router";
 import { HomeContainerComponent } from "./home-container.component";
 import { HomeComponent } from "./home.component";
-import { VideoPlayerComponent } from "../video-player/desktop/video-player.component";
-import { VideoPlayerIndex } from "../video-player";
 import { authGuard } from "../core/guards/auth.guard";
 
 
@@ -26,19 +24,9 @@ export const HomeRoutes: Routes = [
                     title: 'Watch Video'
                    }, */
                 //]
-            }, 
-            { 
-                path: 'watch/:id', 
-                component: VideoPlayerIndex, 
-                title: 'Watch Video - DavidoTV',
-            },    
-           /*  { 
-                path: 'watch/:id', 
-                component: VideoPlayerComponent, 
-                title: 'Watch Video - DavidoTV',
-            },    */ 
-            { path: 'videos', loadChildren: () => import('../videos/videos.route').then(r => r.VideosRoutes) },      
-            { path: 'official', loadChildren: () => import('../videos/official/official.route').then(r => r.OfficialRoutes) },      
+            },
+            // IA canonicalization: legacy watch/videos/official shadowed by
+            // top-level /media/* redirects (app.routes.ts); stack deleted.
             { path: 'events', loadChildren: () => import('../event/event.route').then(r => r.EventRoutes) },
             // FE-01: private shelves — unauthenticated deep-links redirect to /auth.
             { path: 'library', loadChildren: () => import('../library/library.route').then(r => r.LibraryRoutes), canActivate: [authGuard] },
