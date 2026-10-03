@@ -284,7 +284,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   }
 
     // In search-results.component.ts
-    private searchVideos() {
+    searchVideos() {
     if (!this.currentSearchTerm.trim()) return;
 
     this.loading = true;
