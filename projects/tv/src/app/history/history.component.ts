@@ -14,6 +14,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserInterface, UserService } from '../common/services/user.service';
 import { distinctUntilChanged, filter, finalize, Observable, Subscription, switchMap, tap } from 'rxjs';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../common/component/confirmationDialog.component';
 
 interface WatchedVideo {
   videoId: string;
@@ -135,6 +137,7 @@ export class HistoryComponent implements OnInit, OnDestroy {
   isLoading = true;
   sortOrder: 'newest' | 'oldest' = 'newest';
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
   private subscriptions: Subscription[] = [];
   user: UserInterface | null = null;
 
@@ -262,7 +265,17 @@ loadWatchHistory(): Observable<void> {
 }
 
 clearHistory(): void {
-  if (confirm('Are you sure you want to clear all watch history?')) {
+  const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    data: {
+      title: 'Clear watch history',
+      message: 'Are you sure you want to clear all watch history? This cannot be undone.',
+      confirmText: 'Clear all',
+      cancelText: 'Keep it'
+    }
+  });
+
+  dialogRef.afterClosed().subscribe((confirmed) => {
+    if (!confirmed) return;
     this.isLoading = true;
     this.cdRef.markForCheck();
 
@@ -284,7 +297,7 @@ clearHistory(): void {
         })
       );
     }
-  }
+  });
 }
 
   sortByDate(order: 'newest' | 'oldest'): void {

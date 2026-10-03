@@ -15,6 +15,7 @@ import { AuthService } from '../auth.service';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthStateService } from '../../core/services/auth-state.service';
+import { UserService } from '../../common/services/user.service';
 
 
 @Component({
@@ -162,6 +163,7 @@ export class SignupDialogComponent implements OnInit, OnDestroy {
   private snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
   private authState = inject(AuthStateService);
+  private userService = inject(UserService);
 
   constructor(
     private thisDialogRef: MatDialogRef<AuthComponent>,
@@ -222,6 +224,8 @@ export class SignupDialogComponent implements OnInit, OnDestroy {
           if (response.user) {
             localStorage.setItem('isAuthenticated', 'true');
             this.authState.seedSession(response.user, response.token);
+            // Bridge the legacy navbar (subscribes to getCurrentUser$).
+            this.userService.setCurrentUser(response.user);
           }
           // notify of success
           this.snackBar.open(response.message, 'Ok',{duration: 3000});
