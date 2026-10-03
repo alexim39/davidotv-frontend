@@ -16,7 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subject, takeUntil, switchMap, tap, Subscription } from 'rxjs';
 
 import { ForumService, Thread, Comment, User } from './forum.service';
@@ -33,6 +33,7 @@ import { ApiService } from '../core/services/api.service';
   providers: [ForumService, ApiService],
   imports: [
     CommonModule,
+    RouterModule,
     ReactiveFormsModule,
     FormsModule,
     MatCardModule,
@@ -73,7 +74,7 @@ import { ApiService } from '../core/services/api.service';
       <mat-card class="thread-card">
         <mat-card-header>
           <img mat-card-avatar 
-               [src]="thread.author.avatar || 'assets/default-avatar.png'" 
+               [src]="thread.author.avatar || '/img/avatar.png'" 
                [alt]="thread.author.name">
           <mat-card-title>{{ thread.title }}</mat-card-title>
           <mat-card-subtitle>
@@ -89,18 +90,18 @@ import { ApiService } from '../core/services/api.service';
           <!-- Media Display -->
           <div *ngIf="thread.media" class="thread-media">
             <img *ngIf="thread.media.type === 'image'" 
-                 [src]="apiService.getBaseUrl() + thread.media.url" 
+                 [src]="mediaUrl(thread.media.url)" 
                  [alt]="thread.media.originalName"
                  class="media-content">
             <video *ngIf="thread.media.type === 'video'" 
                    controls 
                    class="media-content">
-              <source [src]="apiService.getBaseUrl() + thread.media.url" [type]="getMediaType(thread.media)">
+              <source [src]="mediaUrl(thread.media.url)" [type]="getMediaType(thread.media)">
             </video>
             <audio *ngIf="thread.media.type === 'audio'" 
                    controls 
                    class="media-content">
-              <source [src]="apiService.getBaseUrl() + thread.media.url" [type]="getMediaType(thread.media)">
+              <source [src]="mediaUrl(thread.media.url)" [type]="getMediaType(thread.media)">
             </audio>
           </div>
 
@@ -123,14 +124,16 @@ import { ApiService } from '../core/services/api.service';
             <mat-icon>thumb_up</mat-icon>
             {{ thread.likeCount }}
           </button>
-          <button mat-button color="primary" disabled>
-            <mat-icon>comment</mat-icon>
+          <span class="stat">
+            <mat-icon aria-hidden="true">comment</mat-icon>
             {{ thread.commentCount }}
-          </button>
-          <button mat-button color="primary" disabled>
-            <mat-icon>visibility</mat-icon>
+            <span class="sr-only">comments</span>
+          </span>
+          <span class="stat">
+            <mat-icon aria-hidden="true">visibility</mat-icon>
             {{ thread.viewCount }}
-          </button>
+            <span class="sr-only">views</span>
+          </span>
         </mat-card-actions>
       </mat-card>
 
@@ -157,6 +160,7 @@ import { ApiService } from '../core/services/api.service';
             <span *ngIf="!isSubmitting">Post Comment</span>
             <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
           </button>
+          <a *ngIf="!currentUser" class="signin-cta" routerLink="/auth">Sign in to join the discussion</a>
         </form>
 
         <!-- Comments Loading -->
@@ -215,6 +219,21 @@ import { ApiService } from '../core/services/api.service';
         border-radius: var(--dt-radius-sm);
         overflow: hidden;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+        .thread-actions .stat {
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 0 8px; min-height: var(--dt-target);
+          color: var(--dt-text-2); font-size: 14px;
+        }
+        .thread-actions .stat mat-icon { font-size: 20px; width: 20px; height: 20px; }
+        .sr-only {
+          position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+          overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+        }
+        .comment-form .signin-cta {
+          display: inline-flex; align-items: center; min-height: var(--dt-target);
+          color: var(--dt-accent-3); font-size: 14px; font-weight: 600; margin-top: 8px;
+        }
 
         mat-card-header {
           padding: 16px 16px 0;
@@ -410,6 +429,13 @@ export class ThreadDetailComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /** Slash-safe media URL (base has no trailing slash; stored paths vary). */
+  mediaUrl(path?: string): string {
+    if (!path) return '';
+    if (/^https?:\/\//i.test(path)) return path;
+    return `${this.apiService.getBaseUrl()}/${path.replace(/^\//, '')}`;
   }
 
   getMediaType(media: Thread['media']): string {
