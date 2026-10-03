@@ -42,7 +42,7 @@ import { AuthStateService } from '../../../core/services/auth-state.service';
           </button>
         </form>
 
-        <p class="hint">No account? <a routerLink="/auth/signup">Create one</a> • <a routerLink="/auth">Forgot?</a></p>
+        <p class="hint">No account? <a routerLink="/auth/signup">Create one</a> • <a routerLink="/auth/forgot-password">Forgot?</a></p>
       </div>
     </div>
   `,
