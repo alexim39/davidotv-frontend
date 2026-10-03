@@ -12,6 +12,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ProductGridComponent } from './product-grid.component';
 import { catchError, finalize, of, Subscription } from 'rxjs';
 import { UserInterface, UserService } from '../../common/services/user.service';
+import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader/skeleton-loader.component';
+import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+import { ErrorStateComponent } from '../../shared/components/error-state/error-state.component';
 
 @Component({
   selector: 'app-shop-home',
@@ -27,7 +30,10 @@ import { UserInterface, UserService } from '../../common/services/user.service';
     MatToolbarModule,
     MatDividerModule,
     MatProgressSpinnerModule,
-    ProductGridComponent
+    ProductGridComponent,
+    SkeletonLoaderComponent,
+    EmptyStateComponent,
+    ErrorStateComponent
   ],
   template: `
     <!-- Main Container -->
@@ -45,29 +51,18 @@ import { UserInterface, UserService } from '../../common/services/user.service';
         </mat-toolbar>
         <mat-divider></mat-divider>
         @if (isLoading) {
-          <div class="loading-spinner">
-            <mat-spinner diameter="50" strokeWidth="2" color="accent"/>
-            <p class="loading-text">Loading featured products...</p>
-          </div>
+          <async-skeleton-loader [count]="4" />
         } @else if (featuredProducts.length > 0) {
           <app-product-grid [products]="featuredProducts"/>
+        } @else if (loadError) {
+          <async-error-state [message]="loadError" (retry)="retry()" />
         } @else {
-          
-
-           <div class="no-results">
-            <mat-icon class="no-results-icon" aria-hidden="false" aria-label="No product found">search_off</mat-icon>
-            <h3>No Product found</h3>
-            <p>No featured products available.</p>
-            <button 
-              mat-flat-button 
-              color="primary" 
-              (click)="retry()"
-              aria-label="Retry loading product"
-            >
-              <mat-icon>refresh</mat-icon>
-              Try Again
-            </button>
-          </div>
+          <async-empty-state
+            icon="shopping_bag"
+            title="No featured products"
+            message="No featured products available right now."
+            actionLabel="Browse all products"
+            (actionClicked)="retry()" />
         }
       </section>
 
@@ -83,28 +78,19 @@ import { UserInterface, UserService } from '../../common/services/user.service';
         </mat-toolbar>
         <mat-divider></mat-divider>
         @if (isLoading) {
-          <div class="loading-spinner">
-            <mat-spinner diameter="50" strokeWidth="2" color="accent"/>
-            <p class="loading-text">Loading new arrivals...</p>
-          </div>
+          <async-skeleton-loader [count]="4" />
         } @else if (newArrivals.length > 0) {
           <app-product-grid [products]="newArrivals"/>
+        } @else if (loadError) {
+          <async-error-state [message]="loadError" (retry)="retry()" />
         } @else {
 
-          <div class="no-results">
-            <mat-icon class="no-results-icon" aria-hidden="false" aria-label="No product found">search_off</mat-icon>
-            <h3>No Product found</h3>
-            <p>No new arrivals available.</p>
-            <button 
-              mat-flat-button 
-              color="primary" 
-              (click)="retry()"
-              aria-label="Retry loading product"
-            >
-              <mat-icon>refresh</mat-icon>
-              Try Again
-            </button>
-          </div>
+          <async-empty-state
+            icon="new_releases"
+            title="No new arrivals"
+            message="No new arrivals available right now."
+            actionLabel="Browse all products"
+            (actionClicked)="retry()" />
         }
       </section>
 
@@ -143,27 +129,18 @@ import { UserInterface, UserService } from '../../common/services/user.service';
         </mat-toolbar>
         <mat-divider></mat-divider>
         @if (isLoading) {
-          <div class="loading-spinner">
-            <mat-spinner diameter="50" strokeWidth="2" color="accent"/>
-            <p class="loading-text">Loading limited...</p>
-          </div>
+          <async-skeleton-loader [count]="4" />
         } @else if (limitedEdition.length > 0) {
           <app-product-grid [products]="limitedEdition"/>
+        } @else if (loadError) {
+          <async-error-state [message]="loadError" (retry)="retry()" />
         } @else {
-        <div class="no-results">
-          <mat-icon class="no-results-icon" aria-hidden="false" aria-label="No product found">search_off</mat-icon>
-          <h3>No Product found</h3>
-           <p>No limited edition products available.</p>
-          <button 
-            mat-flat-button 
-            color="primary" 
-            (click)="retry()"
-            aria-label="Retry loading product"
-          >
-            <mat-icon>refresh</mat-icon>
-            Try Again
-          </button>
-        </div>
+        <async-empty-state
+          icon="diamond"
+          title="No limited editions"
+          message="No limited edition products available right now."
+          actionLabel="Browse all products"
+          (actionClicked)="retry()" />
         }
       </section>
     </div>
@@ -365,6 +342,7 @@ export class ShopHomeComponent implements OnInit {
   newArrivals: ProductInterface[] = [];
   limitedEdition: ProductInterface[] = [];
   isLoading = true;
+  loadError: string | null = null;
 
   subscriptionSuccess = false;
   subscriptions: Subscription[] = [];
@@ -391,6 +369,7 @@ export class ShopHomeComponent implements OnInit {
 
   loadProducts() {
     this.isLoading = true;
+    this.loadError = null;
     
     // Track completed requests
     let completedRequests = 0;
@@ -408,6 +387,7 @@ export class ShopHomeComponent implements OnInit {
       .pipe(
         catchError(error => {
           console.error('Error fetching featured products:', error);
+          this.loadError = error?.error?.message || error?.message || 'We could not load store products. Check your connection and try again.';
           return of([]);
         }),
         finalize(checkCompletion)
@@ -422,6 +402,7 @@ export class ShopHomeComponent implements OnInit {
       .pipe(
         catchError(error => {
           console.error('Error fetching new arrivals:', error);
+          this.loadError = this.loadError || error?.error?.message || error?.message || 'We could not load store products. Check your connection and try again.';
           return of([]);
         }),
         finalize(checkCompletion)
@@ -435,6 +416,7 @@ export class ShopHomeComponent implements OnInit {
       .pipe(
         catchError(error => {
           console.error('Error fetching limited edition products:', error);
+          this.loadError = this.loadError || error?.error?.message || error?.message || 'We could not load store products. Check your connection and try again.';
           return of([]);
         }),
         finalize(checkCompletion)
@@ -446,6 +428,7 @@ export class ShopHomeComponent implements OnInit {
 
    retry(): void {
     this.isLoading = true;
+    this.loadError = null;
     this.loadProducts();
   }
 

@@ -181,7 +181,7 @@ import { EventDetailDialogComponent } from './event-detail-dialog.component';
     }
 
     .description {
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       margin-bottom: 0.5rem;
       max-height: 3.6rem; /* 2 lines */ 
       overflow: hidden;

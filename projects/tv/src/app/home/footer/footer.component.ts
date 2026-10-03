@@ -224,7 +224,7 @@ import { RouterModule } from '@angular/router';
 
         .tagline {
           color: #A1A1AA;
-          font-size: 10px;
+          font-size: 12px;
           letter-spacing: 0.08em;
           text-transform: uppercase;
           margin: 6px 0 0;

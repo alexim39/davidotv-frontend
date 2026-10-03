@@ -576,8 +576,8 @@
   }
   
   .nav-button {
-    width: 36px;
-    height: 36px;
+    width: var(--dt-target);
+    height: var(--dt-target);
     
     mat-icon {
       font-size: 20px;

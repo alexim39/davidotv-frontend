@@ -69,10 +69,10 @@ export interface VideoCardData {
     .video-card:hover .thumb { transform: scale(1.04); }
     .duration {
       position: absolute; bottom: 8px; right: 8px;
-      background: rgba(0,0,0,0.75); color: white; font-size: 11px; padding: 2px 6px; border-radius: 6px;
+      background: rgba(0,0,0,0.75); color: white; font-size: 12px; padding: 2px 6px; border-radius: 6px;
     }
     .badge {
-      position: absolute; top: 8px; left: 8px; font-size: 10px; letter-spacing: 0.08em; font-weight: 700;
+      position: absolute; top: 8px; left: 8px; font-size: 12px; letter-spacing: 0.08em; font-weight: 700;
       padding: 4px 8px; border-radius: var(--dt-radius-pill); background: linear-gradient(135deg,#BE123C,#FB7185); color: white;
     }
     .play-overlay {
@@ -84,7 +84,7 @@ export interface VideoCardData {
     .meta { padding: 12px; display: grid; gap: 4px; }
     .title { font-size: 14px; font-weight: 600; line-height: 1.35; color: #F8F7F8; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 38px; }
     .channel { font-size: 12px; color: #A1A1AA; margin: 0; }
-    .stats { font-size: 11px; color: #71717A; margin: 0; }
+    .stats { font-size: 12px; color: #71717A; margin: 0; }
   `]
 })
 export class VideoCardComponent {

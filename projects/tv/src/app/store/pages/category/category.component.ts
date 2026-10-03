@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,6 +11,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { ProductGridComponent } from '../product-grid.component';
 import { StoreService, ProductInterface } from '../../services/store.service';
 import { catchError, finalize, of } from 'rxjs';
+import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
+import { ErrorStateComponent } from '../../../shared/components/error-state/error-state.component';
 
 @Component({
   selector: 'app-shop-category',
@@ -26,7 +28,9 @@ import { catchError, finalize, of } from 'rxjs';
     MatToolbarModule,
     MatProgressBarModule,
     MatChipsModule,
-    ProductGridComponent
+    ProductGridComponent,
+    EmptyStateComponent,
+    ErrorStateComponent
   ],
   template: `
     <!-- Category Header -->
@@ -74,15 +78,16 @@ import { catchError, finalize, of } from 'rxjs';
         @if (!isLoading && products.length > 0) {
           <app-product-grid [products]="products"></app-product-grid>
         }
+        @else if (!isLoading && loadError) {
+          <async-error-state [message]="loadError" (retry)="loadProducts()" />
+        }
         @else if (!isLoading && products.length === 0) {
-          <div class="empty-state">
-            <mat-icon class="empty-icon">inventory_2</mat-icon>
-            <h3>No products found in this category</h3>
-            <p>Check back later or browse other categories</p>
-            <button mat-raised-button color="primary" routerLink="/store">
-              Browse All Categories
-            </button>
-          </div>
+          <async-empty-state
+            icon="inventory_2"
+            title="No products found in this category"
+            message="Check back later or browse other categories."
+            actionLabel="Browse all products"
+            (actionClicked)="browseAll()" />
         }
       </div>
 
@@ -332,6 +337,7 @@ export class ShopCategoryComponent implements OnInit {
   categoryImage: string = '';
   products: ProductInterface[] = [];
   isLoading: boolean = true;
+  loadError: string | null = null;
   
   // Pagination
   currentPage: number = 1;
@@ -344,6 +350,7 @@ export class ShopCategoryComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private storeService: StoreService
   ) {}
 
@@ -407,6 +414,7 @@ export class ShopCategoryComponent implements OnInit {
 
   loadProducts() {
     this.isLoading = true;
+    this.loadError = null;
     
     let sort = '';
     if (this.currentSort === 'popular') {
@@ -438,6 +446,7 @@ export class ShopCategoryComponent implements OnInit {
     this.storeService.getProducts(params).pipe(
       catchError(error => {
         console.error('Error loading products:', error);
+        this.loadError = error?.error?.message || error?.message || 'We could not load products. Check your connection and try again.';
         return of({ products: [], total: 0 });
       }),
       finalize(() => this.isLoading = false)
@@ -447,6 +456,10 @@ export class ShopCategoryComponent implements OnInit {
       this.totalPages = Math.ceil(this.totalProducts / this.itemsPerPage);
       this.updateVisiblePages();
     });
+  }
+
+  browseAll(): void {
+    this.router.navigate(['/store']);
   }
 
   sortProducts(sortType: string) {

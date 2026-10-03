@@ -72,12 +72,12 @@ import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
     .talent-card{ display:grid; gap:12px; padding:16px; border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(14px); }
     .audio{ width:100%; border-radius:var(--dt-radius-sm); }
     .t-title{ margin:0; color:#F8F7F8; font-size:16px; font-weight:700; }
-    .genre{ font-size:11px; color:#FB7185; border:1px solid rgba(251,113,133,0.35); padding:2px 8px; border-radius:var(--dt-radius-pill); margin-left:8px; }
+    .genre{ font-size:12px; color:#FB7185; border:1px solid rgba(251,113,133,0.35); padding:2px 8px; border-radius:var(--dt-radius-pill); margin-left:8px; }
     .artist{ margin:4px 0 0; color:#A1A1AA; font-size:12px; }
     .desc{ margin:8px 0 0; color:#A1A1AA; font-size:13px; }
     .stats{ display:flex; gap:14px; align-items:center; flex-wrap:wrap; color:#71717A; font-size:12px; margin-top:8px; }
     .stats mat-icon{ font-size:16px; width:16px; height:16px; vertical-align:middle; }
-    .status{ margin-left:auto; text-transform:uppercase; font-weight:700; letter-spacing:0.06em; font-size:11px; padding:4px 10px; border-radius:var(--dt-radius-pill); background:rgba(255,255,255,0.08); }
+    .status{ margin-left:auto; text-transform:uppercase; font-weight:700; letter-spacing:0.06em; font-size:12px; padding:4px 10px; border-radius:var(--dt-radius-pill); background:rgba(255,255,255,0.08); }
     .status[data-status="called_up"]{ background:linear-gradient(135deg,#BE123C,#FB7185); color:white; }
     .actions{ display:flex; gap:10px; flex-wrap:wrap; }
     .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:var(--dt-radius-pill); }

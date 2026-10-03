@@ -558,7 +558,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 0.7rem;
+          font-size: 0.75rem;
         }
       }
 

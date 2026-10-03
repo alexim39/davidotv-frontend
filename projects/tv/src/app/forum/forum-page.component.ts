@@ -11,6 +11,9 @@ import { ThreadListComponent } from './thread-list.component';
 import { ThreadDetailComponent } from './thread-detail.component';
 import { CreateThreadComponent } from './create-thread.component';
 import { MatButtonModule } from '@angular/material/button';
+import { SkeletonLoaderComponent } from '../shared/components/skeleton-loader/skeleton-loader.component';
+import { EmptyStateComponent } from '../shared/components/empty-state/empty-state.component';
+import { ErrorStateComponent } from '../shared/components/error-state/error-state.component';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { ChangeDetectorRef } from '@angular/core';
 
@@ -26,6 +29,9 @@ import { ChangeDetectorRef } from '@angular/core';
     MatChipsModule,
     MatProgressSpinnerModule,
     ThreadListComponent,
+    SkeletonLoaderComponent,
+    EmptyStateComponent,
+    ErrorStateComponent,
   ],
   template: `
     <div class="forum-container">
@@ -52,24 +58,26 @@ import { ChangeDetectorRef } from '@angular/core';
             </div>
           </div>
 
-          <div *ngIf="isLoading" class="loading-spinner">
-            <mat-spinner diameter="40"></mat-spinner>
-            <span>Loading threads...</span>
-          </div>
+          <async-skeleton-loader *ngIf="isLoading" [count]="6" />
 
-          <app-thread-list 
-            *ngIf="!isLoading" 
+          <app-thread-list
+            *ngIf="!isLoading && !loadError && threads.length > 0"
             [threads]="threads"
             (threadClicked)="navigateToThread($event)">
           </app-thread-list>
 
-          <div *ngIf="!isLoading && threads.length === 0" class="no-threads">
-            <mat-icon>forum</mat-icon>
-            <p>No discussions found</p>
-            <button mat-raised-button color="primary" (click)="openCreateThreadDialog()">
-              Start a discussion
-            </button>
-          </div>
+          <async-empty-state
+            *ngIf="!isLoading && !loadError && threads.length === 0"
+            icon="forum"
+            title="No discussions yet"
+            message="Be the first to start a 30BG conversation."
+            actionLabel="Start a discussion"
+            (actionClicked)="openCreateThreadDialog()" />
+
+          <async-error-state
+            *ngIf="!isLoading && loadError"
+            [message]="loadError"
+            (retry)="loadThreads()" />
         </div>
       </div>
     </div>
@@ -175,6 +183,7 @@ export class ForumPageComponent implements OnInit, OnDestroy {
   threads: Thread[] = [];
   selectedThread: Thread | null = null;
   isLoading = false;
+  loadError: string | null = null;
   currentView: 'list' | 'detail' = 'list';
   popularTags = ['music', 'tour', 'lyrics', 'news', 'discussion', 'videos'];
   private destroy$ = new Subject<void>();
@@ -207,6 +216,7 @@ export class ForumPageComponent implements OnInit, OnDestroy {
   loadThreads(): void {
     this.currentView = 'list';
     this.isLoading = true;
+    this.loadError = null;
     this.selectedThread = null;
 
     this.forumService.getThreads().pipe(
@@ -222,6 +232,7 @@ export class ForumPageComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Error loading threads:', err);
         this.threads = [];
+        this.loadError = err?.error?.message || err?.message || 'We could not load discussions. Check your connection and try again.';
         this.cd.detectChanges(); 
       }
     });
@@ -269,6 +280,7 @@ export class ForumPageComponent implements OnInit, OnDestroy {
 
   filterByTag(tag: string): void {
     this.isLoading = true;
+    this.loadError = null;
     this.forumService.getThreadsByTag(tag).pipe(
       finalize(() => {
         this.isLoading = false;
@@ -283,6 +295,7 @@ export class ForumPageComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Error filtering threads:', err);
         this.threads = [];
+        this.loadError = err?.error?.message || err?.message || 'We could not filter discussions. Check your connection and try again.';
         this.cd.detectChanges(); 
       }
     });

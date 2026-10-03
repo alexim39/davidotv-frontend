@@ -56,7 +56,7 @@ import { TalentService } from './talent.service';
     .rose-btn{ height:48px; border-radius:var(--dt-radius-pill); background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; font-weight:600; box-shadow:0 8px 24px rgba(225,29,72,0.35); }
     .err{ color:#FB7185; font-size:13px; margin:0; }
     .ok{ color:#4ADE80; font-size:13px; margin:0; }
-    .hint{ color:#71717A; font-size:11px; text-align:center; }
+    .hint{ color:#71717A; font-size:12px; text-align:center; }
   `]
 })
 export class TalentUploadComponent {

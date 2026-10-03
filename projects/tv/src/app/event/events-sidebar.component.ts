@@ -177,7 +177,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
             }
             
             span {
-              font-size: 0.7rem;
+              font-size: 0.75rem;
               text-align: center;
               white-space: nowrap;
               overflow: hidden;

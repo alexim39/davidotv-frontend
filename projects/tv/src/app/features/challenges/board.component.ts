@@ -69,7 +69,7 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
     .card{ padding:18px; border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(14px); display:grid; gap:8px; align-content:start; }
     .top{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
     .c-title{ margin:0; color:#F8F7F8; font-size:16px; font-weight:700; }
-    .status{ text-transform:uppercase; font-size:10px; font-weight:700; letter-spacing:0.06em; padding:4px 10px; border-radius:var(--dt-radius-pill); background:rgba(255,255,255,0.08); color:#A1A1AA; }
+    .status{ text-transform:uppercase; font-size:12px; font-weight:700; letter-spacing:0.06em; padding:4px 10px; border-radius:var(--dt-radius-pill); background:rgba(255,255,255,0.08); color:#A1A1AA; }
     .status[data-status="active"]{ background:linear-gradient(135deg,#BE123C,#FB7185); color:white; }
     .status[data-status="closed"]{ background:rgba(74,222,128,0.15); color:#4ADE80; }
     .tag{ margin:0; color:#FB7185; font-size:12px; font-weight:600; }

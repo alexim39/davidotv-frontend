@@ -117,8 +117,9 @@
         overflow: hidden;
 
         button {
-          width: 36px;
-          height: 36px;
+          width: var(--dt-target);
+          height: var(--dt-target);
+          min-width: var(--dt-target);
         }
 
         .quantity {

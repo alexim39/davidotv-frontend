@@ -98,7 +98,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
           
           .reply-time {
             color: var(--dt-text-2);
-            font-size: 11px;
+            font-size: 12px;
           }
 
           .delete-button {

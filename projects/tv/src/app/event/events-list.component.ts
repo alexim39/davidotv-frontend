@@ -10,6 +10,8 @@ import { EventService } from './event.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UserInterface, UserService } from '../common/services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { EmptyStateComponent } from '../shared/components/empty-state/empty-state.component';
+import { ErrorStateComponent } from '../shared/components/error-state/error-state.component';
 
 @Component({
   selector: 'app-events-list',
@@ -20,7 +22,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatIconModule,
     MatListModule,
     MatButtonModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    EmptyStateComponent,
+    ErrorStateComponent
   ],
   template: `
     <div *ngIf="loading" class="loader-container">
@@ -28,22 +32,18 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       <span>Loading events...</span>
     </div>
 
-    <div *ngIf="!loading && filteredEvents.length === 0" class="no-events-message">
-       <div class="no-results">
-          <mat-icon class="no-results-icon" aria-hidden="false" aria-label=" No events found for this category">info</mat-icon>
-          <h3> No events found for this category</h3>
-          <p>We couldn't load events at this time. Please try again.</p>
-          <button 
-            mat-flat-button 
-            color="primary" 
-            (click)="retry()"
-            aria-label="Retry loading events"
-          >
-            <mat-icon>refresh</mat-icon>
-            Try Again
-          </button>
-        </div>
-    </div>
+    <async-empty-state
+      *ngIf="!loading && !loadError && filteredEvents.length === 0"
+      icon="event"
+      title="No events found for this category"
+      message="New dates drop regularly — check back soon or try another filter."
+      actionLabel="Reload events"
+      (actionClicked)="retry()" />
+
+    <async-error-state
+      *ngIf="!loading && loadError"
+      [message]="loadError"
+      (retry)="retry()" />
 
     <div class="events-grid" *ngIf="!loading">
       <mat-card class="event-card" *ngFor="let event of filteredEvents" (click)="handleCardClick($event, event)">
@@ -292,6 +292,7 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
 
 
   loading = true;
+  loadError: string | null = null;
   subscriptions: Subscription[] = [];
 
   private cd = inject(ChangeDetectorRef);
@@ -365,6 +366,7 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
 
   private getEvents(): void {
     this.loading = true;
+    this.loadError = null;
     this.cd.detectChanges();
 
     this.subscriptions.push(
@@ -394,6 +396,7 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
           this.events = [];
           this.filteredEvents = [];
           this.loading = false;
+          this.loadError = error?.error?.message || error?.message || 'We could not load events. Check your connection and try again.';
           this.cd.detectChanges();
         }
       })
@@ -508,6 +511,7 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
 
    retry(): void {
     this.loading = true;
+    this.loadError = null;
     this.getEvents();
   }
 }

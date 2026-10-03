@@ -56,7 +56,7 @@ import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
     .meta{ max-width:1100px; margin:16px auto; padding:20px; border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(16px); }
     .title{ margin:0 0 8px; color:#F8F7F8; font-size:20px; font-weight:700; line-height:1.3; }
     .chan-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; color:#A1A1AA; font-size:13px; }
-    .badge{ background:linear-gradient(135deg,#BE123C,#FB7185); color:white; padding:2px 8px; border-radius:var(--dt-radius-pill); font-size:10px; font-weight:700; }
+    .badge{ background:linear-gradient(135deg,#BE123C,#FB7185); color:white; padding:2px 8px; border-radius:var(--dt-radius-pill); font-size:12px; font-weight:700; }
     .desc{ color:#A1A1AA; font-size:13px; white-space:pre-wrap; margin-top:12px; }
     .actions{ display:flex; gap:10px; margin-top:16px; }
     .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:var(--dt-radius-pill); }

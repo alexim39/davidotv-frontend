@@ -71,7 +71,7 @@ import { AuthComponent } from '../auth/auth.component';
       color: #F8F7F8; max-width: 720px; text-align: center; padding: 1rem; width: 92%;
     }
     .eyebrow {
-      display: inline-block; font-size: 11px; letter-spacing: 0.14em; font-weight: 700; color: #FB7185;
+      display: inline-block; font-size: 12px; letter-spacing: 0.14em; font-weight: 700; color: #FB7185;
       border: 1px solid rgba(251,113,133,0.28); background: rgba(225,29,72,0.10); padding: 6px 10px; border-radius: var(--dt-radius-pill); margin-bottom: 12px;
       backdrop-filter: blur(8px);
     }

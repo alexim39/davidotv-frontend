@@ -336,7 +336,7 @@ import { CartInterface, CartService } from './cart/cart.service';
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: bold;
             color: white;
           }
@@ -345,7 +345,7 @@ import { CartInterface, CartService } from './cart/cart.service';
             background: #FF4081;
             color: white;
             font-weight: bold;
-            font-size: 10px;
+            font-size: 12px;
             top: 2px;
             right: 2px;
           }
@@ -511,7 +511,7 @@ import { CartInterface, CartService } from './cart/cart.service';
           .badge {
             background: #ff4081;
             //color: white;
-            font-size: 11px;
+            font-size: 12px;
             padding: 2px 6px;
             border-radius: var(--dt-radius-sm);
           }
@@ -655,7 +655,7 @@ import { CartInterface, CartService } from './cart/cart.service';
             .badge {
               background: #ff4081;
               color: white;
-              font-size: 11px;
+              font-size: 12px;
               padding: 2px 6px;
               border-radius: var(--dt-radius-sm);
               margin-top: 4px;

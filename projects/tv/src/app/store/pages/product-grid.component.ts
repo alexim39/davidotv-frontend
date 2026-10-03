@@ -296,8 +296,10 @@ import { Subscription } from 'rxjs';
       .quick-action-btn {
         background: rgba(255, 255, 255, 0.9);
         color: var(--dt-text-2);
-        width: 36px;
-        height: 36px;
+        width: var(--dt-target);
+        height: var(--dt-target);
+        min-width: var(--dt-target);
+        min-height: var(--dt-target);
         display: flex;
         align-items: center;
         justify-content: center;

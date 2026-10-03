@@ -200,7 +200,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       background-color: rgba(0, 0, 0, 0.8);
       color: white;
       padding: 2px 4px;
-      font-size: 10px;
+      font-size: 12px;
       border-top-left-radius: var(--dt-radius-sm);
     }
 
@@ -234,14 +234,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-secondary);
     }
 
     .visibility-badge {
       padding: 2px 6px;
       border-radius: var(--dt-radius-sm);
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 500;
     }
 
