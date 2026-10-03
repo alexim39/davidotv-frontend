@@ -200,7 +200,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
               
               <mat-radio-button value="paypal" class="payment-option">
                 <div class="option-content">
-                  <img src="assets/paypal-logo.png" alt="PayPal" class="paypal-logo">
+                  <mat-icon aria-hidden="true">account_balance_wallet</mat-icon>
                   <span>PayPal</span>
                 </div>
               </mat-radio-button>
@@ -283,7 +283,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
                   Bank Transfer
                 </p>
                 <p *ngIf="paymentForm.value.paymentMethod === 'paypal'">
-                  <img src="assets/paypal-logo.png" alt="PayPal" class="paypal-logo">
+                  <mat-icon>account_balance_wallet</mat-icon>
                   PayPal
                 </p>
               </div>
@@ -816,7 +816,7 @@ export class CheckoutPageComponent implements OnInit, OnDestroy {
   }
 
   private openPaystack(publicKey: string, email: string): void {
-    const reference = crypto.randomUUID();
+    const reference = this.newReference();
     const handler = PaystackPop.setup({
       key: publicKey,
       email,
@@ -829,6 +829,18 @@ export class CheckoutPageComponent implements OnInit, OnDestroy {
       },
     });
     handler.openIframe();
+  }
+
+  /** crypto.randomUUID needs a secure context; fall back to a unique id. */
+  private newReference(): string {
+    try {
+      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+      }
+    } catch {
+      // fall through to manual id
+    }
+    return `dtv-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
   }
 
   private completeOrder(paymentReference: string): void {

@@ -258,7 +258,8 @@ export class ForumPageComponent implements OnInit, OnDestroy {
   }
 
   navigateToThread(threadId: any): void {
-    if (!threadId) this.router.navigate(['/forum/thread', threadId]);  
+    if (!threadId) return;
+    this.router.navigate(['/forum/thread', threadId]);
   }
 
   backToList(): void {

@@ -20,11 +20,11 @@
               @for (item of cartItems; track item._id) {
                 <mat-card class="cart-item">
                   <div class="item-image-container">
-                    <img [src]="item.product.images" [alt]="item.selectedVariant?.name" class="item-image">
+                    <img [src]="productImage(item)" [alt]="item.product?.name || 'Product image'" class="item-image">
                   </div>
 
                   <div class="item-details">
-                    <h3 class="item-name">{{item.selectedVariant?.name}}</h3>
+                    <h3 class="item-name">{{item.product?.name}}</h3>
                     @if (item.product.variants) {
                       <p class="item-variant">Variant: {{item.product.variants}}</p>
                     }
@@ -106,7 +106,7 @@
               <span class="total-amount">N{{getTotal() | number:'1.2-2'}}</span>
             </div>
 
-            <button mat-raised-button color="primary" class="checkout-btn" routerLink="/checkout">
+            <button mat-raised-button color="primary" class="checkout-btn" routerLink="/store/checkout">
               Proceed to Checkout
             </button>
 

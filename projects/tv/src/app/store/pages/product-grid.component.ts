@@ -45,7 +45,7 @@ import { Subscription } from 'rxjs';
               <!-- Product Image with Badges -->
               <div class="product-image-container" [routerLink]="['/store/product', product._id]">
                 <img 
-                  [src]="product.images[0].url || 'assets/images/product-placeholder.jpg'" 
+                  [src]="product.images[0].url || '/img/store/shopping.png'" 
                   [alt]="product.name" 
                   class="product-image"
                   [class.out-of-stock]="product.inventory.stock <= 0"

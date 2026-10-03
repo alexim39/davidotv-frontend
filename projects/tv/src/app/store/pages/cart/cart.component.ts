@@ -108,6 +108,16 @@ export class CartPageComponent implements OnInit {
     return this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
   }
 
+  /** First product image (string or {url}), else the store fallback (exists in public/). */
+  productImage(item: CartInterface): string {
+    const images = (item as unknown as { product?: { images?: unknown } })?.product?.images;
+    const first = Array.isArray(images) ? images[0] : undefined;
+    if (typeof first === 'string' && first) return first;
+    const url = (first as { url?: unknown } | undefined)?.url;
+    if (typeof url === 'string' && url) return url;
+    return '/img/store/shopping.png';
+  }
+
   increaseQuantity(item: CartInterface): void {
     if (!item.product.inventory || item.quantity < item.product.inventory.stock) {
       this.updateCartItem(item, item.quantity + 1);
