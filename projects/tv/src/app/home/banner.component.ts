@@ -76,7 +76,7 @@ import { AuthComponent } from '../auth/auth.component';
       backdrop-filter: blur(8px);
     }
     .banner-title { font-size: clamp(2.4rem,5vw,3.4rem); font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; line-height: 1.05; }
-    .banner-subtitle { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #A1A1AA; border-radius: 999px; padding: 6px 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); }
+    .banner-subtitle { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dt-text-2, #C9C9D1); border-radius: 999px; padding: 6px 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); }
     .highlight { background: linear-gradient(135deg,#BE123C 0%,#E11D48 50%,#FB7185 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
     .banner-description-wrapper { min-height: 84px; display: flex; align-items: center; justify-content: center; margin: 14px 0 0; }
     .banner-description { font-size: clamp(1rem,2.2vw,1.18rem); color: #E4E4E7; line-height: 1.6; max-width: 640px; text-shadow: 0 2px 18px rgba(0,0,0,0.45); }

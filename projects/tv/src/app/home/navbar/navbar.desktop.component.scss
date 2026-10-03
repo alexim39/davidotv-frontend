@@ -73,8 +73,8 @@
     }
     input {
       flex: 1; border: none; padding: 0 20px; outline: none;
-      font-size: 14px; background: transparent; color: #F8F7F8;
-      &::placeholder { color: #71717A; }
+      font-size: 14px; background: transparent; color: var(--dt-text-1, #F8F7F8);
+      &::placeholder { color: var(--dt-text-3, #8E8E96); }
     }
     .search-button {
       width: 56px;
@@ -132,12 +132,13 @@
   .user-name { font-size: 13px; font-weight: 600; color: #F8F7F8; margin-right: 4px; max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* User menu polish (global also covers) */
-  .user-menu { margin-top: 8px; min-width: 280px; padding: 0; border-radius: 16px; overflow: hidden; background: #1A1A1E; }
+  .user-menu { margin-top: 8px; min-width: 280px; padding: 0; border-radius: var(--dt-radius-card, 16px); overflow: hidden; background: var(--dt-card, #1A1A1E); }
+  .menu-user-info-toned { padding: 1em; text-align: center; color: var(--dt-text-2, #C9C9D1); }
 
-  .mobile-toggle { display: none; color: #A1A1AA; }
+  .mobile-toggle { display: none; color: #A1A1AA; min-width: 44px; min-height: 44px; }
 
   @media (max-width: 1280px) {
-    .nav-links a { min-width: 68px; font-size: 11px; mat-icon { font-size: 19px; } }
+    .nav-links a { min-width: 68px; font-size: 12px; mat-icon { font-size: 19px; } }
   }
   @media (max-width: 1024px) {
     .nav-links { display: none; }

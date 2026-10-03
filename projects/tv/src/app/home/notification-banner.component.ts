@@ -45,8 +45,8 @@ import { MatButtonModule } from '@angular/material/button';
   `,
   styles: [`
     .notification-banner {
-      background: linear-gradient(135deg, #8f0045 0%, #282828 100%);
-      color: #ffffff;
+      background: linear-gradient(135deg, var(--dt-accent-1, #BE123C) 0%, #282828 100%);
+      color: var(--dt-text-1, #F8F7F8);
       padding: 12px 0;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);

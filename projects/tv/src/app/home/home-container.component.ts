@@ -140,9 +140,9 @@ import { MatDialog } from '@angular/material/dialog';
     /* Sidenav styles */
   .app-sidenav {
   width: var(--desktop-sidenav-width);
-  //background-color: #fff;
+  background-color: var(--dt-card, #1A1A1E);
   padding-top: 12px;
-  border-right: 1px solid #eee;
+  border-right: 1px solid var(--dt-line, rgba(255,255,255,0.08));
 
   mat-nav-list {
     display: flex;
@@ -150,13 +150,17 @@ import { MatDialog } from '@angular/material/dialog';
     margin-top: 4em;
 
     a {
-      height: 40px;
+      height: 44px;
       padding: 0 16px;
       display: flex;
       align-items: center;
       text-decoration: none;
-      gap: 24px;
-      font-size: 9.5px;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--dt-text-2, #C9C9D1);
+      border-radius: var(--dt-radius-card, 16px);
+      margin: 2px 8px;
       //color: #8f0045;
       transition: background-color 0.2s;
 
@@ -184,13 +188,11 @@ import { MatDialog } from '@angular/material/dialog';
       }
 
       &.active {
-        //background-color: #666;
-        font-weight: 300;
-        //text-decoration: underline;
-        color: #8f0045;
-        border-bottom: 1px solid #8f0045;
+        background: rgba(225, 29, 72, 0.14);
+        font-weight: 700;
+        color: var(--dt-accent-3, #FB7185);
         mat-icon {
-          color: #8f0045;
+          color: var(--dt-accent-3, #FB7185);
         }
 
         span {
@@ -200,11 +202,12 @@ import { MatDialog } from '@angular/material/dialog';
     }
 
     h3 {
-      font-size: 11px;
-      //color: #606060;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--dt-text-3, #8E8E96);
       padding: 12px 16px 4px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.08em;
     }
 
     mat-divider {
@@ -317,7 +320,11 @@ export class HomeContainerComponent implements OnInit, OnDestroy {
       }
     });
 
-     this.subscriptions.push(
+    // Only revalidate when a session flag exists — an unconditional call
+    // 401s for logged-out visitors, and the error interceptor then yanks
+    // them off home to /auth. Matches the navbar pattern.
+    if (localStorage.getItem('isAuthenticated') === 'true') {
+      this.subscriptions.push(
         this.userService.getUser().subscribe({
           next: (response) => {
             if (response.success) {
@@ -327,6 +334,7 @@ export class HomeContainerComponent implements OnInit, OnDestroy {
           }
         })
       );
+    }
   }
 
   toggleSidenav() {
