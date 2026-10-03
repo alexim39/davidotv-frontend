@@ -27,14 +27,16 @@ import { TalentService } from './talent.service';
           <mat-form-field appearance="outline"><mat-label>Genre</mat-label><input matInput formControlName="genre" placeholder="Afrobeats / Amapiano / R&B"/></mat-form-field>
           <mat-form-field appearance="outline"><mat-label>Story behind the track</mat-label><textarea matInput rows="3" formControlName="description"></textarea></mat-form-field>
 
-          <label class="drop" [class.dragover]="dragOver()" (dragover)="onDragOver($event)" (dragleave)="dragOver.set(false)" (drop)="onDrop($event)">
-            <mat-icon>cloud_upload</mat-icon>
+          <label class="drop" [class.dragover]="dragOver()" (dragover)="onDragOver($event)" (dragleave)="dragOver.set(false)" (drop)="onDrop($event)"
+                 tabindex="0" role="button" aria-label="Upload track: activate to browse files, or drag and drop audio or video"
+                 (keydown.enter)="fileInput.click()" (keydown.space)="$event.preventDefault(); fileInput.click()">
+            <mat-icon aria-hidden="true">cloud_upload</mat-icon>
             <span>{{ file()?.name ?? 'Drag audio/video here or click to browse (mp3, wav, mp4, mov ≤ 100MB)' }}</span>
-            <input type="file" hidden (change)="onFile($event)" accept="audio/*,video/*"/>
+            <input #fileInput type="file" hidden (change)="onFile($event)" accept="audio/*,video/*"/>
           </label>
 
-          @if (error()) { <p class="err">{{error()}}</p> }
-          @if (success()) { <p class="ok">✅ Uploaded! You've entered the queue.</p> }
+          @if (error()) { <p class="err" role="alert">{{error()}}</p> }
+          @if (success()) { <p class="ok" role="status">✅ Uploaded! You've entered the queue.</p> }
           @if (uploading()) { <mat-progress-bar mode="indeterminate"></mat-progress-bar> }
 
           <button mat-flat-button class="rose-btn" type="submit" [disabled]="form.invalid || !file() || uploading()">
