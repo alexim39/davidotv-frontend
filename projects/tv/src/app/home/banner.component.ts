@@ -45,7 +45,11 @@ import { AuthStateService } from '../core/services/auth-state.service';
       <div class="banner-overlay"></div>
       <div class="banner-content" [@bannerFadeSlide]>
         <span class="eyebrow">AFROBEAT HOME • NEXT GLOBAL STAR</span>
-        <h1 class="banner-title">Welcome to <span class="highlight">DavidoTV</span></h1>
+        @if (greetingName()) {
+          <h1 class="banner-title">Welcome back, <span class="highlight">{{ greetingName() }}</span></h1>
+        } @else {
+          <h1 class="banner-title">Welcome to <span class="highlight">DavidoTV</span></h1>
+        }
         <span class="banner-subtitle">Built by fans for fans</span>
         <div class="banner-description-wrapper">
           <div *ngIf="isLoading" class="message-loader">Curating vibes…</div>
@@ -129,6 +133,12 @@ export class BannerComponent implements OnInit, OnDestroy {
   readonly dialog = inject(MatDialog);
   readonly auth = inject(AuthStateService);
 
+  /** First name for the personalized hero (null when signed out). */
+  greetingName(): string | null {
+    const u = this.auth.user() as unknown as { name?: string; username?: string } | null;
+    const raw = u?.name || u?.username || '';
+    return raw ? raw.split(' ')[0] : null;
+  }
   constructor(private sanitizer: DomSanitizer, private cdr: ChangeDetectorRef, private router: Router) {
     this.safeVideoUrl = this.sanitizeUrl(this.videoUrls[this.currentVideoIndex]);
   }
