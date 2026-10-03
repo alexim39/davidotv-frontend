@@ -42,4 +42,9 @@ export class OrdersService {
   list(page = 1, limit = 12): Observable<unknown> {
     return this.api.get(`${OrdersService.BASE}?page=${page}&limit=${limit}`) as any;
   }
+
+  /** Publishable key for Paystack Inline (pk_* is safe to expose). */
+  paystackKey(): Observable<{ data: { publicKey: string } }> {
+    return this.api.get(`${OrdersService.BASE}/paystack-key`) as any;
+  }
 }

@@ -1,6 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { CartService, CartInterface } from './cart.service';
+import { OrdersService, OrderItemInput } from '../../services/orders.service';
+import { AuthStateService } from '../../../core/services/auth-state.service';
+
+declare const PaystackPop: any;
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,6 +24,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 @Component({
   selector: 'app-checkout-page',
   standalone: true,
+  providers: [CartService],
   imports: [
     CommonModule,
     RouterModule,
@@ -247,7 +254,12 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
         <!-- Review Section -->
         <mat-card class="checkout-section" *ngIf="currentStep === 3">
           <h2 class="section-title">Review Your Order</h2>
-          
+          <div *ngIf="orderNumber" class="order-confirmed">
+            <mat-icon>verified</mat-icon>
+            <p>Order {{orderNumber}} confirmed — receipt sent to {{deliveryForm.value.email}}.</p>
+            <button mat-stroked-button routerLink="/store">Continue shopping</button>
+          </div>
+
           <div class="order-summary">
             <div class="summary-section">
               <h3>Delivery Information</h3>
@@ -311,8 +323,14 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
                 <span>{{shippingCost === 0 ? 'Free' : 'N' + (shippingCost | number:'1.2-2')}}</span>
               </div>
               <div *ngIf="discountAmount > 0" class="price-row discount">
-                <span>Discount</span>
+                <span>Member discount ({{memberTier}}, {{discountPct}}%)</span>
                 <span>-N{{discountAmount | number:'1.2-2'}}</span>
+              </div>
+              <div *ngIf="quoteLoading" class="price-row">
+                <span>Refreshing prices…</span>
+              </div>
+              <div *ngIf="quoteError" class="price-row discount">
+                <span>{{quoteError}}</span>
               </div>
               <div class="price-row total">
                 <span>Total</span>
@@ -328,7 +346,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
               <mat-icon>arrow_back</mat-icon>
               Back to Payment
             </button>
-            <button mat-raised-button color="primary" (click)="placeOrder()" [disabled]="!agreeTerms || isPlacingOrder">
+            <button mat-raised-button color="primary" (click)="placeOrder()" [disabled]="!agreeTerms || isPlacingOrder || cartItems.length === 0">
               <span *ngIf="!isPlacingOrder">Place Order</span>
               <span *ngIf="isPlacingOrder">Processing...</span>
               <mat-icon *ngIf="!isPlacingOrder">shopping_bag</mat-icon>
@@ -564,6 +582,22 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       }
     }
 
+    .order-confirmed {
+      text-align: center;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(76, 175, 80, 0.4);
+      border-radius: 8px;
+      background: rgba(76, 175, 80, 0.08);
+
+      mat-icon {
+        color: #4caf50;
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+      }
+    }
+
     .price-summary {
       margin: 24px 0;
 
@@ -607,13 +641,17 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     }
   `]
 })
-export class CheckoutPageComponent {
+export class CheckoutPageComponent implements OnInit, OnDestroy {
   currentStep = 1;
   deliveryCompleted = false;
   paymentCompleted = false;
   reviewCompleted = false;
 
   private fb = inject(FormBuilder);
+  private readonly cartService = inject(CartService);
+  private readonly orders = inject(OrdersService);
+  private readonly auth = inject(AuthStateService);
+  private readonly subs: Subscription[] = [];
 
   // Checkout wiring lands next slice (quote + Paystack + POST /orders/checkout).
   // Deliberately NO mock prices or mock setTimeout orders (§5.5).
@@ -622,7 +660,12 @@ export class CheckoutPageComponent {
   subtotal = 0;
   shippingCost = 1500;
   discountAmount = 0;
+  discountPct = 0;
+  memberTier = 'free';
   total = 0;
+  quoteLoading = false;
+  quoteError: string | null = null;
+  orderNumber: string | null = null;
 
   // Nigerian states for dropdown
   nigerianStates = [
@@ -662,6 +705,72 @@ export class CheckoutPageComponent {
 
   constructor(private snackBar: MatSnackBar) {}
 
+  ngOnInit(): void {
+    // Real cart (same source as the cart page) → server-side quote.
+    this.subs.push(
+      this.cartService.getCart().subscribe({
+        next: (cart) => this.onCartLoaded(cart?.items ?? []),
+        error: () => {
+          this.quoteError = 'Could not load your cart. Please go back and try again.';
+        },
+      })
+    );
+    // Re-quote when the shipping method changes.
+    this.subs.push(
+      this.deliveryForm.get('shippingMethod')!.valueChanges.subscribe(() => this.refreshQuote())
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.forEach((s) => s.unsubscribe());
+  }
+
+  private orderInputs(): OrderItemInput[] {
+    return this.cartItems.map((item) => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      selectedVariant: item.selectedVariant,
+    }));
+  }
+
+  private onCartLoaded(items: CartInterface[]): void {
+    this.cartItems = items.map((item) => ({
+      id: item._id,
+      productId: typeof item.product === 'string' ? item.product : item.product._id,
+      name: typeof item.product === 'string' ? 'Item' : (item.product as any).name ?? 'Item',
+      image: typeof item.product === 'string' ? '' : ((item.product as any).images?.[0]?.url ?? ''),
+      price: item.priceAtAddition,
+      quantity: item.quantity,
+      selectedVariant: item.selectedVariant,
+    }));
+    this.refreshQuote();
+  }
+
+  refreshQuote(): void {
+    const inputs = this.orderInputs();
+    if (inputs.length === 0) return;
+    this.quoteLoading = true;
+    this.quoteError = null;
+    this.subs.push(
+      this.orders.quote(inputs, this.deliveryForm.get('shippingMethod')?.value ?? 'standard').subscribe({
+        next: (res: any) => {
+          const q = res?.data ?? res;
+          this.subtotal = q.subtotal ?? 0;
+          this.shippingCost = q.shipping ?? 0;
+          this.discountAmount = q.discount ?? 0;
+          this.discountPct = q.discountPct ?? 0;
+          this.memberTier = q.tier ?? 'free';
+          this.total = q.total ?? 0;
+          this.quoteLoading = false;
+        },
+        error: (e) => {
+          this.quoteLoading = false;
+          this.quoteError = e?.message ?? 'Could not price your order. Please try again.';
+        },
+      })
+    );
+  }
+
   submitDelivery() {
     if (this.deliveryForm.valid) {
       this.deliveryCompleted = true;
@@ -689,11 +798,66 @@ export class CheckoutPageComponent {
   }
 
   placeOrder() {
-    // Real checkout lands in the next slice (quote + Paystack inline + POST
-    // /orders/checkout). Deliberately a no-op toast — never fake an order.
-    this.snackBar.open('Checkout is being connected to live payments — your cart is safe.', 'Dismiss', {
-      duration: 5000,
-      panelClass: 'success-snackbar'
+    if (this.isPlacingOrder || this.cartItems.length === 0) return;
+    const email = this.deliveryForm.get('email')?.value || this.auth.user()?.email;
+    if (!email) {
+      this.snackBar.open('Add an email address so we can send your receipt.', 'Dismiss', { duration: 4000 });
+      return;
+    }
+    if (typeof PaystackPop === 'undefined') {
+      this.snackBar.open('Payment library failed to load. Check your connection and try again.', 'Dismiss', { duration: 4000 });
+      return;
+    }
+    this.isPlacingOrder = true;
+    this.subs.push(
+      this.orders.paystackKey().subscribe({
+        next: (res: any) => this.openPaystack(res?.data?.publicKey ?? res?.publicKey, email),
+        error: (e) => {
+          this.isPlacingOrder = false;
+          this.snackBar.open(e?.message ?? 'Card payments are not configured yet.', 'Dismiss', { duration: 4000 });
+        },
+      })
+    );
+  }
+
+  private openPaystack(publicKey: string, email: string): void {
+    const reference = crypto.randomUUID();
+    const handler = PaystackPop.setup({
+      key: publicKey,
+      email,
+      amount: Math.round(this.total * 100), // kobo
+      ref: reference,
+      callback: (resp: { reference: string }) => this.completeOrder(resp.reference),
+      onClose: () => {
+        this.isPlacingOrder = false;
+        this.snackBar.open('Payment window closed — no charge was made.', 'Dismiss', { duration: 3000 });
+      },
     });
+    handler.openIframe();
+  }
+
+  private completeOrder(paymentReference: string): void {
+    this.subs.push(
+      this.orders.checkout({
+        items: this.orderInputs(),
+        shippingMethod: this.deliveryForm.get('shippingMethod')?.value ?? 'standard',
+        shippingAddress: this.deliveryForm.value,
+        paymentReference,
+      }).subscribe({
+        next: (res: any) => {
+          this.isPlacingOrder = false;
+          this.reviewCompleted = true;
+          this.orderNumber = res?.data?.orderNumber ?? null;
+          this.snackBar.open(
+            this.orderNumber ? `Order ${this.orderNumber} placed successfully!` : 'Order placed successfully!',
+            'Dismiss', { duration: 5000, panelClass: 'success-snackbar' }
+          );
+        },
+        error: (e) => {
+          this.isPlacingOrder = false;
+          this.snackBar.open(e?.message ?? 'Payment verified but order failed — contact support with your reference.', 'Dismiss', { duration: 6000 });
+        },
+      })
+    );
   }
 }
