@@ -187,6 +187,10 @@
         <mat-icon>payments</mat-icon>
         <span>Payment</span>
       </a>
+      <a mat-button routerLink="/store/orders" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <mat-icon>receipt_long</mat-icon>
+        <span>My Orders</span>
+      </a>
       <button mat-button (click)="logout(); toggleMobileMenu()">
         <mat-icon>logout</mat-icon>
         <span>Sign Out</span>
@@ -226,6 +230,10 @@
     <button mat-menu-item routerLink="/payment">
       <mat-icon>payments</mat-icon>
       <span>Payment</span>
+    </button>
+    <button mat-menu-item routerLink="/store/orders">
+      <mat-icon>receipt_long</mat-icon>
+      <span>My Orders</span>
     </button>
     <button mat-menu-item routerLink="/settings/account">
       <mat-icon>settings</mat-icon>

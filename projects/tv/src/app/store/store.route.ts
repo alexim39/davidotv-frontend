@@ -4,6 +4,7 @@ import { ShopCategoryComponent } from "./pages/category/category.component";
 import { ProductDetailComponent } from "./pages/product/product-detail";
 import { CartPageComponent } from "./pages/cart/cart.component";
 import { CheckoutPageComponent } from "./pages/cart/checkout.component";
+import { OrdersHistoryComponent } from "./pages/orders/orders.component";
 import { ShopHomeComponent } from "./pages/home.component";
 import { WishlistComponent } from "./pages/wishlist/wishlist.component";
 
@@ -31,6 +32,10 @@ export const StoreRoutes: Routes = [
       {
         path: 'checkout',
         component: CheckoutPageComponent
+      },
+      {
+        path: 'orders',
+        component: OrdersHistoryComponent
       },
       {
         path: 'wishlist',

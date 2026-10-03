@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CartService, CartInterface } from './cart.service';
 import { OrdersService, OrderItemInput } from '../../services/orders.service';
@@ -254,11 +254,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
         <!-- Review Section -->
         <mat-card class="checkout-section" *ngIf="currentStep === 3">
           <h2 class="section-title">Review Your Order</h2>
-          <div *ngIf="orderNumber" class="order-confirmed">
-            <mat-icon>verified</mat-icon>
-            <p>Order {{orderNumber}} confirmed — receipt sent to {{deliveryForm.value.email}}.</p>
-            <button mat-stroked-button routerLink="/store">Continue shopping</button>
-          </div>
 
           <div class="order-summary">
             <div class="summary-section">
@@ -649,6 +644,7 @@ export class CheckoutPageComponent implements OnInit, OnDestroy {
 
   private fb = inject(FormBuilder);
   private readonly cartService = inject(CartService);
+  private readonly router = inject(Router);
   private readonly orders = inject(OrdersService);
   private readonly auth = inject(AuthStateService);
   private readonly subs: Subscription[] = [];
@@ -665,7 +661,6 @@ export class CheckoutPageComponent implements OnInit, OnDestroy {
   total = 0;
   quoteLoading = false;
   quoteError: string | null = null;
-  orderNumber: string | null = null;
 
   // Nigerian states for dropdown
   nigerianStates = [
@@ -847,11 +842,13 @@ export class CheckoutPageComponent implements OnInit, OnDestroy {
         next: (res: any) => {
           this.isPlacingOrder = false;
           this.reviewCompleted = true;
-          this.orderNumber = res?.data?.orderNumber ?? null;
+          const orderNumber = res?.data?.orderNumber ?? res?.data?.id ?? null;
           this.snackBar.open(
-            this.orderNumber ? `Order ${this.orderNumber} placed successfully!` : 'Order placed successfully!',
-            'Dismiss', { duration: 5000, panelClass: 'success-snackbar' }
+            orderNumber ? `Order ${orderNumber} placed successfully!` : 'Order placed successfully!',
+            'Dismiss', { duration: 4000, panelClass: 'success-snackbar' }
           );
+          // Success deep-link: receipt + tracking live on the orders page.
+          this.router.navigate(['/store/orders'], { queryParams: orderNumber ? { fresh: orderNumber } : {} });
         },
         error: (e) => {
           this.isPlacingOrder = false;
