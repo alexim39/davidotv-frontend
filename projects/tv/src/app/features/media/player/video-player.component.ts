@@ -313,7 +313,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     return this.trustedEmbed(id);
   }
 
-  private trustedEmbed(id: string, autoplay = false): SafeResourceUrl {
+  private trustedEmbed(id: string, autoplay = true): SafeResourceUrl {
     // Bypass is safe: id is validated to video-id characters only, and the
     // host + path are fixed (plain-string binding blanks the iframe).
     // enablejsapi exposes ended events so autoplay-next can advance.
