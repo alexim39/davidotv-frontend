@@ -32,16 +32,16 @@
           <span>Home</span>
         </a>
         <a mat-button routerLink="/media/trending" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-          <mat-icon>video_library</mat-icon>
-          <span>Videos</span>
+          <mat-icon>play_circle</mat-icon>
+          <span>Watch</span>
         </a>
-        <a mat-button routerLink="/media/official" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-          <mat-icon>verified</mat-icon>
-          <span>Official</span>
+        <a mat-button routerLink="/talent" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <mat-icon>auto_awesome</mat-icon>
+          <span>Talent</span>
         </a>
         <a mat-button routerLink="/forum" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
           <mat-icon>forum</mat-icon>
-          <span>Forum</span>
+          <span>Community</span>
         </a>
         <a mat-button routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
           <mat-icon>shopping_bag</mat-icon>
@@ -135,24 +135,16 @@
         <span>Home</span>
       </a>
       <a mat-button routerLink="/media/trending" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-        <mat-icon class="icon-container">local_fire_department</mat-icon>
-        <span>Trending</span>
+        <mat-icon class="icon-container">play_circle</mat-icon>
+        <span>Watch</span>
       </a>
-       <a mat-button routerLink="/media/official" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-        <mat-icon class="icon-container">verified</mat-icon>
-        <span>Official</span>
+       <a mat-button routerLink="/talent" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <mat-icon class="icon-container">auto_awesome</mat-icon>
+        <span>Talent</span>
       </a>
-      <a mat-button routerLink="/media/trending" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-        <mat-icon class="icon-container">video_library</mat-icon>
-        <span>Videos</span>
-      </a>
-     <!--  <a mat-button routerLink="/feed" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-        <mat-icon class="icon-container">rss_feed</mat-icon>
-        <span>Feeds</span>
-      </a> -->
       <a mat-button routerLink="/forum" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon class="icon-container">forum</mat-icon>
-        <span>Forum</span>
+        <span>Community</span>
       </a>
       <a mat-button routerLink="/events" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon class="icon-container">event</mat-icon>
