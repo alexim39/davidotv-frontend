@@ -59,7 +59,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
   <div class="add-comment-section" *ngIf="user">
     <div class="user-avatar-container">
       <img [src]="user.avatar || 'img/avatar.png'" alt="Your profile" class="user-avatar">
-      <span style="display: block; margin-top: 5px; font-size: 9px; color: #666; text-align: center;">
+      <span style="display: block; margin-top: 5px; font-size: 9px; color: var(--dt-text-2); text-align: center;">
         {{ user.name | titlecase}}
       </span>
     </div>

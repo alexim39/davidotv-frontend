@@ -72,7 +72,7 @@ import { MatIconModule } from '@angular/material/icon';
       .setting-card {
         padding: 16px;
         margin-bottom: 24px;
-        border-radius: 8px;
+        border-radius: var(--dt-radius-sm);
       }
 
       .setting-row {
@@ -108,7 +108,7 @@ import { MatIconModule } from '@angular/material/icon';
 
         ::ng-deep .mat-slide-toggle {
           .mat-slide-toggle-bar {
-            background-color: #ccc;
+            background-color: var(--dt-card);
           }
 
           &.mat-checked .mat-slide-toggle-bar {
@@ -132,7 +132,7 @@ import { MatIconModule } from '@angular/material/icon';
 
         .preview-container {
           background: white;
-          border-radius: 8px;
+          border-radius: var(--dt-radius-sm);
           overflow: hidden;
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
           transition: all 0.3s ease;
@@ -174,7 +174,7 @@ import { MatIconModule } from '@angular/material/icon';
           flex: 1;
           background: white;
           border: 1px solid #e5e5e5;
-          border-radius: 4px;
+          border-radius: var(--dt-radius-sm);
 
           .dark & {
             background: #383838;

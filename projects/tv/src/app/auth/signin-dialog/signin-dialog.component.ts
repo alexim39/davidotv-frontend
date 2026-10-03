@@ -102,7 +102,7 @@ form {
 	}
 	button[mat-flat-button] {
 		margin-top: 18px;
-    border-radius: 999px !important;
+    border-radius: var(--dt-radius-pill) !important;
     background: linear-gradient(135deg,#BE123C,#FB7185) !important;
     color: white !important;
     font-weight: 700;

@@ -76,7 +76,7 @@ $breakpoint-mobile: 768px;
     background: linear-gradient(135deg, #BE123C 0%, #E11D48 50%, #FB7185 100%);
     font-weight: 700;
     color: white;
-    border-radius: 999px;
+    border-radius: var(--dt-radius-pill);
     box-shadow: 0 8px 24px rgba(225,29,72,0.35);
   }
 }
@@ -117,7 +117,7 @@ $breakpoint-mobile: 768px;
   width: 100%;
   aspect-ratio: 16/9;
   background-color: #000;
-  border-radius: 12px;
+  border-radius: var(--dt-radius-card);
   overflow: hidden;
   max-width: 1200px;
   margin: 0 auto;
@@ -321,7 +321,7 @@ button.mat-icon-button {
       .reaction-buttons {
         @include flex-center(4px);
         background: rgba(255, 255, 255, 0.05);
-        border-radius: 20px;
+        border-radius: var(--dt-radius-sheet);
         padding: 2px;
         
         @media (max-width: $breakpoint-mobile) {
@@ -335,7 +335,7 @@ button.mat-icon-button {
           border: none;
           background: transparent;
           color: rgba(255, 255, 255, 0.8);
-          border-radius: 16px;
+          border-radius: var(--dt-radius-card);
           cursor: pointer;
           transition: all 0.2s ease;
 
@@ -349,13 +349,13 @@ button.mat-icon-button {
             font-size: 14px; /* Example size, adjust as needed */
             height: 18px; /* Ensure height matches font-size for proper alignment */
             width: 18px; /* Ensure width matches font-size */
-            color: #666; /* Example color */
+            color: var(--dt-text-2); /* Example color */
           }
           
           .count {
             // Adjust font-size, color, or font-weight for the text
             font-size: 14px; /* Example size, adjust as needed */
-            color: #666; /* Example color */
+            color: var(--dt-text-2); /* Example color */
             line-height: 1; /* Ensure line-height helps with vertical alignment */
           }
           
@@ -415,7 +415,7 @@ button.mat-icon-button {
           margin-left: 4px;
           padding: 6px 12px;
           background: rgba($primary-color, 0.1);
-          border-radius: 16px;
+          border-radius: var(--dt-radius-card);
           color: $primary-color;
           font-size: 0.8rem;
 
@@ -432,13 +432,13 @@ button.mat-icon-button {
             font-size: 14px; /* Example size, adjust as needed */
             height: 18px; /* Ensure height matches font-size for proper alignment */
             width: 18px; /* Ensure width matches font-size */
-            color: #666; /* Example color */
+            color: var(--dt-text-2); /* Example color */
           }
 
           span {
             // Adjust font-size, color, or font-weight for the text
             font-size: 14px; /* Example size, adjust as needed */
-            color: #666; /* Example color */
+            color: var(--dt-text-2); /* Example color */
             line-height: 1; /* Ensure line-height helps with vertical alignment */
           }
         } 
@@ -469,7 +469,7 @@ button.mat-icon-button {
   right: 10px;
   background-color: rgba(0, 0, 0, 0.7);
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--dt-radius-sm);
   font-size: 0.8rem;
   z-index: 5;
 }
@@ -504,7 +504,7 @@ button.mat-icon-button {
 .mobile-comments-trigger {
   @include flex-center(8px);
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--dt-radius-sm);
   margin-top: 16px;
   cursor: pointer;
   transition: background 0.2s ease;

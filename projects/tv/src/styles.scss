@@ -37,7 +37,7 @@ body:not(.dark-mode) {
 *::-webkit-scrollbar { width: 8px; height: 8px; }
 *::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #BE123C, #FB7185);
-  border-radius: 999px;
+  border-radius: var(--dt-radius-pill);
 }
 *::-webkit-scrollbar-track { background: transparent; }
 
@@ -55,7 +55,7 @@ body:not(.dark-mode) {
   background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 37%, rgba(255,255,255,0.06) 63%);
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
-  border-radius: 12px;
+  border-radius: var(--dt-radius-card);
 }
 @keyframes shimmer {
   0% { background-position: 100% 0; }
@@ -69,7 +69,7 @@ body:not(.dark-mode) {
   backdrop-filter: blur(14px);
 }
 .mat-mdc-button, .mat-mdc-raised-button, .mat-mdc-flat-button, .mat-mdc-stroked-button {
-  border-radius: 999px !important;
+  border-radius: var(--dt-radius-pill) !important;
   letter-spacing: 0.02em;
   font-weight: 600;
 }
@@ -94,7 +94,7 @@ body:not(.dark-mode) {
 .mat-mdc-text-field-wrapper {
   background: rgba(255,255,255,0.04) !important;
   backdrop-filter: blur(12px);
-  border-radius: 12px !important;
+  border-radius: var(--dt-radius-card) !important;
 }
 .mdc-text-field--outlined .mdc-notched-outline__leading,
 .mdc-text-field--outlined .mdc-notched-outline__notch,
@@ -121,7 +121,7 @@ body:not(.dark-mode) {
 .mat-mdc-dialog-container .mdc-dialog__surface {
   background: #131316 !important;
   border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 20px !important;
+  border-radius: var(--dt-radius-sheet) !important;
   box-shadow: 0 24px 64px rgba(0,0,0,0.65);
   backdrop-filter: blur(18px);
 }
@@ -130,7 +130,7 @@ body:not(.dark-mode) {
 .mat-mdc-menu-panel {
   background: #1A1A1E !important;
   border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px !important;
+  border-radius: var(--dt-radius-card) !important;
   box-shadow: 0 12px 40px rgba(0,0,0,0.55);
 }
 // Explicit item colors: never rely on the MDC theme default, which mismatches
@@ -173,7 +173,7 @@ body:not(.dark-mode) {
 .mat-mdc-snack-bar-container .mdc-snackbar__surface {
   background: #1E1E22 !important;
   border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px !important;
+  border-radius: var(--dt-radius-card) !important;
   color: #F8F7F8 !important;
 }
 .mat-mdc-progress-bar .mdc-linear-progress__bar-inner { border-color: #E11D48 !important; }
@@ -186,7 +186,7 @@ body:not(.dark-mode) {
   background: rgba(255,255,255,0.05) !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
   backdrop-filter: blur(14px);
-  border-radius: 16px !important;
+  border-radius: var(--dt-radius-card) !important;
   overflow: hidden;
   &:hover { border-color: rgba(255,255,255,0.14) !important; box-shadow: 0 12px 36px rgba(0,0,0,0.55) !important; }
 }
@@ -194,7 +194,7 @@ body:not(.dark-mode) {
 .product-price .discount-percent { color: #4ADE80 !important; }
 .add-to-cart, .product-actions .add-to-cart {
   background: linear-gradient(135deg,#BE123C,#FB7185) !important; color: white !important;
-  border-radius: 999px !important; box-shadow: 0 8px 24px rgba(225,29,72,0.35);
+  border-radius: var(--dt-radius-pill) !important; box-shadow: 0 var(--dt-radius-sm) 24px rgba(225,29,72,0.35);
 }
 
 // Forum / Feed / Community cards
@@ -205,7 +205,7 @@ body:not(.dark-mode) {
   background: rgba(255,255,255,0.05) !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
   backdrop-filter: blur(12px);
-  border-radius: 16px !important;
+  border-radius: var(--dt-radius-card) !important;
 }
 
 // Video player shell
@@ -217,7 +217,7 @@ body:not(.dark-mode) {
   background: rgba(255,255,255,0.04) !important;
   border: 1px solid rgba(255,255,255,0.06) !important;
   backdrop-filter: blur(12px);
-  border-radius: 16px;
+  border-radius: var(--dt-radius-card);
 }
 
 // Events / Merch / Library grids
@@ -227,7 +227,7 @@ body:not(.dark-mode) {
 .event-card, .merch-card, .playlist-card {
   background: rgba(255,255,255,0.05) !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
-  border-radius: 16px !important;
+  border-radius: var(--dt-radius-card) !important;
 }
 
 // Input quick wins for legacy .search-bar etc (outside mat-form-field)

@@ -4,7 +4,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px;
-  //color: #333;
+  //color: var(--dt-text-2);
 
   .upload-header {
     text-align: center;
@@ -19,7 +19,7 @@
 
     p {
       font-size: 1.1rem;
-      //color: #666;
+      //color: var(--dt-text-2);
     }
   }
 
@@ -85,8 +85,8 @@
   }
 
   .upload-dropzone {
-    border: 2px dashed #ccc;
-    border-radius: 8px;
+    border: 2px dashed var(--dt-line-strong);
+    border-radius: var(--dt-radius-sm);
     padding: 40px;
     text-align: center;
     transition: all 0.3s;
@@ -105,7 +105,7 @@
         font-size: 60px;
         width: 60px;
         height: 60px;
-        //color: #666;
+        //color: var(--dt-text-2);
         margin-bottom: 16px;
       }
 
@@ -115,14 +115,14 @@
       }
 
       p {
-        //color: #666;
+        //color: var(--dt-text-2);
         margin: 8px 0;
       }
 
       .file-requirements {
         font-size: 0.9rem;
         margin-top: 16px;
-        //color: #999;
+        //color: var(--dt-text-2);
       }
     }
   }
@@ -142,7 +142,7 @@
 
       video {
         width: 100%;
-        border-radius: 8px;
+        border-radius: var(--dt-radius-sm);
         //background-color: #000;
       }
     }
@@ -176,14 +176,14 @@
         width: 160px;
         height: 90px;
         object-fit: cover;
-        border-radius: 4px;
+        border-radius: var(--dt-radius-sm);
         border: 1px solid #eee;
       }
     }
 
     .thumbnail-placeholder {
       p {
-        //color: #999;
+        //color: var(--dt-text-2);
         font-size: 0.9rem;
       }
     }
@@ -230,7 +230,7 @@
       }
 
       p {
-        //color: #666;
+        //color: var(--dt-text-2);
         margin-bottom: 24px;
       }
     }
@@ -241,7 +241,7 @@
       gap: 16px;
       //background-color: #f9f9f9;
       padding: 16px;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       text-align: left;
       margin-top: 24px;
 
@@ -249,7 +249,7 @@
         width: 120px;
         height: 68px;
         object-fit: cover;
-        border-radius: 4px;
+        border-radius: var(--dt-radius-sm);
       }
 
       .video-info {
@@ -263,7 +263,7 @@
         p {
           margin: 0;
           font-size: 0.9rem;
-          //color: #666;
+          //color: var(--dt-text-2);
         }
       }
     }

@@ -111,7 +111,7 @@ template: `
       padding: 12px;
       border-top: 1px solid #f0f0f0;
       background: #f9f9f9;
-      border-radius: 0 0 8px 8px;
+      border-radius: 0 0 var(--dt-radius-sm) var(--dt-radius-sm);
     }
     
     .share-menu button {
@@ -138,7 +138,7 @@ template: `
     }
 
     .testimonial-card {
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
       margin-bottom: 24px;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -166,7 +166,7 @@ template: `
 
 .testimonial-card {
   //background: #ffffff;
-  border-radius: 8px;
+  border-radius: var(--dt-radius-sm);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   margin-bottom: 24px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -296,7 +296,7 @@ template: `
     }
     .subtext {
       font-size: 0.9rem;
-      //color: #999;
+      //color: var(--dt-text-2);
     }
   }
 

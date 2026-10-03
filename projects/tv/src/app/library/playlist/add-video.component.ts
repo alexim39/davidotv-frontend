@@ -180,7 +180,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       position: relative;
       width: 80px;
       height: 45px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       overflow: hidden;
       background-color: var(--bg-thumbnail);
       flex-shrink: 0;
@@ -201,7 +201,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       color: white;
       padding: 2px 4px;
       font-size: 10px;
-      border-top-left-radius: 4px;
+      border-top-left-radius: var(--dt-radius-sm);
     }
 
     .playlist-info {
@@ -240,7 +240,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
     .visibility-badge {
       padding: 2px 6px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       font-size: 10px;
       font-weight: 500;
     }

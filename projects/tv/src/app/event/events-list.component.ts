@@ -160,7 +160,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     }
     .event-badge span {
       padding: 0.25rem 0.5rem;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       font-size: 0.75rem;
       font-weight: 500;
       color: white;
@@ -194,7 +194,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       line-height: 1.3;
     }
     .event-dscription {
-      color: gray;
+      color: var(--dt-text-2);
       font-size: 0.8rem;  
       margin-bottom: 1rem;
       line-height: 1.4; 
@@ -208,7 +208,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       align-items: center;
       margin-bottom: 0.5rem;
       font-size: 0.9rem;
-      color: #666;
+      color: var(--dt-text-2);
     }
     .event-date mat-icon,
     .event-location mat-icon,
@@ -259,13 +259,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       h3 {
         font-size: 1.25rem;
         font-weight: 500;
-        //color: #333;
+        //color: var(--dt-text-2);
         margin: 0;
       }
 
       p {
         font-size: 0.875rem;
-        color: #666;
+        color: var(--dt-text-2);
         margin: 0;
         max-width: 300px;
       }

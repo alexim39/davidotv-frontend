@@ -60,7 +60,7 @@
   .search-bar {
     display: flex;
     border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 999px;
+    border-radius: var(--dt-radius-pill);
     overflow: hidden;
     height: 44px;
     background: rgba(255,255,255,0.06);
@@ -97,7 +97,7 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-width: 78px; height: 64px; font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
       color: #A1A1AA; text-decoration: none; transition: all 180ms; position: relative; padding: 0 10px;
-      border-radius: 10px;
+      border-radius: var(--dt-radius-sm);
       mat-icon { font-size: 20px; margin-bottom: 3px; transition: color 180ms; }
       &:hover { color: #F8F7F8; background: rgba(255,255,255,0.06); mat-icon { color: #FB7185; } }
       &.active {
@@ -105,7 +105,7 @@
         mat-icon { color: #FB7185; }
         &::after {
           content: ''; position: absolute; bottom: 6px; left: 12px; right: 12px;
-          height: 2.5px; background: linear-gradient(90deg, #BE123C, #FB7185); border-radius: 999px;
+          height: 2.5px; background: linear-gradient(90deg, #BE123C, #FB7185); border-radius: var(--dt-radius-pill);
         }
       }
     }
@@ -123,7 +123,7 @@
   }
   .user-profile {
     display: flex; align-items: center; gap: 8px; padding: 4px 8px 4px 4px;
-    border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--dt-radius-pill); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
     backdrop-filter: blur(10px); transition: all 180ms; height: 42px;
     &:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.14); }
   }
@@ -132,7 +132,7 @@
   .user-name { font-size: 13px; font-weight: 600; color: #F8F7F8; margin-right: 4px; max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* User menu polish (global also covers) */
-  .user-menu { margin-top: 8px; min-width: 280px; padding: 0; border-radius: var(--dt-radius-card, 16px); overflow: hidden; background: var(--dt-card, #1A1A1E); }
+  .user-menu { margin-top: var(--dt-radius-sm); min-width: 280px; padding: 0; border-radius: var(--dt-radius-card, var(--dt-radius-card)); overflow: hidden; background: var(--dt-card, #1A1A1E); }
   .menu-user-info-toned { padding: 1em; text-align: center; color: var(--dt-text-2, #C9C9D1); }
 
   .mobile-toggle { display: none; color: #A1A1AA; min-width: 44px; min-height: 44px; }

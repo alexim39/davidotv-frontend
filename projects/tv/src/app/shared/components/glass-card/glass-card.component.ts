@@ -20,7 +20,7 @@ import { CommonModule } from '@angular/common';
       backdrop-filter: blur(16px) saturate(1.2);
       -webkit-backdrop-filter: blur(16px) saturate(1.2);
       border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 20px;
+      border-radius: var(--dt-radius-sheet);
       box-shadow: 0 8px 32px rgba(0,0,0,0.55);
       overflow: hidden;
       transition: transform 180ms cubic-bezier(0.4,0,0.2,1), box-shadow 180ms;

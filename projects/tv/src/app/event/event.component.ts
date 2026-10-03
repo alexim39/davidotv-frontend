@@ -189,7 +189,7 @@ import { Subscription } from 'rxjs';
       .featured-events {
         padding: 2rem;
         background-color:rgb(16, 8, 8, 0.2);
-        //border-radius: 10px;
+        //border-radius: var(--dt-radius-sm);
         //margin: 0.5em 0;
         
         .section-title {
@@ -261,7 +261,7 @@ import { Subscription } from 'rxjs';
           
           .map-view {
             height: 600px;
-            border-radius: 8px;
+            border-radius: var(--dt-radius-sm);
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
           }

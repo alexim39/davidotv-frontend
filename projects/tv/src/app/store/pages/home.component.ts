@@ -186,7 +186,7 @@ import { UserInterface, UserService } from '../../common/services/user.service';
       }
 
       p {
-        color: #666;
+        color: var(--dt-text-2);
         margin: 0;
         font-size: 0.9rem;
         display: block !important;
@@ -220,7 +220,7 @@ import { UserInterface, UserService } from '../../common/services/user.service';
         overflow: hidden;
         background-size: cover;
         background-position: center;
-        border-radius: 8px !important;
+        border-radius: var(--dt-radius-sm) !important;
         cursor: pointer;
         transition: transform 0.3s ease;
 
@@ -282,7 +282,7 @@ import { UserInterface, UserService } from '../../common/services/user.service';
       height: 200px;
       .loading-text {
         font-size: 0.875rem;
-        color: #666;
+        color: var(--dt-text-2);
         font-weight: 500;
         margin-left: 10px;
       }
@@ -324,13 +324,13 @@ import { UserInterface, UserService } from '../../common/services/user.service';
       h3 {
         font-size: 1.25rem;
         font-weight: 500;
-        //color: #333;
+        //color: var(--dt-text-2);
         margin: 0;
       }
 
       p {
         font-size: 0.875rem;
-        color: #666;
+        color: var(--dt-text-2);
         margin: 0;
         max-width: 300px;
       }
@@ -352,7 +352,7 @@ import { UserInterface, UserService } from '../../common/services/user.service';
       gap: 16px;
       .loading-text {
         font-size: 0.875rem;
-        color: #666;
+        color: var(--dt-text-2);
         font-weight: 500;
       }
     }

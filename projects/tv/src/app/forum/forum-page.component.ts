@@ -145,7 +145,7 @@ import { ChangeDetectorRef } from '@angular/core';
 
       span {
         font-size: 1rem;
-        //color: #666;
+        //color: var(--dt-text-2);
         letter-spacing: 0.02em;
       }
     }

@@ -106,7 +106,7 @@ styles: [`
 .comment {
   margin-bottom: 20px;
   padding: 15px;
-  //border-radius: 8px;
+  //border-radius: var(--dt-radius-sm);
   
   .comment-main {
     display: flex;
@@ -133,7 +133,7 @@ styles: [`
       .comment-author {
         font-weight: 500;
         margin-right: 4px;
-        color: #666;
+        color: var(--dt-text-2);
         font-size: 12px;
       }
       
@@ -261,7 +261,7 @@ styles: [`
 
 .no-replies {
   padding: 12px;
-  color: #666;
+  color: var(--dt-text-2);
   font-size: 14px;
   text-align: center;
 }

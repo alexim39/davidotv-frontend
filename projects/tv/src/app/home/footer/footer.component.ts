@@ -178,7 +178,7 @@ import { RouterModule } from '@angular/router';
           width: 36px;
           height: 2.5px;
           background: linear-gradient(90deg, #BE123C, #FB7185);
-          border-radius: 999px;
+          border-radius: var(--dt-radius-pill);
         }
       }
 
@@ -218,7 +218,7 @@ import { RouterModule } from '@angular/router';
         img {
           height: 40px;
           margin-bottom: 8px;
-          //border-radius: 8px;
+          //border-radius: var(--dt-radius-sm);
         }
 
 
@@ -233,7 +233,7 @@ import { RouterModule } from '@angular/router';
           backdrop-filter: blur(8px);
           padding: 4px 8px;
           width: fit-content;
-          border-radius: 999px;
+          border-radius: var(--dt-radius-pill);
         }
       }
 
@@ -281,7 +281,7 @@ import { RouterModule } from '@angular/router';
 
           ::ng-deep .mat-form-field-outline {
             background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+            border-radius: var(--dt-radius-sm);
           }
 
           ::ng-deep .mat-form-field-label {
@@ -296,7 +296,7 @@ import { RouterModule } from '@angular/router';
         button {
           align-self: flex-start;
           font-weight: 700;
-          border-radius: 999px !important;
+          border-radius: var(--dt-radius-pill) !important;
           background: linear-gradient(135deg, #BE123C, #FB7185) !important;
           color: white !important;
           box-shadow: 0 8px 24px rgba(225,29,72,0.35);

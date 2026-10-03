@@ -21,7 +21,7 @@ import { CommonModule } from '@angular/common';
     .activation-content {
       text-align: center;
       padding: 2em;
-      border-radius: 16px;
+      border-radius: var(--dt-radius-card);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
       background-color: white;
       width: 90%; /* Adjust width for responsiveness */
@@ -59,7 +59,7 @@ import { CommonModule } from '@angular/common';
     .activation-details {
       p {
         margin-bottom: 1em;
-        color: #666;
+        color: var(--dt-text-2);
       }
     }
 

@@ -124,7 +124,7 @@ import { ShortNumberPipe } from "./short-number.pipe";
     }
     
     .comment-time {
-      color: #888;
+      color: var(--dt-text-2);
       font-size: 0.8em;
     }
     

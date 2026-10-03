@@ -103,7 +103,7 @@ import { MatButtonModule } from '@angular/material/button';
       color: #ffffff;
       background: rgba(191, 64, 44, 0.2);
       padding: 2px 6px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
     }
 
     .cta-link {
@@ -112,7 +112,7 @@ import { MatButtonModule } from '@angular/material/button';
       text-decoration: none !important;
       transition: all 0.2s ease;
       padding: 0 4px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       margin: 0 2px;
     }
 

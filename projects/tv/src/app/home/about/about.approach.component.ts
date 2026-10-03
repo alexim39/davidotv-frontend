@@ -148,7 +148,7 @@ styles: [`
     flex-direction: column;
     justify-content: space-between;
     background: #1a082a;
-    border-radius: 12px;
+    border-radius: var(--dt-radius-card);
     box-shadow: 0 2px 16px rgba(140,0,69,0.07);
     margin: 1em;
     min-width: 320px;

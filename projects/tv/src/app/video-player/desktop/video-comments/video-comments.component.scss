@@ -17,7 +17,7 @@
   justify-content: space-between;
   margin-bottom: 24px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #666; //$divider-color;
+  border-bottom: 1px solid var(--dt-line-strong); //$divider-color;
 
   .comments-title {
     font-size: 1.25rem;
@@ -88,7 +88,7 @@
 
         .submit-button {
           font-weight: 500;
-          border-radius: 18px;
+          border-radius: var(--dt-radius-card);
           padding: 0 16px;
         }
       }
@@ -135,7 +135,7 @@
 
       .comment-time {
         font-size: 0.75rem;
-        color: #666; //$text-secondary;
+        color: var(--dt-text-2); //$text-secondary;
       }
     }
 
@@ -218,7 +218,7 @@
 
           .submit-button {
             font-weight: 500;
-            border-radius: 18px;
+            border-radius: var(--dt-radius-card);
             padding: 0 16px;
           }
         }
@@ -228,7 +228,7 @@
     .replies-list {
       margin-top: 16px;
       padding-left: 16px;
-      border-left: 2px solid #666; //$divider-color;
+      border-left: 2px solid var(--dt-line-strong); //$divider-color;
 
       .reply-item {
         display: flex;
@@ -263,7 +263,7 @@
 
             .reply-time {
               font-size: 0.6875rem;
-              color: #666;
+              color: var(--dt-text-2);
             }
           }
 

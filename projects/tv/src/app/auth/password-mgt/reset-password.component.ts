@@ -53,7 +53,7 @@ import { AuthService } from '../auth.service';
       width: 100%;
       max-width: 450px;
       padding: 2rem;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     }
 
@@ -75,11 +75,11 @@ import { AuthService } from '../auth.service';
       font-size: 1.5rem;
       font-weight: 500;
       margin-bottom: 0.5rem;
-      color: #666;
+      color: var(--dt-text-2);
     }
 
     .reset-password-subtitle {
-      color: #666;
+      color: var(--dt-text-2);
       margin-bottom: 1.5rem;
       font-size: 0.95rem;
       line-height: 1.5;
@@ -143,7 +143,7 @@ import { AuthService } from '../auth.service';
 
     .success-message {
       background: #e8f5e9;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       padding: 1rem;
       margin-top: 1.5rem;
       color: #2e7d32;

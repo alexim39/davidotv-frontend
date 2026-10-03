@@ -73,7 +73,7 @@ import { MatDividerModule } from '@angular/material/divider';
         padding: 20px 24px;
         font-size: 15px;
         line-height: 1.5;
-        color: #333;
+        color: var(--dt-text-2);
 
         h4 {
           color: #8f0045;

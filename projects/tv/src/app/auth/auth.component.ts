@@ -106,7 +106,7 @@ import { AuthStateService } from '../core/services/auth-state.service';
       min-height: 540px;
       background: #131316;
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
+      border-radius: var(--dt-radius-sheet);
       box-shadow: 0 24px 64px rgba(0,0,0,0.65);
     }
 
@@ -235,7 +235,7 @@ import { AuthStateService } from '../core/services/auth-state.service';
     .divider {
       width: 80%;
       margin: 1rem 0;
-      color: rgba(0, 0, 0, 0.6);
+      color: var(--dt-text-2);
     }
 
     .social-buttons-sign-in, {
@@ -261,7 +261,7 @@ import { AuthStateService } from '../core/services/auth-state.service';
       gap: 8px;
       padding: 0 16px;
       height: 40px;
-      border-radius: 20px;
+      border-radius: var(--dt-radius-sheet);
       font-weight: 500;
       transition: all 0.3s ease;
     }

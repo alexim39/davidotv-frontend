@@ -72,7 +72,7 @@ import { CommonModule } from '@angular/common';
       padding: 4rem 0;
       background: linear-gradient(135deg, #8f0045 0%, #000000 100%);
       color: white;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       margin-bottom: 4rem;
     }
 
@@ -104,7 +104,7 @@ import { CommonModule } from '@angular/common';
     }
 
     mat-card {
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
       transition: all 0.3s cubic-bezier(.25,.8,.25,1);
     }
@@ -151,7 +151,7 @@ import { CommonModule } from '@angular/common';
 
     .pillar-card {
       padding: 2rem;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       box-shadow: 0 10px 20px rgba(45, 20, 20, 0.8);
       text-align: justify;
       transition: all 0.3s cubic-bezier(.25,.8,.25,1);

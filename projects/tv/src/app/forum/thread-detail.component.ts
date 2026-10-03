@@ -212,7 +212,7 @@ import { ApiService } from '../core/services/api.service';
 
       .thread-card {
         margin-bottom: 32px;
-        border-radius: 8px;
+        border-radius: var(--dt-radius-sm);
         overflow: hidden;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 
@@ -238,7 +238,7 @@ import { ApiService } from '../core/services/api.service';
 
             .time {
               margin-left: auto;
-              color: #888;
+              color: var(--dt-text-2);
               font-size: 13px;
               white-space: nowrap;
             }
@@ -259,7 +259,7 @@ import { ApiService } from '../core/services/api.service';
             .media-content {
               max-width: 100%;
               max-height: 500px;
-              border-radius: 8px;
+              border-radius: var(--dt-radius-sm);
               object-fit: contain;
               
               video {

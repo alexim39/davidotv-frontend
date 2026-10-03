@@ -178,7 +178,7 @@ import { Subscription } from 'rxjs';
       align-items: center;
       justify-content: center;
       padding: 40px;
-      color: #666;
+      color: var(--dt-text-2);
 
       p {
         margin-top: 16px;
@@ -195,7 +195,7 @@ import { Subscription } from 'rxjs';
 
     .product-card {
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       overflow: hidden;
       position: relative;
       border: none;
@@ -264,7 +264,7 @@ import { Subscription } from 'rxjs';
 
       .badge {
         padding: 4px 8px;
-        border-radius: 4px;
+        border-radius: var(--dt-radius-sm);
         font-size: 12px;
         font-weight: 600;
         color: white;
@@ -295,7 +295,7 @@ import { Subscription } from 'rxjs';
 
       .quick-action-btn {
         background: rgba(255, 255, 255, 0.9);
-        color: #333;
+        color: var(--dt-text-2);
         width: 36px;
         height: 36px;
         display: flex;
@@ -347,7 +347,7 @@ import { Subscription } from 'rxjs';
 
       .product-brand {
         font-size: 14px;
-        color: #666;
+        color: var(--dt-text-2);
         margin-bottom: 8px;
       }
 
@@ -374,7 +374,7 @@ import { Subscription } from 'rxjs';
 
         .review-count {
           font-size: 12px;
-          color: #666;
+          color: var(--dt-text-2);
         }
       }
 
@@ -393,14 +393,14 @@ import { Subscription } from 'rxjs';
 
         .original-price {
           font-size: 14px;
-          color: #999;
+          color: var(--dt-text-2);
           text-decoration: line-through;
         }
 
         .standard-price {
           font-size: 18px;
           font-weight: 600;
-          color: #666;
+          color: var(--dt-text-2);
         }
 
         .discount-percent {

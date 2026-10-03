@@ -342,7 +342,7 @@ interface ApiTransactionData {
       gap: 8px;
       margin-bottom: 16px;
       font-size: 14px;
-      //color: #666;
+      //color: var(--dt-text-2);
     }
 
     .breadcrumb a {
@@ -359,7 +359,7 @@ interface ApiTransactionData {
     }
 
     .breadcrumb .current {
-      //color: #333;
+      //color: var(--dt-text-2);
       font-weight: 500;
     }
 
@@ -370,7 +370,7 @@ interface ApiTransactionData {
       margin: 0 0 8px 0;
       font-size: 28px;
       font-weight: 600;
-      //color: #333;
+      //color: var(--dt-text-2);
     }
 
     .transactions-icon {
@@ -384,7 +384,7 @@ interface ApiTransactionData {
 
     .header-main p {
       margin: 0;
-      //color: #666;
+      //color: var(--dt-text-2);
       font-size: 16px;
     }
 
@@ -397,7 +397,7 @@ interface ApiTransactionData {
     .summary-card,
     .table-card {
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      border-radius: 12px;
+      border-radius: var(--dt-radius-card);
     }
 
     .card-header {
@@ -415,7 +415,7 @@ interface ApiTransactionData {
       margin: 0;
       font-size: 20px;
       font-weight: 600;
-      //color: #333;
+      //color: var(--dt-text-2);
     }
 
     .summary-icon,
@@ -433,20 +433,20 @@ interface ApiTransactionData {
     .summary-item {
       text-align: center;
       padding: 16px;
-      border-radius: 8px;
-      border: 1px solid #333;
+      border-radius: var(--dt-radius-sm);
+      border: 1px solid var(--dt-line-strong);
     }
 
     .summary-label {
       font-size: 14px;
-      //color: #666;
+      //color: var(--dt-text-2);
       margin-bottom: 8px;
     }
 
     .summary-value {
       font-size: 24px;
       font-weight: 600;
-      color: #333;
+      color: var(--dt-text-2);
     }
 
     .summary-value.success {
@@ -481,14 +481,14 @@ interface ApiTransactionData {
 
     .transactions-table {
       width: 100%;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       overflow: hidden;
     }
 
     .transactions-table th {
       //background-color: #f5f5f5;
       font-weight: 600;
-      //color: #333;
+      //color: var(--dt-text-2);
     }
 
     .transaction-id {
@@ -496,7 +496,7 @@ interface ApiTransactionData {
       font-size: 12px;
       //background: #e3f2fd;
       padding: 4px 8px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       color: #8f0045;
     }
 
@@ -509,7 +509,7 @@ interface ApiTransactionData {
     .type-chip {
       font-size: 12px;
       //background-color: #e0e0e0;
-      //color: #333;
+      //color: var(--dt-text-2);
     }
 
     .status-chip {
@@ -562,7 +562,7 @@ interface ApiTransactionData {
     }
 
     .transaction-card {
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       box-shadow: 0 1px 4px rgba(0,0,0,0.1);
     }
 
@@ -591,13 +591,13 @@ interface ApiTransactionData {
 
     .label {
       font-weight: 500;
-      //color: #666;
+      //color: var(--dt-text-2);
       font-size: 14px;
     }
 
     .value {
       font-weight: 500;
-      //color: #333;
+      //color: var(--dt-text-2);
       font-size: 14px;
     }
 
@@ -605,7 +605,7 @@ interface ApiTransactionData {
     .no-data {
       text-align: center;
       padding: 48px 24px;
-      //color: #666;
+      //color: var(--dt-text-2);
     }
 
     .no-data-icon {
@@ -618,7 +618,7 @@ interface ApiTransactionData {
 
     .no-data h3 {
       margin: 0 0 8px 0;
-      //color: #333;
+      //color: var(--dt-text-2);
     }
 
     .no-data p {

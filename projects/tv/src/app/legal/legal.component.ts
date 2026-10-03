@@ -45,7 +45,7 @@ import { RouterModule } from '@angular/router';
         flex: 20%;
         width: 100%;
         padding-right: 2em;
-        border-right: 1px solid #ccc;
+        border-right: 1px solid var(--dt-line-strong);
         
         mat-list {
           mat-list-item {

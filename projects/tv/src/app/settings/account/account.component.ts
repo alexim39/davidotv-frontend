@@ -80,7 +80,7 @@ import { MatCardModule } from '@angular/material/card';
 
     .settings-card {
       width: 100%;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
 

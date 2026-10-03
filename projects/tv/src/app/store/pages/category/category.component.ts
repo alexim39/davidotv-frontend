@@ -125,7 +125,7 @@ import { catchError, finalize, of } from 'rxjs';
       background-size: cover;
       background-position: center;
       position: relative;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       overflow: hidden;
       display: flex;
       align-items: flex-end;
@@ -198,7 +198,7 @@ import { catchError, finalize, of } from 'rxjs';
     }
 
     .filter-btn {
-      border-radius: 20px;
+      border-radius: var(--dt-radius-sheet);
       padding: 0 16px;
       height: 36px;
 
@@ -233,13 +233,13 @@ import { catchError, finalize, of } from 'rxjs';
       h3 {
         font-size: 1.5rem;
         margin: 0 0 8px;
-        color: #333;
+        color: var(--dt-text-2);
       }
 
       p {
         font-size: 1rem;
         margin: 0 0 16px;
-        color: #666;
+        color: var(--dt-text-2);
       }
     }
 
@@ -251,7 +251,7 @@ import { catchError, finalize, of } from 'rxjs';
       gap: 16px;
 
       button {
-        border-radius: 20px;
+        border-radius: var(--dt-radius-sheet);
       }
 
       .page-numbers {

@@ -48,7 +48,7 @@ export interface EnterDialogData { uploadId: string; uploadTitle: string; }
     .hint{ color:#A1A1AA; font-size:13px; }
     .err{ color:#FB7185; font-size:13px; }
     .ok{ color:#4ADE80; font-size:13px; }
-    .rose-btn{ background:linear-gradient(135deg,#BE123C,#FB7185); color:white; border-radius:999px; }
+    .rose-btn{ background:linear-gradient(135deg,#BE123C,#FB7185); color:white; border-radius:var(--dt-radius-pill); }
   `]
 })
 export class EnterChallengeDialogComponent implements OnInit {

@@ -41,15 +41,15 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
   `,
   styles: [`
     .profile{ padding:24px; background:#0B0B0C; min-height:70vh; display:grid; gap:16px; }
-    .header{ display:flex; gap:16px; align-items:center; flex-wrap:wrap; padding:18px; border-radius:20px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(16px); }
+    .header{ display:flex; gap:var(--dt-radius-card); align-items:center; flex-wrap:wrap; padding:var(--dt-radius-card); border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(var(--dt-radius-card)); }
     .avatar{ width:72px; height:72px; border-radius:50%; object-fit:cover; border:2px solid rgba(251,113,133,0.5); }
     .name{ margin:0; color:#F8F7F8; font-size:18px; font-weight:700; }
     .handle{ color:#FB7185; font-weight:600; }
     .email{ margin:4px 0 0; color:#A1A1AA; font-size:12px; }
-    .upload-btn{ margin-left:auto; padding:10px 16px; border-radius:999px; background:linear-gradient(135deg,#BE123C,#FB7185); color:white; cursor:pointer; display:flex; gap:8px; align-items:center; font-weight:600; }
-    .form{ padding:18px; border-radius:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); display:grid; gap:12px; }
+    .upload-btn{ margin-left:auto; padding:var(--dt-radius-sm) var(--dt-radius-card); border-radius:var(--dt-radius-pill); background:linear-gradient(135deg,#BE123C,#FB7185); color:white; cursor:pointer; display:flex; gap:var(--dt-radius-sm); align-items:center; font-weight:600; }
+    .form{ padding:var(--dt-radius-card); border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); display:grid; gap:var(--dt-radius-card); }
     .sec{ margin:0; color:#F8F7F8; font-size:14px; font-weight:700; }
-    .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:999px; }
+    .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:var(--dt-radius-pill); }
   `]
 })
 export class ProfileComponent implements OnInit {

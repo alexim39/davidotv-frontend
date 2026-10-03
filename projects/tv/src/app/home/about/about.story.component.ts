@@ -62,7 +62,7 @@ import { MatIconModule } from '@angular/material/icon';
             margin-bottom: -0.5em;
             img {
               width: 100%;
-              border-radius: 10px;
+              border-radius: var(--dt-radius-sm);
             }
         }
       .text-content {

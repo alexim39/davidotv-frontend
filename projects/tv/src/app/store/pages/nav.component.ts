@@ -289,7 +289,7 @@ import { CartInterface, CartService } from './cart/cart.service';
             right: 0;
             height: 3px;
             background: #FF4081;
-            border-radius: 3px 3px 0 0;
+            border-radius: var(--dt-radius-sm) var(--dt-radius-sm) 0 0;
             animation: fadeIn 0.3s ease;
           }
         }
@@ -369,7 +369,7 @@ import { CartInterface, CartService } from './cart/cart.service';
         h3 {
           margin: 0;
           font-size: 16px;
-          color: #666;
+          color: var(--dt-text-2);
           font-weight: 500;
         }
       }
@@ -380,15 +380,15 @@ import { CartInterface, CartService } from './cart/cart.service';
         font-size: 14px;
 
         &.active {
-          background: rgba(63, 81, 181, 0.1);
-          color: #3f51b5;
+          background: var(--dt-gradient-soft);
+          color: var(--dt-accent-3);
           font-weight: 500;
         }
 
         .menu-active-icon {
           position: absolute;
           left: 8px;
-          color: #3f51b5;
+          color: var(--dt-accent-3);
         }
 
         .limited-badge {
@@ -407,7 +407,7 @@ import { CartInterface, CartService } from './cart/cart.service';
       width: 380px;
       max-width: 100vw;
       overflow: hidden;
-      border-radius: 12px;
+      border-radius: var(--dt-radius-card);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
       position: relative;
       max-height: 80vh;
@@ -485,7 +485,7 @@ import { CartInterface, CartService } from './cart/cart.service';
           padding: 12px;
           font-size: 14px;
           font-weight: 500;
-          color: #666;
+          color: var(--dt-text-2);
           background: transparent;
           border: none;
           border-bottom: 2px solid transparent;
@@ -513,7 +513,7 @@ import { CartInterface, CartService } from './cart/cart.service';
             //color: white;
             font-size: 11px;
             padding: 2px 6px;
-            border-radius: 10px;
+            border-radius: var(--dt-radius-sm);
           }
         }
       }
@@ -557,13 +557,13 @@ import { CartInterface, CartService } from './cart/cart.service';
             margin: 0 0 8px 0;
             font-size: 18px;
             font-weight: 600;
-            //color: #333;
+            //color: var(--dt-text-2);
           }
 
           p {
             margin: 0 0 20px 0;
             font-size: 14px;
-            //color: #666;
+            //color: var(--dt-text-2);
             max-width: 80%;
           }
 
@@ -610,7 +610,7 @@ import { CartInterface, CartService } from './cart/cart.service';
           justify-content: center;
           gap: 6px;
           font-size: 12px;
-          //color: #666;
+          //color: var(--dt-text-2);
 
           mat-icon {
             font-size: 14px;
@@ -635,7 +635,7 @@ import { CartInterface, CartService } from './cart/cart.service';
             justify-content: center;
             gap: 8px;
             padding: 16px 12px;
-            border-radius: 8px;
+            border-radius: var(--dt-radius-sm);
             font-size: 13px;
             font-weight: 500;
             //color: #555;
@@ -657,7 +657,7 @@ import { CartInterface, CartService } from './cart/cart.service';
               color: white;
               font-size: 11px;
               padding: 2px 6px;
-              border-radius: 10px;
+              border-radius: var(--dt-radius-sm);
               margin-top: 4px;
             }
 

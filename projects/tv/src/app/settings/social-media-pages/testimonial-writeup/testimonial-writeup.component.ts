@@ -214,13 +214,13 @@ import { MatIconModule } from '@angular/material/icon';
           h4 {
             margin: 0 0 4px;
             font-size: 16px;
-            color: #333;
+            color: var(--dt-text-2);
           }
 
           p {
             margin: 0;
             font-size: 14px;
-            color: #666;
+            color: var(--dt-text-2);
           }
         }
       }
@@ -241,7 +241,7 @@ import { MatIconModule } from '@angular/material/icon';
 
     .testimonial-form-card {
       padding: 24px;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
 
       form {
         display: flex;
@@ -305,7 +305,7 @@ import { MatIconModule } from '@angular/material/icon';
 
   .write-testimonial-prompt {
     margin-bottom: 24px;
-   border: 1px solid #666;
+   border: 1px solid var(--dt-line-strong);
 
     .prompt-content {
       display: flex;
@@ -325,7 +325,7 @@ import { MatIconModule } from '@angular/material/icon';
         h4 {
           margin: 0 0 4px;
           font-size: 16px;
-          color: #333;
+          color: var(--dt-text-2);
         }
 
         p {

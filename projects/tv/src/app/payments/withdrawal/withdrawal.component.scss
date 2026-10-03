@@ -14,7 +14,7 @@
   gap: 8px;
   margin-bottom: 16px;
   font-size: 14px;
-  color: #666;
+  color: var(--dt-text-2);
 
   a {
     display: flex;
@@ -36,7 +36,7 @@
   }
 
   .current {
-    color: #333;
+    color: var(--dt-text-2);
     font-weight: 500;
   }
 }
@@ -49,7 +49,7 @@
     margin: 0 0 8px 0;
     font-size: 28px;
     font-weight: 600;
-    color: #333;
+    color: var(--dt-text-2);
 
     .withdrawal-icon {
       color: #8f0045;
@@ -63,7 +63,7 @@
 
   p {
     margin: 0;
-    color: #666;
+    color: var(--dt-text-2);
     font-size: 16px;
   }
 }
@@ -77,7 +77,7 @@
 /* Balance Card Styles */
 .balance-card {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border-radius: 12px;
+  border-radius: var(--dt-radius-card);
   padding: 24px;
   position: relative;
   overflow: hidden;
@@ -104,7 +104,7 @@
       margin: 0;
       font-size: 20px;
       font-weight: 600;
-      color: #333;
+      color: var(--dt-text-2);
       display: flex;
       align-items: center;
       gap: 12px;
@@ -143,7 +143,7 @@
     .amount {
       font-size: 48px;
       font-weight: 600;
-      color: #333;
+      color: var(--dt-text-2);
       letter-spacing: -1px;
     }
   }
@@ -159,7 +159,7 @@
       align-items: center;
       padding: 12px;
       background: rgba(143, 0, 69, 0.05);
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
 
       .detail-icon {
         color: #8f0045;
@@ -172,14 +172,14 @@
       .detail-text {
         .detail-label {
           font-size: 12px;
-          color: #666;
+          color: var(--dt-text-2);
           margin-bottom: 4px;
         }
 
         .detail-value {
           font-size: 16px;
           font-weight: 500;
-          color: #333;
+          color: var(--dt-text-2);
         }
       }
     }
@@ -189,7 +189,7 @@
 /* Withdrawal Card Styles */
 .withdrawal-card {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border-radius: 12px;
+  border-radius: var(--dt-radius-card);
   overflow: hidden;
   padding: 24px;
 
@@ -205,7 +205,7 @@
       margin: 0;
       font-size: 20px;
       font-weight: 600;
-      color: #333;
+      color: var(--dt-text-2);
     }
 
     button {
@@ -234,7 +234,7 @@
 
     .search-container {
       padding: 8px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       margin: 8px 0;
 
       input {
@@ -266,8 +266,8 @@
 
 .recent-withdrawals {
   padding: 16px;
-  border-radius: 4px;
-  color: #666;
+  border-radius: var(--dt-radius-sm);
+  color: var(--dt-text-2);
 }
 
 ::ng-deep .mat-expansion-panel {

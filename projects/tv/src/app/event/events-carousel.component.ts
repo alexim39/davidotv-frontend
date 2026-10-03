@@ -142,7 +142,7 @@ import { EventDetailDialogComponent } from './event-detail-dialog.component';
     .event-card {
       width: 300px;
       flex-shrink: 0;
-      border-radius: 12px;
+      border-radius: var(--dt-radius-card);
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       cursor: pointer;
@@ -190,14 +190,14 @@ import { EventDetailDialogComponent } from './event-detail-dialog.component';
       -webkit-line-clamp: 2; /* Limit to 2 lines */
       -webkit-box-orient: vertical; 
       line-height: 1.2rem;
-      color: #666;
+      color: var(--dt-text-2);
     }
 
     .meta {
       display: flex;
       align-items: center;
       gap: 1rem;
-      color: #666;
+      color: var(--dt-text-2);
       font-size: 0.9rem;
       margin-bottom: 0.5rem;
     }

@@ -22,11 +22,11 @@ import { MatIconModule } from '@angular/material/icon';
   `,
   styles: [`
     .nf-wrap { min-height: 70vh; display: grid; place-items: center; padding: 24px; background: #0B0B0C; }
-    .nf-card { text-align: center; padding: 40px 32px; border-radius: 20px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); backdrop-filter: blur(16px); max-width: 420px; }
+    .nf-card { text-align: center; padding: 40px 32px; border-radius: var(--dt-radius-sheet); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); backdrop-filter: blur(var(--dt-radius-card)); max-width: 420px; }
     .nf-icon { font-size: 40px; width: 40px; height: 40px; color: #FB7185; }
     .nf-code { margin: 12px 0 4px; font-size: 40px; font-weight: 800; color: #F8F7F8; }
     .nf-text { color: #A1A1AA; font-size: 14px; margin: 0 0 20px; }
-    .rose-btn { background: linear-gradient(135deg,#BE123C,#FB7185); color: white; border-radius: 999px; }
+    .rose-btn { background: linear-gradient(135deg,#BE123C,#FB7185); color: white; border-radius: var(--dt-radius-pill); }
   `]
 })
 export class NotFoundComponent {}

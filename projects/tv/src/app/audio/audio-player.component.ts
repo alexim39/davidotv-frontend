@@ -390,7 +390,7 @@ type SimpleAudioPlayer = HTMLAudioElement | null;
     /* Music Container */
     .music-container {
       background-color: #181818;
-      border-radius: 12px;
+      border-radius: var(--dt-radius-card);
       padding: 24px;
       margin-bottom: 24px;
     }
@@ -406,7 +406,7 @@ type SimpleAudioPlayer = HTMLAudioElement | null;
       position: relative;
       width: 300px;
       height: 300px;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       overflow: hidden;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
       transition: transform 0.3s ease;
@@ -476,7 +476,7 @@ type SimpleAudioPlayer = HTMLAudioElement | null;
       margin: 24px auto;
       padding: 16px;
       background-color: rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       scroll-behavior: smooth;
     }
 
@@ -572,7 +572,7 @@ type SimpleAudioPlayer = HTMLAudioElement | null;
     /* Track Details */
     .track-details-container {
       background-color: #181818;
-      border-radius: 12px;
+      border-radius: var(--dt-radius-card);
       padding: 24px;
       margin-bottom: 24px;
     }
@@ -635,7 +635,7 @@ type SimpleAudioPlayer = HTMLAudioElement | null;
     /* Comments Section (Same as video component) */
     .comments-section {
       background-color: #181818;
-      border-radius: 12px;
+      border-radius: var(--dt-radius-card);
       padding: 24px;
     }
 
@@ -780,7 +780,7 @@ type SimpleAudioPlayer = HTMLAudioElement | null;
     /* Recommendation Items */
     .recommendation-item {
       background-color: #181818;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       overflow: hidden;
       margin-bottom: 16px;
       transition: transform 0.3s ease, background-color 0.3s ease;
@@ -806,7 +806,7 @@ type SimpleAudioPlayer = HTMLAudioElement | null;
     .thumbnail {
       width: 80px;
       height: 80px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       object-fit: cover;
     }
 
@@ -846,7 +846,7 @@ type SimpleAudioPlayer = HTMLAudioElement | null;
     /* Playlist Section */
     .playlist-item {
       background-color: #181818;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       overflow: hidden;
       margin-bottom: 16px;
       transition: transform 0.3s ease;
@@ -909,7 +909,7 @@ type SimpleAudioPlayer = HTMLAudioElement | null;
     .mini-album-art {
       width: 56px;
       height: 56px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       margin-right: 16px;
     }
 

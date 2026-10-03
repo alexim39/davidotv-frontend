@@ -2,18 +2,19 @@
   <mat-toolbar class="navbar">
     <div class="navbar-container">
       <!-- Logo -->
-      <div class="logo" mat-button routerLink="/">
+      <a class="logo" mat-button routerLink="/" aria-label="DavidoTV home">
         <mat-icon class="logo-icon">live_tv</mat-icon>
         <span class="brand-name">
           Davido<span class="tv-red">TV</span>
         </span>
-      </div>
+      </a>
 
       <!-- Desktop Search Bar -->
       <div class="search-container">
         <div class="search-bar">
-          <input 
-            type="text" 
+          <input
+            type="text"
+            aria-label="Search DavidoTV videos"
             placeholder="Search DavidoTV videos..." 
             [(ngModel)]="searchQuery"
             (keyup.enter)="onSearch()"
@@ -63,10 +64,11 @@
             <mat-icon>notifications</mat-icon>
           </button> -->
 
-          <button mat-icon-button class="action-icon" 
-                  [matBadge]="notificationsCount" 
-                  [matBadgeHidden]="notificationsCount <= 1"
-                  matBadgeColor="warn">
+          <button mat-icon-button class="action-icon"
+                  [matBadge]="notificationsCount"
+                  [matBadgeHidden]="notificationsCount < 1"
+                  matBadgeColor="warn"
+                  aria-label="Notifications">
             <mat-icon>notifications</mat-icon>
           </button>
           
@@ -80,7 +82,7 @@
       </div>
 
       <!-- Mobile Hamburger -->
-      <button mat-icon-button class="mobile-toggle" (click)="toggleMobileMenu()">
+      <button mat-icon-button class="mobile-toggle" (click)="toggleMobileMenu()" aria-label="Toggle menu" [attr.aria-expanded]="mobileMenuOpen">
         <mat-icon>{{ mobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
       </button>
     </div>
@@ -100,10 +102,11 @@
         <div class="mobile-user-name">{{user?.name | titlecase }} {{user?.lastname | titlecase }}</div>
         <div class="mobile-user-email">{{user?.email}}</div>
       </div>
-      <button mat-icon-button class="mobile-notification-badge" 
-        [matBadge]="notificationsCount" 
-        [hidden]="notificationsCount <= 1"
-        matBadgeColor="warn">
+      <button mat-icon-button class="mobile-notification-badge"
+        [matBadge]="notificationsCount"
+        [matBadgeHidden]="notificationsCount < 1"
+        matBadgeColor="warn"
+        aria-label="Notifications">
         <mat-icon>notifications</mat-icon>
       </button>
     </div>
@@ -111,8 +114,9 @@
     <!-- Mobile Search -->
     <div class="mobile-search">
       <div class="search-bar">
-        <input 
-          type="text" 
+        <input
+          type="text"
+          aria-label="Search DavidoTV"
           placeholder="Search DavidoTV..." 
           [(ngModel)]="searchQuery"
           (keyup.enter)="onSearch(); toggleMobileMenu()"
@@ -175,10 +179,10 @@
         <mat-icon>history</mat-icon>
         <span>History</span>
       </a>
-      <a mat-button routerLink="/history" (click)="toggleMobileMenu(); uploadContent()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <button mat-button (click)="toggleMobileMenu(); uploadContent()">
         <mat-icon>computer_arrow_up</mat-icon>
         <span>Upload</span>
-      </a>
+      </button>
      <!--  <a mat-button routerLink="/history" (click)="toggleMobileMenu(); uploadContent()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon>chat</mat-icon>
         <span>Chat rooms</span>

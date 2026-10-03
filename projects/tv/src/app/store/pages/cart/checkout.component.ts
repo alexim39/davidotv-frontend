@@ -422,7 +422,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       margin-bottom: 12px;
       padding: 12px;
       border: 1px solid #e0e0e0;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
 
       &.mat-radio-checked {
         border-color: var(--dt-accent-3);
@@ -441,7 +441,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       }
 
       .option-details {
-        color: #666;
+        color: var(--dt-text-2);
         font-size: 0.9rem;
       }
 
@@ -460,7 +460,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       display: block;
       padding: 16px;
       border: 1px solid #e0e0e0;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
 
       &.mat-radio-checked {
         border-color: var(--dt-accent-3);
@@ -482,13 +482,13 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       margin: 24px 0;
       padding: 16px;
       border: 1px solid #e0e0e0;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
     }
 
     .transfer-info, .paypal-info {
       margin: 24px 0;
       padding: 16px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
     }
 
     .section-actions {
@@ -537,7 +537,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
         height: 60px;
         margin-right: 16px;
         background: #f5f5f5;
-        border-radius: 4px;
+        border-radius: var(--dt-radius-sm);
         overflow: hidden;
 
         .item-image {
@@ -573,7 +573,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
         .item-variant {
           margin: 4px 0 0;
           font-size: 0.8rem;
-          color: #666;
+          color: var(--dt-text-2);
         }
       }
 
@@ -587,7 +587,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
       padding: 16px;
       margin-bottom: 16px;
       border: 1px solid rgba(76, 175, 80, 0.4);
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       background: rgba(76, 175, 80, 0.08);
 
       mat-icon {

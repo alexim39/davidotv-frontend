@@ -195,7 +195,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
       gap: 8px;
       margin-bottom: 16px;
       font-size: 14px;
-      color: #666;
+      color: var(--dt-text-2);
     }
 
     .breadcrumb a {
@@ -212,7 +212,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
     }
 
     .breadcrumb .current {
-      color: #333;
+      color: var(--dt-text-2);
       font-weight: 500;
     }
 
@@ -223,7 +223,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
       margin: 0 0 8px 0;
       font-size: 28px;
       font-weight: 600;
-      color: #333;
+      color: var(--dt-text-2);
     }
 
     .transactions-icon {
@@ -237,7 +237,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
     .header-main p {
       margin: 0;
-      color: #666;
+      color: var(--dt-text-2);
       font-size: 16px;
     }
 
@@ -287,7 +287,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
   height: calc(100vh - 180px);
   min-height: 500px;
   background: transparent;
-  border-radius: 12px;
+  border-radius: var(--dt-radius-card);
 }
 
 .mobile-toolbar {
@@ -295,7 +295,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
   border-bottom: 1px solid #e2e8f0;
   margin-bottom: 16px;
   padding: 0 16px;
-  border-radius: 8px 8px 0 0;
+  border-radius: var(--dt-radius-sm) var(--dt-radius-sm) 0 0;
 
   .toolbar-spacer {
     flex: 1;
@@ -321,7 +321,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
   flex: 1;
   padding-right: 32px;
   overflow-y: auto;
-  border-radius: 12px;
+  border-radius: var(--dt-radius-card);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   padding: 24px;
 }
@@ -330,7 +330,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
   width: 320px;
   border: 1px solid #e2e8f0;
   box-shadow: -2px 0 12px rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
+  border-radius: var(--dt-radius-card);
   display: flex;
   flex-direction: column;
 }
@@ -410,7 +410,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
     height: 52px;
     transition: all 0.2s ease;
     margin: 4px 0;
-    border-radius: 8px;
+    border-radius: var(--dt-radius-sm);
     display: flex;
     justify-content: space-between;
     align-items: center;

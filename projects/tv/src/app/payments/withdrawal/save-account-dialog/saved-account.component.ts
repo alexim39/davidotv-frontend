@@ -216,7 +216,7 @@ export class ConfirmationDialogComponent {
     }
 
     .close-button {
-      color: #666;
+      color: var(--dt-text-2);
     }
 
     .saved-accounts-container {
@@ -233,7 +233,7 @@ export class ConfirmationDialogComponent {
       justify-content: center;
       padding: 40px;
       gap: 16px;
-      color: #666;
+      color: var(--dt-text-2);
     }
 
     .accounts-header {
@@ -242,13 +242,13 @@ export class ConfirmationDialogComponent {
 
     .accounts-header h3 {
       margin: 0 0 8px 0;
-      color: #333;
+      color: var(--dt-text-2);
       font-weight: 500;
     }
 
     .accounts-description {
       margin: 0;
-      color: #666;
+      color: var(--dt-text-2);
       font-size: 14px;
     }
 
@@ -263,7 +263,7 @@ export class ConfirmationDialogComponent {
       align-items: center;
       padding: 16px;
       border: 1px solid #e0e0e0;
-      border-radius: 12px;
+      border-radius: var(--dt-radius-card);
       //background-color: #fafafa;
       transition: all 0.2s ease;
       gap: 16px;
@@ -271,7 +271,7 @@ export class ConfirmationDialogComponent {
 
     .saved-account-item:hover {
       //background-color: #f5f5f5;
-      border-color: #ccc;
+      border-color: var(--dt-line-strong);
       transform: translateY(-1px);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
@@ -304,7 +304,7 @@ export class ConfirmationDialogComponent {
     .bank-name {
       font-weight: 600;
       font-size: 16px;
-      color: #333;
+      color: var(--dt-text-2);
       margin-bottom: 4px;
     }
 
@@ -313,7 +313,7 @@ export class ConfirmationDialogComponent {
       align-items: center;
       gap: 8px;
       font-size: 14px;
-      color: #666;
+      color: var(--dt-text-2);
     }
 
     .account-number {
@@ -367,13 +367,13 @@ export class ConfirmationDialogComponent {
 
     .no-accounts-container h3, .error-container h3 {
       margin: 0;
-      color: #666;
+      color: var(--dt-text-2);
       font-weight: 500;
     }
 
     .no-accounts-message {
       margin: 0;
-      color: #999;
+      color: var(--dt-text-2);
       font-size: 14px;
       line-height: 1.5;
       max-width: 300px;
@@ -391,7 +391,7 @@ export class ConfirmationDialogComponent {
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #666;
+      color: var(--dt-text-2);
       font-size: 12px;
     }
 

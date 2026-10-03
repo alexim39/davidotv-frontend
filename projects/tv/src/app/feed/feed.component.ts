@@ -101,13 +101,11 @@ import { MatMenuModule } from '@angular/material/menu';
       </div>
 
       <div *ngIf="isLoading && posts.length > 0" class="loading-more">
-        <mat-spinner [color]="primaryColor" diameter="30"></mat-spinner>
+        <mat-spinner color="primary" diameter="30"></mat-spinner>
       </div>
     </div>
   `,
   styles: [`
-    $primary-color: #8f0045;
-
     .social-feed-container {
       max-width: 800px;
       margin: 0 auto;
@@ -118,13 +116,13 @@ import { MatMenuModule } from '@angular/material/menu';
         margin-bottom: 30px;
 
         h1 {
-          color: $primary-color;
+          color: var(--dt-accent-2);
           font-weight: 700;
           margin-bottom: 8px;
         }
 
         p {
-          color: rgba(0, 0, 0, 0.6);
+          color: var(--dt-text-2);
           font-size: 16px;
         }
       }
@@ -140,7 +138,7 @@ import { MatMenuModule } from '@angular/material/menu';
       }
 
       .post-card {
-        border-radius: 12px;
+        border-radius: var(--dt-radius-card);
         overflow: hidden;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         transition: transform 0.2s, box-shadow 0.2s;
@@ -168,13 +166,13 @@ import { MatMenuModule } from '@angular/material/menu';
           }
 
           .post-time {
-            color: rgba(0, 0, 0, 0.5);
+            color: var(--dt-text-2);
             font-size: 12px;
             margin-right: 8px;
           }
 
           .more-button {
-            color: rgba(0, 0, 0, 0.5);
+            color: var(--dt-text-2);
           }
         }
 
@@ -235,7 +233,7 @@ import { MatMenuModule } from '@angular/material/menu';
             }
 
             &.liked {
-              color: $primary-color;
+              color: var(--dt-accent-2);
             }
           }
         }
@@ -280,7 +278,6 @@ export class SocialFeedComponent implements OnInit {
   posts: SocialPost[] = [];
   isLoading = false;
   currentFilter: 'all' | 'instagram' | 'twitter' | 'tiktok' = 'all';
-  primaryColor = '#8f0045';
 
   constructor(
     private socialFeedService: SocialFeedService,

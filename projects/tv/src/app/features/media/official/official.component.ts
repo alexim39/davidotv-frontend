@@ -34,7 +34,7 @@ import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loa
   `,
   styles: [`
     .official{padding:24px;background:#0B0B0C;min-height:60vh}
-    .hero{padding:20px;border-radius:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);backdrop-filter:blur(16px);margin-bottom:18px}
+    .hero{padding:var(--dt-radius-sheet);border-radius:var(--dt-radius-sheet);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);backdrop-filter:blur(var(--dt-radius-card));margin-bottom:var(--dt-radius-card)}
     .hero h2{margin:0;color:#F8F7F8;font-size:22px;font-weight:800}
     .hero p{margin:6px 0 0;color:#A1A1AA;font-size:13px}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}

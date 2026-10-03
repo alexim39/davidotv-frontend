@@ -172,7 +172,7 @@ styles: [`
 
   .browse-btn, .create-btn {
     padding: 8px 24px;
-    border-radius: 20px;
+    border-radius: var(--dt-radius-sheet);
   }
 }
 

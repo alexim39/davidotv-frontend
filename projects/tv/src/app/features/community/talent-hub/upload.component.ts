@@ -47,13 +47,13 @@ import { TalentService } from './talent.service';
   `,
   styles: [`
     .upload-wrap{ min-height:70vh; display:grid; place-items:center; padding:24px; background:#0B0B0C; }
-    .card{ max-width:640px; width:100%; padding:28px; border-radius:20px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter: blur(16px); }
+    .card{ max-width:640px; width:100%; padding:28px; border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter: blur(var(--dt-radius-card)); }
     .title{ margin:0; font-size:24px; font-weight:800; color:#F8F7F8; }
     .sub{ color:#A1A1AA; font-size:13px; margin:6px 0 16px; }
     .form{ display:grid; gap:12px; }
-    .drop{ display:grid; place-items:center; gap:8px; padding:22px; border:1.5px dashed rgba(255,255,255,0.18); border-radius:16px; text-align:center; color:#A1A1AA; cursor:pointer; transition: border-color 180ms, background 180ms; }
+    .drop{ display:grid; place-items:center; gap:var(--dt-radius-sm); padding:22px; border:1.5px dashed rgba(255,255,255,0.18); border-radius:var(--dt-radius-card); text-align:center; color:#A1A1AA; cursor:pointer; transition: border-color 180ms, background 180ms; }
     .drop.dragover{ border-color:#FB7185; background:rgba(251,113,133,0.08); }
-    .rose-btn{ height:48px; border-radius:999px; background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; font-weight:600; box-shadow:0 8px 24px rgba(225,29,72,0.35); }
+    .rose-btn{ height:48px; border-radius:var(--dt-radius-pill); background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; font-weight:600; box-shadow:0 var(--dt-radius-sm) 24px rgba(225,29,72,0.35); }
     .err{ color:#FB7185; font-size:13px; margin:0; }
     .ok{ color:#4ADE80; font-size:13px; margin:0; }
     .hint{ color:#71717A; font-size:11px; text-align:center; }

@@ -137,7 +137,7 @@ form {
 
   button[mat-flat-button] {
     margin: 14px 0 6px;
-    border-radius: 999px !important;
+    border-radius: var(--dt-radius-pill) !important;
     background: linear-gradient(135deg,#BE123C,#FB7185) !important;
     color: white !important;
     font-weight: 700;

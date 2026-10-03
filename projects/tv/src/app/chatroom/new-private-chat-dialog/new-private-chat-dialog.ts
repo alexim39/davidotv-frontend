@@ -28,7 +28,7 @@ template: `
       <img matListAvatar [src]="user.avatar" [alt]="user.name">
       <h3 matLine>{{ user.name }}</h3>
       <p matLine>
-        <span [style.color]="user.isOnline ? 'green' : 'gray'">
+        <span [style.color]="user.isOnline ? 'green' : 'var(--dt-text-2)'">
           {{ user.isOnline ? 'Online' : 'Offline' }}
         </span>
       </p>
@@ -52,7 +52,7 @@ mat-nav-list {
 
   mat-list-item {
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: var(--dt-radius-sm);
 
     &:hover {
       background-color: rgba(143, 0, 69, 0.1);
@@ -70,7 +70,7 @@ mat-nav-list {
     }
 
     p {
-      color: #666;
+      color: var(--dt-text-2);
       font-size: 0.8rem;
     }
 

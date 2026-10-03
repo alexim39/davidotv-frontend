@@ -62,14 +62,14 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
   `,
   styles: [`
     .board{ padding:24px; background:#0B0B0C; min-height:70vh; display:grid; gap:16px; align-content:start; }
-    .head{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:18px; border-radius:20px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(16px); }
+    .head{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:var(--dt-radius-card); padding:var(--dt-radius-card); border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(var(--dt-radius-card)); }
     .title{ margin:0; color:#F8F7F8; font-size:20px; font-weight:800; }
     .sub{ margin:6px 0 0; color:#A1A1AA; font-size:12px; }
     .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
-    .card{ padding:18px; border-radius:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(14px); display:grid; gap:8px; align-content:start; }
+    .card{ padding:var(--dt-radius-card); border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(14px); display:grid; gap:var(--dt-radius-sm); align-content:start; }
     .top{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
     .c-title{ margin:0; color:#F8F7F8; font-size:16px; font-weight:700; }
-    .status{ text-transform:uppercase; font-size:10px; font-weight:700; letter-spacing:0.06em; padding:4px 10px; border-radius:999px; background:rgba(255,255,255,0.08); color:#A1A1AA; }
+    .status{ text-transform:uppercase; font-size:var(--dt-radius-sm); font-weight:700; letter-spacing:0.06em; padding:var(--dt-radius-sm) var(--dt-radius-sm); border-radius:var(--dt-radius-pill); background:rgba(255,255,255,0.08); color:#A1A1AA; }
     .status[data-status="active"]{ background:linear-gradient(135deg,#BE123C,#FB7185); color:white; }
     .status[data-status="closed"]{ background:rgba(74,222,128,0.15); color:#4ADE80; }
     .tag{ margin:0; color:#FB7185; font-size:12px; font-weight:600; }
@@ -81,7 +81,7 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
     .entries mat-icon{ font-size:16px; width:16px; height:16px; }
     .winner{ color:#4ADE80; font-size:12px; font-weight:700; display:flex; gap:6px; align-items:center; }
     .winner mat-icon{ font-size:16px; width:16px; height:16px; }
-    .ghost{ border-color:rgba(255,255,255,0.18); color:#F8F7F8; border-radius:999px; }
+    .ghost{ border-color:rgba(255,255,255,0.18); color:#F8F7F8; border-radius:var(--dt-radius-pill); }
     .empty{ color:#71717A; text-align:center; padding:24px; }
   `]
 })

@@ -53,13 +53,13 @@ import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
     .player-wrap{ background:#0B0B0C; min-height:100vh; padding:0 0 24px; }
     .stage{ aspect-ratio:16/9; background:black; max-width:1100px; margin:0 auto; }
     .iframe{ width:100%; height:100%; border:0; }
-    .meta{ max-width:1100px; margin:16px auto; padding:20px; border-radius:20px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(16px); }
+    .meta{ max-width:1100px; margin:var(--dt-radius-card) auto; padding:var(--dt-radius-sheet); border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(var(--dt-radius-card)); }
     .title{ margin:0 0 8px; color:#F8F7F8; font-size:20px; font-weight:700; line-height:1.3; }
     .chan-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; color:#A1A1AA; font-size:13px; }
-    .badge{ background:linear-gradient(135deg,#BE123C,#FB7185); color:white; padding:2px 8px; border-radius:999px; font-size:10px; font-weight:700; }
+    .badge{ background:linear-gradient(135deg,#BE123C,#FB7185); color:white; padding:2px var(--dt-radius-sm); border-radius:var(--dt-radius-pill); font-size:var(--dt-radius-sm); font-weight:700; }
     .desc{ color:#A1A1AA; font-size:13px; white-space:pre-wrap; margin-top:12px; }
     .actions{ display:flex; gap:10px; margin-top:16px; }
-    .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:999px; }
+    .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:var(--dt-radius-pill); }
     .loading{ padding:40px; text-align:center; color:#A1A1AA; }
   `]
 })

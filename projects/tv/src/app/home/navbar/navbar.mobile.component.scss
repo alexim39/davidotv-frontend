@@ -43,7 +43,7 @@
   .mobile-search {
     padding: 16px; border-bottom: 1px solid var(--border-color); background: var(--bg-color);
     .search-bar {
-      display: flex; border: 1px solid var(--input-border); border-radius: 999px;
+      display: flex; border: 1px solid var(--input-border); border-radius: var(--dt-radius-pill);
       overflow: hidden; height: 44px; background: var(--input-bg); backdrop-filter: blur(10px);
       transition: border-color 180ms, box-shadow 180ms;
       &:focus-within { border-color: rgba(251,113,133,0.35); box-shadow: 0 0 0 3px rgba(225,29,72,0.14); }
@@ -63,7 +63,7 @@
   .mobile-nav-section button {
     display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 16px;
     text-align: left; font-size: 14px; font-weight: 500; color: #F8F7F8;
-    background: transparent; border: none; cursor: pointer; border-radius: 10px; margin: 2px 8px; width: calc(100% - 16px);
+    background: transparent; border: none; cursor: pointer; border-radius: var(--dt-radius-sm); margin: 2px var(--dt-radius-sm); width: calc(100% - var(--dt-radius-card));
     transition: background 180ms, color 180ms;
     mat-icon { color: #A1A1AA; font-size: 20px; }
     &:hover { background: rgba(255,255,255,0.06); color: #F8F7F8; mat-icon { color: #FB7185; } }
@@ -76,7 +76,7 @@
   .mobile-auth-prompt { font-size: 13px; color: #A1A1AA; margin-bottom: 14px; line-height: 1.5; }
   .mobile-auth-section button {
     width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 12px 16px; font-weight: 700; border-radius: 999px;
+    padding: var(--dt-radius-card) var(--dt-radius-card); font-weight: 700; border-radius: var(--dt-radius-pill);
     background: linear-gradient(135deg,#BE123C,#FB7185); color: white; box-shadow: 0 8px 24px rgba(225,29,72,0.35);
   }
 

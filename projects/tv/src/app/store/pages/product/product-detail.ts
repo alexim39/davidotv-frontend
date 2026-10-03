@@ -280,7 +280,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
       align-items: center;
       z-index: 1000;
       p {
-        color: #ccc;
+        color: var(--dt-text-2);
         margin-left: 1em;
         font-size: 14px;
       }
@@ -312,7 +312,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
     .product-gallery {
       .main-image-container {
         position: relative;
-        border-radius: 8px;
+        border-radius: var(--dt-radius-sm);
         overflow: hidden;
         margin-bottom: 16px;
         background: #f5f5f5;
@@ -355,7 +355,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
           z-index: 1;
           .badge {
             padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: var(--dt-radius-sm);
             font-size: 12px;
             font-weight: 600;
             color: white;
@@ -380,7 +380,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
         .thumbnail {
           width: 80px;
           height: 80px;
-          border-radius: 4px;
+          border-radius: var(--dt-radius-sm);
           overflow: hidden;
           cursor: pointer;
           border: 2px solid transparent;
@@ -388,7 +388,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
           background: #f5f5f5;
 
           &.active {
-            border-color: #3f51b5;
+            border-color: var(--dt-accent-2);
           }
 
           img {
@@ -413,20 +413,20 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
           .current-price {
             font-size: 1.8rem;
             font-weight: 700;
-            color: #333;
+            color: var(--dt-text-2);
           }
 
           .original-price {
             font-size: 1.2rem;
             text-decoration: line-through;
-            color: #999;
+            color: var(--dt-text-2);
           }
 
           .discount-badge {
             background: #f44336;
             color: white;
             padding: 2px 8px;
-            border-radius: 12px;
+            border-radius: var(--dt-radius-card);
             font-size: 0.8rem;
             font-weight: 600;
           }
@@ -453,7 +453,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 
           .reviews {
             font-size: 0.9rem;
-            color: #666;
+            color: var(--dt-text-2);
           }
 
           .stock-status {
@@ -483,9 +483,9 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 
           button {
             &.selected {
-              background: #3f51b5;
+              background: var(--dt-gradient);
               color: white;
-              border-color: #3f51b5;
+              border-color: transparent;
             }
           }
         }
@@ -545,7 +545,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 
       .delivery-info {
         border: 1px solid #e0e0e0;
-        border-radius: 8px;
+        border-radius: var(--dt-radius-sm);
         padding: 16px;
 
         .delivery-item {
@@ -559,7 +559,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
           }
 
           mat-icon {
-            color: #666;
+            color: var(--dt-text-2);
           }
 
           span {
@@ -605,7 +605,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
             .spec-name {
               font-weight: 500;
               width: 200px;
-              color: #666;
+              color: var(--dt-text-2);
             }
 
             .spec-value {
@@ -654,7 +654,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
       p {
         font-size: 1rem;
         margin: 0 0 16px;
-        color: #666;
+        color: var(--dt-text-2);
       }
     }
 
@@ -667,7 +667,7 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
       gap: 16px;
       
       p {
-        color: #666;
+        color: var(--dt-text-2);
         font-size: 0.875rem;
         font-weight: 500;
       }

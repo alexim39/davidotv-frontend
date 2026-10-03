@@ -39,7 +39,7 @@ import { UserInterface, UserService } from '../../common/services/user.service';
     .error-message {
       padding: 16px;
       text-align: center;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       margin: 16px 0;
     }
     

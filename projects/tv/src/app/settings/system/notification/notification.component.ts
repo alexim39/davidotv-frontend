@@ -70,7 +70,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
       .setting-card {
         padding: 16px;
-        border-radius: 8px;
+        border-radius: var(--dt-radius-sm);
       }
 
       .setting-row {
@@ -107,7 +107,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
         ::ng-deep .mat-slide-toggle {
           .mat-slide-toggle-bar {
-           // background-color: #ccc;
+           // background-color: var(--dt-card);
           }
 
           &.mat-checked .mat-slide-toggle-bar {
@@ -144,7 +144,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
           display: flex;
           align-items: center;
           padding: 8px;
-          border-radius: 4px;
+          border-radius: var(--dt-radius-sm);
           background-color: #f9f9f9;
 
           mat-icon {

@@ -126,7 +126,7 @@ import { ProductInterface } from '../../store/services/store.service';
         }
 
         button {
-          color: #666;
+          color: var(--dt-text-2);
           transition: all 0.2s ease;
 
           &:hover {
@@ -151,7 +151,7 @@ import { ProductInterface } from '../../store/services/store.service';
         position: relative;
         flex: 1;
         max-width: 400px;
-        border-radius: 12px;
+        border-radius: var(--dt-radius-card);
         overflow: hidden;
         aspect-ratio: 1 / 1;
         margin-bottom: 16px;
@@ -188,7 +188,7 @@ import { ProductInterface } from '../../store/services/store.service';
 
           .original-price {
             font-size: 1rem;
-            color: #999;
+            color: var(--dt-text-2);
             text-decoration: line-through;
           }
 
@@ -203,7 +203,7 @@ import { ProductInterface } from '../../store/services/store.service';
             font-weight: 700;
             background-color: #FF4D4D;
             padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: var(--dt-radius-sm);
             color: white;
           }
         }
@@ -223,7 +223,7 @@ import { ProductInterface } from '../../store/services/store.service';
               z-index: 1;
               .badge {
                 padding: 4px 8px;
-                border-radius: 4px;
+                border-radius: var(--dt-radius-sm);
                 font-size: 12px;
                 font-weight: 600;
                 color: white;
@@ -253,7 +253,7 @@ import { ProductInterface } from '../../store/services/store.service';
           align-items: center;
           gap: 6px;
           font-size: 0.875rem;
-          color: #666;
+          color: var(--dt-text-2);
 
           .meta-icon {
             font-size: 18px;
@@ -270,13 +270,13 @@ import { ProductInterface } from '../../store/services/store.service';
           font-size: 1rem;
           font-weight: 600;
           margin: 0 0 8px;
-          color: #666;
+          color: var(--dt-text-2);
         }
 
         p {
           font-size: 0.9375rem;
           line-height: 1.6;
-          color: #666;
+          color: var(--dt-text-2);
           margin: 0;
         }
       }

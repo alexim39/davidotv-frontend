@@ -1,53 +1,113 @@
-// 30BG Midnight — Design tokens v1 (see docs/design/01-design-system.md).
-// Single source of truth: migrate literals here, never the reverse.
+// 30BG Midnight v2 — Single source of truth.
+// Spec: docs/design/01-design-system.md + 06-components-and-tokens.md
+// Rule: components reference var(--dt-*) only. No hex literals in components.
 
 :root {
-  // Text ramp (all pass AA on --dt-base; verified in design doc)
-  --dt-text-1: #F8F7F8;
-  --dt-text-2: #C9C9D1;
-  --dt-text-3: #8E8E96;
+  // ── Surfaces (each visually distinct, never pure black) ──
+  --dt-base: #0b0b0c;       // app background
+  --dt-raised: #131316;     // nav / toolbar / sheets (solid fallback for glass)
+  --dt-raised-glass: rgba(19, 19, 22, 0.72);
+  --dt-card: #1a1a1e;       // cards
+  --dt-overlay: #1e1e22;    // dialogs / menus / bottom-sheets
+  --dt-sunken: #08080a;     // video stage / image well
+  --dt-line: rgba(255, 255, 255, 0.08);
+  --dt-line-strong: rgba(255, 255, 255, 0.14);
 
-  // Brand accents
-  --dt-accent-1: #BE123C;
-  --dt-accent-2: #E11D48;
-  --dt-accent-3: #FB7185;
-  --dt-gradient: linear-gradient(135deg, #BE123C 0%, #E11D48 50%, #FB7185 100%);
+  // ── Text ramp (all AA on --dt-base; see audit) ──
+  --dt-text-1: #f8f7f8;     // ~18:1 titles/body
+  --dt-text-2: #c9c9d1;     // ~11:1 secondary (replaces #666/#888)
+  --dt-text-3: #8e8e96;     // ~6:1 captions only, never body
+  --dt-text-inverse: #18181b;
+
+  // ── Brand accents (one accent family, three jobs) ──
+  --dt-accent-1: #be123c;
+  --dt-accent-2: #e11d48;   // focus rings, progress, active
+  --dt-accent-3: #fb7185;   // gradient end, active icons
+  --dt-accent-ink: #ffffff; // text on accent
+  --dt-gradient: linear-gradient(135deg, #be123c 0%, #e11d48 50%, #fb7185 100%);
+  --dt-gradient-soft: linear-gradient(135deg, rgba(190, 18, 60, 0.22), rgba(251, 113, 133, 0.22));
   --dt-glow: 0 8px 24px rgba(225, 29, 72, 0.35);
 
-  // Surfaces + lines
-  --dt-base: #0B0B0C;
-  --dt-raised: rgba(20, 20, 23, 0.72);
-  --dt-card: #1A1A1E;
-  --dt-overlay: #1E1E22;
-  --dt-line: rgba(255, 255, 255, 0.08);
+  // ── Semantic (reserved, never brand) ──
+  --dt-success: #4ade80;
+  --dt-warn: #fbbf24;
+  --dt-danger: #f87171;
+  --dt-info: #7dd3fc;
 
-  // Type
-  --dt-display: 800 32px/1.1 Roboto, sans-serif;
-  --dt-title: 800 20px/1.25 Roboto, sans-serif;
-  --dt-body: 400 14px/1.5 Roboto, sans-serif;
-  --dt-caption: 600 12px/1.4 Roboto, sans-serif;
-  --dt-cta: 700 14px/1 Roboto, sans-serif;
+  // ── Type scale (Roboto; display tight, body loose) ──
+  --dt-font: "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --dt-display-lg: 800 40px/1.05 var(--dt-font);
+  --dt-display: 800 32px/1.1 var(--dt-font);
+  --dt-headline: 800 24px/1.2 var(--dt-font);
+  --dt-title: 800 20px/1.25 var(--dt-font);
+  --dt-title-sm: 700 16px/1.3 var(--dt-font);
+  --dt-body-lg: 400 15px/1.55 var(--dt-font);
+  --dt-body: 400 14px/1.5 var(--dt-font);
+  --dt-body-sm: 500 13px/1.5 var(--dt-font);
+  --dt-caption: 600 12px/1.4 var(--dt-font);
+  --dt-cta: 700 14px/1 var(--dt-font);
+  --dt-letter-display: -0.02em;
+  --dt-letter-caption: 0.04em;
+  --dt-letter-cta: 0.02em;
 
-  // Shape + motion
+  // ── Spacing / shape / elevation ──
+  --dt-space-1: 4px;
+  --dt-space-2: 8px;
+  --dt-space-3: 12px;
+  --dt-space-4: 16px;
+  --dt-space-5: 20px;
+  --dt-space-6: 24px;
+  --dt-space-8: 32px;
+  --dt-space-12: 48px;
+  --dt-gutter: 24px;
+  --dt-radius-sm: 10px;
   --dt-radius-card: 16px;
   --dt-radius-sheet: 20px;
   --dt-radius-pill: 999px;
+  // Legacy aliases (remove after wave 3)
+  --dt-radius-inner: var(--dt-radius-sm);
+  --dt-e1: 0 4px 24px rgba(0, 0, 0, 0.45);
+  --dt-e2: 0 8px 32px rgba(0, 0, 0, 0.55);
+  --dt-e3: 0 24px 64px rgba(0, 0, 0, 0.65);
+
+  // ── Motion ──
   --dt-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dt-ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
   --dt-t-micro: 180ms;
   --dt-t-layout: 300ms;
+  --dt-t-hero: 480ms;
+
+  // ── Touch / z ──
+  --dt-target: 44px;
+  --dt-z-nav: 50;
+  --dt-z-sheet: 80;
+  --dt-z-dialog: 100;
+  --dt-z-toast: 120;
 }
 
-// Accessible focus for keyboard users (WCAG 2.4.7).
+// Mobile gutter tightening
+@media (max-width: 600px) {
+  :root {
+    --dt-gutter: 16px;
+    --dt-display-lg: 800 32px/1.1 var(--dt-font);
+    --dt-display: 800 28px/1.12 var(--dt-font);
+  }
+}
+
+// Keyboard focus — always visible (WCAG 2.4.7)
 :focus-visible {
   outline: 2px solid var(--dt-accent-2);
   outline-offset: 2px;
   border-radius: 6px;
 }
 
-// Global reduced-motion guard (splash already had one; this covers the app).
+// Reduced motion — global kill-switch
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

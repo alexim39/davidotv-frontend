@@ -67,7 +67,7 @@ import { UpcomingEventComponent } from './upcoming-event.component';
       margin-top: 28px;
       background: #0B0B0C;
       border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 20px;
+      border-radius: var(--dt-radius-sheet);
       box-shadow: 0 8px 32px rgba(0,0,0,0.45);
       overflow: hidden;
       position: relative;
@@ -81,7 +81,7 @@ import { UpcomingEventComponent } from './upcoming-event.component';
       padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.06);
     }
     .section-icon {
-      width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px;
+      width: 32px; height: 32px; display: grid; place-items: center; border-radius: var(--dt-radius-sm);
       background: linear-gradient(135deg, #BE123C, #FB7185); color: white; font-size: 18px; box-shadow: 0 4px 16px rgba(225,29,72,0.25);
     }
     h2 { margin: 0; flex: 1; font-size: clamp(1.05rem,2vw,1.35rem); font-weight: 800; letter-spacing: -0.01em; color: #F8F7F8; }
@@ -93,7 +93,7 @@ import { UpcomingEventComponent } from './upcoming-event.component';
     .post-card { width: 100%; }
     :host ::ng-deep .mat-mdc-tab-group { --mdc-tab-indicator-active-indicator-color: #E11D48; }
     :host ::ng-deep .mat-mdc-tab-labels { gap: 4px; }
-    :host ::ng-deep .mat-mdc-tab { border-radius: 999px; }
+    :host ::ng-deep .mat-mdc-tab { border-radius: var(--dt-radius-pill); }
   `]
 })
 export class CommunityComponent implements OnInit, OnDestroy {

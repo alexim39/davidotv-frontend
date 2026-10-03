@@ -200,7 +200,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
             font-size: 0.9rem;
             
             &:nth-child(2) {
-              color: #666;
+              color: var(--dt-text-2);
               font-size: 0.8rem;
             }
           }
@@ -233,7 +233,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
     p {
       font-size: 0.875rem;
-      color: #666;
+      color: var(--dt-text-2);
       margin: 0;
       max-width: 300px;
     }
@@ -265,7 +265,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         margin-right: 0.3em;
       }
       .event-location {
-        color: #666;
+        color: var(--dt-text-2);
         font-size: 0.75em;
       }
     }
@@ -281,7 +281,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 .scroll-list {
   max-height: 220px;
   overflow-y: auto;
-  border-radius: 8px;
+  border-radius: var(--dt-radius-sm);
   box-shadow: 0 1px 4px rgba(140,0,69,0.04);
 }
 
@@ -304,7 +304,7 @@ mat-list-item {
       display: flex;
       align-items: center;
       font-size: 0.92em;
-      color: #666;
+      color: var(--dt-text-2);
       mat-icon {
         margin-right: 0.2em;
         font-size: 1em;

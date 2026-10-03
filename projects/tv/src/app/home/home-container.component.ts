@@ -159,7 +159,7 @@ import { MatDialog } from '@angular/material/dialog';
       font-size: 14px;
       font-weight: 500;
       color: var(--dt-text-2, #C9C9D1);
-      border-radius: var(--dt-radius-card, 16px);
+      border-radius: var(--dt-radius-card, var(--dt-radius-card));
       margin: 2px 8px;
       //color: #8f0045;
       transition: background-color 0.2s;

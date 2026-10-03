@@ -138,7 +138,7 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
       margin: 0;
       font-size: 1.25rem;
       font-weight: 600;
-      //color: #333;
+      //color: var(--dt-text-2);
     }
 
      .controls {
@@ -201,7 +201,7 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
     }
 
     .event-card {
-      border-radius: 12px;
+      border-radius: var(--dt-radius-card);
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -239,7 +239,7 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
       background: rgba(0, 0, 0, 0.7);
       color: white;
       padding: 0.5rem;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       text-align: center;
       min-width: 50px;
     }
@@ -269,7 +269,7 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
       gap: 1rem;
       margin-bottom: 0.8rem;
       font-size: 0.85rem;
-      //color: #666;
+      //color: var(--dt-text-2);
     }
 
     .event-meta mat-icon {
@@ -340,7 +340,7 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
       }
       .subtext {
         font-size: 0.9rem;
-        //color: #999;
+        //color: var(--dt-text-2);
       }
     }
     

@@ -26,7 +26,7 @@ import { MatIconModule } from '@angular/material/icon';
                  class="mock-marker"
                  [style.left]="event.mockCoords?.x + '%'"
                  [style.top]="event.mockCoords?.y + '%'"
-                 [style.background]="event.color || '#3f51b5'">
+                  [style.background]="event.color || '#E11D48'">
             </div>
           </div>
         </div>
@@ -34,7 +34,7 @@ import { MatIconModule } from '@angular/material/icon';
       
       <div class="map-legend">
         <div class="legend-item" *ngFor="let event of events">
-          <div class="marker" [style.background]="event.color || '#3f51b5'"></div>
+          <div class="marker" [style.background]="event.color || '#E11D48'"></div>
           <span>{{event.title}}</span>
           <span class="event-date">{{event.date | date:'shortDate'}}</span>
         </div>
@@ -53,7 +53,7 @@ import { MatIconModule } from '@angular/material/icon';
       .map-container {
         flex: 1;
         //background-color: mat-color($background, app-bar);
-        border-radius: 8px;
+        border-radius: var(--dt-radius-sm);
         overflow: hidden;
         position: relative;
         min-height: 400px;
@@ -106,7 +106,7 @@ import { MatIconModule } from '@angular/material/icon';
           gap: 0.5rem;
           padding: 8px 12px;
           //background: mat-color($background, card);
-          border-radius: 4px;
+          border-radius: var(--dt-radius-sm);
           
           .marker {
             width: 12px;
@@ -131,7 +131,7 @@ export class EventsMapComponent {
       title: 'Lagos Concert',
       date: new Date('2023-12-15'),
       location: 'Eko Convention Center',
-      color: '#3f51b5',
+      color: '#E11D48', // --dt-accent-2 (token value; bindings need hex)
       mockCoords: { x: 30, y: 60 }
     },
     {

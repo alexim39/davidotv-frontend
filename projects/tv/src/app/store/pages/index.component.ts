@@ -66,7 +66,7 @@ import { CategoryNavComponent } from './nav.component';
       color: white;
       margin-bottom: 40px;
       position: relative;
-      border-radius: 8px !important;
+      border-radius: var(--dt-radius-sm) !important;
       overflow: hidden;
 
       .hero-content {

@@ -75,21 +75,21 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
   `,
   styles: [`
     .admin{ padding:24px; background:#0B0B0C; min-height:70vh; display:grid; gap:16px; align-content:start; }
-    .head{ padding:18px; border-radius:20px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(16px); }
+    .head{ padding:var(--dt-radius-card); border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); backdrop-filter:blur(var(--dt-radius-card)); }
     .title{ margin:0; color:#F8F7F8; font-size:20px; font-weight:800; }
     .sub{ margin:6px 0 0; color:#A1A1AA; font-size:12px; }
     .stats{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
     .stat.wide{ border-color:rgba(251,113,133,0.28); }
-    .stat{ padding:18px; border-radius:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); display:grid; gap:4px; color:#F8F7F8; }
+    .stat{ padding:var(--dt-radius-card); border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); display:grid; gap:var(--dt-radius-sm); color:#F8F7F8; }
     .stat mat-icon{ color:#FB7185; }
     .num{ font-size:28px; font-weight:800; }
     .lbl{ color:#A1A1AA; font-size:12px; }
-    .card{ padding:20px; border-radius:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); max-width:560px; display:grid; gap:12px; color:#F8F7F8; }
+    .card{ padding:var(--dt-radius-sheet); border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); max-width:560px; display:grid; gap:var(--dt-radius-card); color:#F8F7F8; }
     .sec{ margin:0; font-size:14px; font-weight:700; }
     .hint{ margin:0; color:#A1A1AA; font-size:12px; }
     .form{ display:grid; gap:12px; }
     .full{ width:100%; }
-    .rose-btn{ background:linear-gradient(135deg,#BE123C,#FB7185); color:white; border-radius:999px; }
+    .rose-btn{ background:linear-gradient(135deg,#BE123C,#FB7185); color:white; border-radius:var(--dt-radius-pill); }
     .ok{ color:#4ADE80; font-size:13px; margin:0; }
     .err{ color:#FB7185; font-size:13px; margin:0; }
   `]

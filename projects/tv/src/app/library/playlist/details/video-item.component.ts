@@ -74,7 +74,7 @@ import { Router } from '@angular/router';
       display: flex;
       gap: 16px;
       padding: 8px;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       transition: background-color 0.2s;
     }
 
@@ -87,7 +87,7 @@ import { Router } from '@angular/router';
       flex-shrink: 0;
       width: 168px;
       height: 94px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       overflow: hidden;
       background-color: var(--bg-thumbnail);
     }

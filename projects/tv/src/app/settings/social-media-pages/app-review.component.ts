@@ -71,7 +71,7 @@ import { TestimonialInterface } from '../../home/home.service';
       //background-color: white;
       color: #8f0045;
       border: 1px solid #e5e5e5;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       padding: 8px 16px;
       font-weight: 500;
       display: flex;
@@ -95,7 +95,7 @@ import { TestimonialInterface } from '../../home/home.service';
   }
 
   .settings-card {
-    border-radius: 8px;
+    border-radius: var(--dt-radius-sm);
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     overflow: hidden;
 

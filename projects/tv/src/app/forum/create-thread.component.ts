@@ -154,13 +154,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         .preview-image {
           max-width: 100%;
           max-height: 300px;
-          border-radius: 4px;
+          border-radius: var(--dt-radius-sm);
         }
         
         .preview-video {
           max-width: 100%;
           max-height: 300px;
-          border-radius: 4px;
+          border-radius: var(--dt-radius-sm);
         }
         
         .preview-audio {
@@ -184,7 +184,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
       
       .hint {
         display: block;
-        color: #666;
+        color: var(--dt-text-2);
         font-size: 12px;
         margin-top: 5px;
       }
@@ -212,7 +212,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         align-items: center;
         gap: 8px;
         font-size: 14px;
-        color: #666;
+        color: var(--dt-text-2);
         
         button {
           min-width: auto;

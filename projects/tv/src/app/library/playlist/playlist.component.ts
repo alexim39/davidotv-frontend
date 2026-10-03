@@ -162,7 +162,7 @@ import { PlaylistEditDialogComponent } from './details/playlist-edit.component';
 
     .empty-state.signed-out {
       background-color: var(--bg-card);
-      border-radius: 12px;
+      border-radius: var(--dt-radius-card);
     }
 
     .empty-content {
@@ -212,7 +212,7 @@ import { PlaylistEditDialogComponent } from './details/playlist-edit.component';
     }
 
     .create-button {
-      border-radius: 20px;
+      border-radius: var(--dt-radius-sheet);
     }
 
     .playlist-grid {
@@ -256,7 +256,7 @@ import { PlaylistEditDialogComponent } from './details/playlist-edit.component';
       background-color: rgba(0, 0, 0, 0.8);
       color: white;
       padding: 4px 8px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       font-size: 12px;
     }
 
@@ -265,7 +265,7 @@ import { PlaylistEditDialogComponent } from './details/playlist-edit.component';
       top: 8px;
       right: 8px;
       padding: 4px 8px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       font-size: 12px;
       font-weight: 500;
     }

@@ -83,8 +83,8 @@ import { ApiService } from '../../core/services/api.service';
     }
 
     .drag-drop-zone {
-      border: 2px dashed #ccc;
-      border-radius: 8px;
+      border: 2px dashed var(--dt-line-strong);
+      border-radius: var(--dt-radius-sm);
       padding: 2rem;
       text-align: center;
       transition: all 0.3s ease;
@@ -97,8 +97,8 @@ import { ApiService } from '../../core/services/api.service';
     }
 
     .drag-over .drag-drop-zone {
-      border-color: #3f51b5;
-      background-color: rgba(63, 81, 181, 0.05);
+      border-color: var(--dt-accent-2);
+      background-color: rgba(225, 29, 72, 0.06);
     }
 
     .image-preview {

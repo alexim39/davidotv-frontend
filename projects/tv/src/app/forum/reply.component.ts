@@ -56,7 +56,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       margin: 12px 0;
       padding: 12px;
       //background: rgba(0,0,0,0.02);
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       border-left: 3px solid #ddd;
       
       .reply-main {
@@ -97,7 +97,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
           }
           
           .reply-time {
-            color: #666;
+            color: var(--dt-text-2);
             font-size: 11px;
           }
 
@@ -135,7 +135,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
               margin-right: 2px;
               
               &.accent {
-                //color: #3f51b5;
+                //color: var(--dt-accent-2);
               }
             }
           }

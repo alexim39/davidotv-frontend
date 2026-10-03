@@ -123,7 +123,7 @@ interface DialogData {
       .event-header {
         position: relative;
         height: 300px;
-        border-radius: 4px 4px 0 0;
+        border-radius: var(--dt-radius-sm) var(--dt-radius-sm) 0 0;
         overflow: hidden;
         
         img {
@@ -177,7 +177,7 @@ interface DialogData {
             
             .meta-label {
               font-size: 0.8rem;
-              //color: rgba(0, 0, 0, 0.6);
+              //color: var(--dt-text-2);
             }
             
             .meta-value {
@@ -242,7 +242,7 @@ interface DialogData {
               height: 50px;
               border-radius: 50%;
               //background-color: #f5f5f5;
-              //color: rgba(0, 0, 0, 0.6);
+              //color: var(--dt-text-2);
               font-size: 0.8rem;
             }
           }
@@ -285,7 +285,7 @@ export class EventDetailDialogComponent {
     ],
     price: 50,
     category: 'concert',
-    color: '#3f51b5'
+    color: '#E11D48'
   }; */
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) {

@@ -138,9 +138,9 @@ export class NavbarComponent implements OnDestroy, OnInit {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  uploadContent(): void {    
+  uploadContent(): void {
     if (this.isAuthenticated) {
-      this.router.navigateByUrl('upload');
+      this.router.navigateByUrl('/talent/upload');
     } else {
       this.authDialog();
     }

@@ -233,7 +233,7 @@ import { UserInterface, UserService } from '../../../common/services/user.servic
       display: flex;
       gap: 24px;
       padding: 16px;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       background-color: var(--bg-card);
     }
 
@@ -241,7 +241,7 @@ import { UserInterface, UserService } from '../../../common/services/user.servic
       position: relative;
       min-width: 320px;
       height: 180px;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       overflow: hidden;
       background-color: var(--bg-thumbnail);
     }
@@ -260,7 +260,7 @@ import { UserInterface, UserService } from '../../../common/services/user.servic
       color: white;
       padding: 4px 8px;
       font-size: 12px;
-      border-top-left-radius: 4px;
+      border-top-left-radius: var(--dt-radius-sm);
     }
 
     .playlist-meta {
@@ -286,7 +286,7 @@ import { UserInterface, UserService } from '../../../common/services/user.servic
 
     .visibility-badge {
       padding: 2px 6px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       font-size: 12px;
       font-weight: 500;
     }
@@ -314,7 +314,7 @@ import { UserInterface, UserService } from '../../../common/services/user.servic
     }
 
     .play-all-button, .shuffle-button {
-      border-radius: 20px;
+      border-radius: var(--dt-radius-sheet);
     }
 
     .playlist-tags {
@@ -323,7 +323,7 @@ import { UserInterface, UserService } from '../../../common/services/user.servic
 
     .video-list-section {
       background-color: var(--bg-card);
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       padding: 16px;
     }
 
@@ -380,7 +380,7 @@ import { UserInterface, UserService } from '../../../common/services/user.servic
     }
 
     .add-videos-button {
-      border-radius: 20px;
+      border-radius: var(--dt-radius-sheet);
     }
 
     .not-found-state {

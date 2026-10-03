@@ -170,7 +170,7 @@ styles: [`
 
   .browse-btn, .create-btn {
     padding: 8px 24px;
-    border-radius: 20px;
+    border-radius: var(--dt-radius-sheet);
   }
 }
  
@@ -189,7 +189,7 @@ styles: [`
   .video-card {
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border-radius: 8px;
+  border-radius: var(--dt-radius-sm);
   overflow: hidden;
   background-color: var(--card-background);
   position: relative; // Add this line
@@ -224,7 +224,7 @@ styles: [`
       background-color: rgba(0, 0, 0, 0.8);
       color: white;
       padding: 2px 6px;
-      border-radius: 4px;
+      border-radius: var(--dt-radius-sm);
       font-size: 0.75rem;
     }
 

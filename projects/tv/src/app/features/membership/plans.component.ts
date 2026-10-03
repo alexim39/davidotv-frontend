@@ -44,11 +44,11 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
     .title{ margin:0; color:#F8F7F8; font-size:22px; font-weight:800; }
     .sub{ margin:6px 0 0; color:#A1A1AA; font-size:13px; }
     .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; }
-    .plan-card{ padding:20px; border-radius:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(14px); display:grid; gap:8px; align-content:start; }
+    .plan-card{ padding:var(--dt-radius-sheet); border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(14px); display:grid; gap:var(--dt-radius-sm); align-content:start; }
     .p-name{ margin:0; color:#F8F7F8; font-size:16px; font-weight:700; }
     .p-price{ margin:0; font-size:24px; font-weight:800; background:linear-gradient(135deg,#BE123C,#FB7185); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
     .p-tag{ margin:0; color:#A1A1AA; font-size:12px; min-height:32px; }
-    .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:999px; }
+    .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:var(--dt-radius-pill); }
     .err{ color:#FB7185; font-size:12px; margin:0; }
   `]
 })

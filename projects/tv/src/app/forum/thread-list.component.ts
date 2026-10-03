@@ -135,7 +135,7 @@ import { ApiService } from '../core/services/api.service';
 
           span:last-child {
             margin-left: auto;
-            color: #888;
+            color: var(--dt-text-2);
             font-size: 13px;
             white-space: nowrap;
           }
@@ -150,14 +150,14 @@ import { ApiService } from '../core/services/api.service';
           .preview-image {
             max-width: 100%;
             max-height: 200px;
-            border-radius: 4px;
+            border-radius: var(--dt-radius-sm);
             object-fit: contain;
           }
           
           .preview-video {
             width: 100%;
             max-height: 200px;
-            border-radius: 4px;
+            border-radius: var(--dt-radius-sm);
           }
           
           .preview-audio {

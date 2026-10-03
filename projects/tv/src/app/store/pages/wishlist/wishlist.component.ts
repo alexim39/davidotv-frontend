@@ -239,7 +239,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       }
 
       p {
-        color: #666;
+        color: var(--dt-text-2);
         margin: 0;
         font-size: 0.9rem;
       }
@@ -267,7 +267,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 
     .wishlist-subtitle {
       font-size: 16px;
-      color: #666;
+      color: var(--dt-text-2);
       margin-bottom: 24px;
     }
 
@@ -297,7 +297,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       text-align: center;
       padding: 60px 20px;
       //background-color: #fafafa;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       margin-top: 40px;
 
       .empty-icon {
@@ -321,12 +321,12 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       h2 {
         font-size: 24px;
         margin: 0 0 12px 0;
-        color: #666;
+        color: var(--dt-text-2);
       }
 
       p {
         font-size: 16px;
-        color: #666;
+        color: var(--dt-text-2);
         margin: 0 0 24px 0;
         max-width: 400px;
       }
@@ -359,7 +359,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       flex-direction: column;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       overflow: hidden;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       position: relative;
 
       &:hover {
@@ -399,7 +399,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       z-index: 1;
       .badge {
         padding: 4px 8px;
-        border-radius: 4px;
+        border-radius: var(--dt-radius-sm);
         font-size: 12px;
         font-weight: 600;
         color: white;
@@ -432,7 +432,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 
     .action-btn {
       background-color: rgba(255, 255, 255, 0.9);
-      color: #333;
+      color: var(--dt-text-2);
       width: 36px;
       height: 36px;
       display: flex;
@@ -488,7 +488,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 
     .product-brand {
       font-size: 14px;
-      color: #666;
+      color: var(--dt-text-2);
       margin-bottom: 12px;
     }
 
@@ -508,11 +508,11 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 
     .original-price {
       font-size: 16px;
-      color: #333;
+      color: var(--dt-text-2);
 
       &.discounted {
         text-decoration: line-through;
-        color: #999;
+        color: var(--dt-text-2);
         font-size: 14px;
       }
     }
@@ -570,7 +570,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 
     .review-count {
       font-size: 12px;
-      color: #666;
+      color: var(--dt-text-2);
     }
 
     /* Recommendations Section */
@@ -617,7 +617,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       font-size: 22px;
       font-weight: 600;
       margin: 0 0 24px 0;
-      color: #333;
+      color: var(--dt-text-2);
     }
 
     .recommendations-grid {
@@ -628,7 +628,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 
     .recommendation-card {
       transition: transform 0.3s ease;
-      border-radius: 8px;
+      border-radius: var(--dt-radius-sm);
       overflow: hidden;
 
       &:hover {
@@ -664,7 +664,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       color: #8f0045;
 
       span:last-child {
-        color: #999;
+        color: var(--dt-text-2);
         text-decoration: line-through;
         font-size: 14px;
         margin-left: 8px;
