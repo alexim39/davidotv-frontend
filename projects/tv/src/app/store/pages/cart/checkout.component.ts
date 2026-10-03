@@ -615,31 +615,14 @@ export class CheckoutPageComponent {
 
   private fb = inject(FormBuilder);
 
-  // Mock cart data - replace with actual service in production
-  cartItems = [
-    {
-      id: '1',
-      productId: '1',
-      name: 'Official Davido 30BG Logo T-Shirt',
-      image: 'https://m.media-amazon.com/images/I/61-jBuhtgZL._AC_UY1100_.jpg',
-      price: 39.99,
-      quantity: 2,
-      variant: 'Large'
-    },
-    {
-      id: '2',
-      productId: '2',
-      name: 'Limited Edition Davido Signed Album',
-      image: 'https://static-01.daraz.com.np/p/7a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a.jpg',
-      price: 199.99,
-      quantity: 1
-    }
-  ];
+  // Checkout wiring lands next slice (quote + Paystack + POST /orders/checkout).
+  // Deliberately NO mock prices or mock setTimeout orders (§5.5).
+  cartItems: Array<{ id: string; productId: string; name: string; image: string; price: number; quantity: number; variant?: string; selectedVariant?: { name: string; option: string } }> = [];
 
-  subtotal = this.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  subtotal = 0;
   shippingCost = 1500;
   discountAmount = 0;
-  total = this.subtotal + this.shippingCost - this.discountAmount;
+  total = 0;
 
   // Nigerian states for dropdown
   nigerianStates = [
@@ -706,18 +689,11 @@ export class CheckoutPageComponent {
   }
 
   placeOrder() {
-    this.isPlacingOrder = true;
-    
-    // Simulate API call
-    setTimeout(() => {
-      this.isPlacingOrder = false;
-      this.reviewCompleted = true;
-      
-      // In a real app, you would navigate to order confirmation page
-      this.snackBar.open('Order placed successfully!', 'Dismiss', {
-        duration: 5000,
-        panelClass: 'success-snackbar'
-      });
-    }, 2000);
+    // Real checkout lands in the next slice (quote + Paystack inline + POST
+    // /orders/checkout). Deliberately a no-op toast — never fake an order.
+    this.snackBar.open('Checkout is being connected to live payments — your cart is safe.', 'Dismiss', {
+      duration: 5000,
+      panelClass: 'success-snackbar'
+    });
   }
 }
