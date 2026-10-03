@@ -1,11 +1,12 @@
 import { Component, Input, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MediaService, YoutubeVideo } from '../media.service';
 import { AuthStateService } from '../../../core/services/auth-state.service';
 import { AnalyticsService } from '../../../core/services/analytics.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
 
 /**
@@ -14,7 +15,7 @@ import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
 @Component({
   selector: 'async-video-player',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, ShortNumberPipe],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatSnackBarModule, ShortNumberPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (video(); as v) {
@@ -64,6 +65,8 @@ import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
 })
 export class VideoPlayerComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly snack = inject(MatSnackBar);
   private readonly media = inject(MediaService);
   private readonly auth = inject(AuthStateService);
   private readonly analytics = inject(AnalyticsService);
@@ -78,10 +81,22 @@ export class VideoPlayerComponent implements OnInit {
     if (!id) return;
     // WEF-01: consumption signal (anon-safe: service skips when signed out).
     this.analytics.track('video_watch', id);
-    this.media.getById(id).subscribe((res:any)=>{
-      const v = res?.data ?? res;
-      this.video.set(v);
-      this.likes.set(v?.appLikes ?? v?.likes ?? 0);
+    this.media.getById(id).subscribe({
+      next: (res:any)=>{
+        const v = res?.data ?? res;
+        this.video.set(v);
+        this.likes.set(v?.appLikes ?? v?.likes ?? 0);
+      },
+      // Paywall: exclusive videos 403 with upgradeRequired for non-members.
+      // Core ApiService normalizes to {status,message,requestId,raw}.
+      error: (e: any) => {
+        const status = e?.status ?? e?.raw?.status;
+        const flag = e?.raw?.error?.upgradeRequired ?? e?.upgradeRequired;
+        if (status === 403 && flag) {
+          this.snack.open('Members-only video — upgrade to watch.', 'Upgrade', { duration: 4000 });
+          this.router.navigate(['/membership']);
+        }
+      }
     });
   }
 

@@ -211,6 +211,16 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
           this.currentVideo = response.data;
           this.comments = this.currentVideo.comments;
           this.initializeLikeDislikeStates();
+        },
+        // Paywall: exclusive videos 403 with upgradeRequired for non-members.
+        // Core ApiService normalizes to {status,message,requestId,raw}.
+        error: (error: any) => {
+          const status = error?.status ?? error?.raw?.status;
+          const flag = error?.raw?.error?.upgradeRequired ?? error?.upgradeRequired;
+          if (status === 403 && flag) {
+            this.snackBar.open('Members-only video — upgrade to watch.', 'Upgrade', { duration: 4000 });
+            this.router.navigate(['/membership']);
+          }
         }
       })
     )
