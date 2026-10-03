@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { Event } from './event.model';
 import { finalize, Subscription } from 'rxjs';
 import { EventService } from './event.service';
+import { Router } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UserInterface, UserService } from '../common/services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -296,6 +297,7 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
   subscriptions: Subscription[] = [];
 
   private cd = inject(ChangeDetectorRef);
+  private router = inject(Router);
   private eventService = inject(EventService)
   currentUser: UserInterface | null = null;
   private snackBar = inject(MatSnackBar);
@@ -424,8 +426,7 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
 
   handleCardClick(e: MouseEvent, event: Event): void {
     e.stopPropagation();
-    console.log('Event clicked:', event._id);
-    // In a real app: this.router.navigate(['/events', event._id]);
+    this.router.navigate(['/events', event._id]);
   }
 
   isFavorite(event: Event): boolean {

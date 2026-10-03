@@ -14,7 +14,12 @@ export const EventRoutes: Routes = [
       { path: 'list', component: EventsListComponent },
       { path: 'map', component: EventsMapComponent },
       //{ path: 'create', component: EventCreateComponent },
-      //{ path: ':id', component: EventDetailComponent }
     ]
+  },
+  // Deep-linkable detail (EventComponent has no outlet, so this is a sibling).
+  {
+    path: ':id',
+    loadComponent: () => import('./event-detail-page.component').then(m => m.EventDetailPageComponent),
+    title: 'Event — DavidO TV'
   }
 ];
