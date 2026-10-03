@@ -2,7 +2,7 @@ import { Component, inject, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,6 +15,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Auth, GoogleAuthProvider, signInWithPopup, UserCredential } from '@angular/fire/auth'; // Added UserCredential for type hinting
 import { AuthService } from './auth.service';
 import { AuthStateService } from '../core/services/auth-state.service';
+import { UserService } from '../common/services/user.service';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'async-auth',
@@ -371,6 +373,9 @@ export class AuthComponent implements OnDestroy {
   private auth: Auth = inject(Auth);
   private apiService: AuthService = inject(AuthService);
   private authState = inject(AuthStateService);
+  private userService = inject(UserService);
+  private router = inject(Router);
+  private dialogRef = inject(MatDialogRef<AuthComponent>, { optional: true });
   private snackBar = inject(MatSnackBar);
   private googleProvider = new GoogleAuthProvider();
 
@@ -400,9 +405,11 @@ export class AuthComponent implements OnDestroy {
               localStorage.setItem('isAuthenticated', 'true');
               // FE-01: seed the signal store so guards see the session.
               if (response.user) this.authState.seedSession(response.user, response.token);
-              // Close dialog and optionally navigate
-              //this.dialogRef.close();
-              window.location.reload();
+              // Bridge the legacy navbar (subscribes to getCurrentUser$).
+              if (response.user) this.userService.setCurrentUser(response.user);
+              // Close dialog (when hosted in one) — signals propagate, no reload.
+              this.dialogRef?.close();
+              this.router.navigate(['/']);
             }
           }
         })

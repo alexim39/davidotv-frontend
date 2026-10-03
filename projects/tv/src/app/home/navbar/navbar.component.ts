@@ -16,6 +16,7 @@ import { Router, RouterModule } from '@angular/router';
 import { UserInterface, UserService } from '../../common/services/user.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { AuthService } from '../../auth/auth.service';
+import { AuthStateService } from '../../core/services/auth-state.service';
 
 @Component({
   selector: 'async-navbar',
@@ -52,17 +53,23 @@ export class NavbarComponent implements OnDestroy, OnInit {
   user: UserInterface | null = null;
   subscriptions: Subscription[] = [];
   private authService = inject(AuthService);
+  private authState = inject(AuthStateService);
   private router = inject(Router);
 
   ngOnInit(): void {
-    const authFlag = localStorage.getItem('isAuthenticated');
-    if (authFlag === 'true') {
+    // Always-on subscription: dialog login bridges via setCurrentUser,
+    // so the navbar updates even when boot saw a logged-out state.
+    this.subscriptions.push(
       this.userService.getCurrentUser$.subscribe({
         next: (user) => {
           this.user = user;
+          if (user) this.isAuthenticated = true;
         }
       })
+    );
 
+    const authFlag = localStorage.getItem('isAuthenticated');
+    if (authFlag === 'true') {
       this.subscriptions.push(
         this.userService.getUser().subscribe({
           next: (response) => {
@@ -102,24 +109,28 @@ export class NavbarComponent implements OnDestroy, OnInit {
   }
 
   logout() {
-    this.isAuthenticated = false;
-    localStorage.clear();
-  
     this.subscriptions.push(
       this.authService.signOut({}).subscribe({
         next: (response) => {
-          if (response.success) {
-            localStorage.removeItem('isAuthenticated');
-            this.router.navigate(['/'], { replaceUrl: true });
-            window.location.reload();
-          }
+          if (response.success) this.finishLogout();
         },
         error: (error: any) => {
           console.error('Error during sign out:', error);
-          this.router.navigate(['/'], { replaceUrl: true });
+          // Still clear local state: server call failed, don't strand the user.
+          this.finishLogout();
         }
       })
     );
+  }
+
+  /** Local sign-out without reload (state propagates via services). */
+  private finishLogout(): void {
+    this.authState.clearSession();
+    localStorage.removeItem('isAuthenticated');
+    this.userService.setCurrentUser(null as unknown as UserInterface);
+    this.user = null;
+    this.isAuthenticated = false;
+    this.router.navigate(['/'], { replaceUrl: true });
   }
 
   onSearch() {

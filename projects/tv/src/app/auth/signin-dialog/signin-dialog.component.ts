@@ -189,9 +189,10 @@ export class SigninDialogComponent implements OnInit, OnDestroy {
             // FE-01: seed the new signal store (SEC-02 returns {user,token})
             // so guards see the session immediately.
             if (response.user) this.authState.seedSession(response.user, response.token);
-            // Close dialog and optionally navigate
-            //this.dialogRef.close();
-            window.location.reload();
+            // Bridge the legacy navbar (subscribes to getCurrentUser$).
+            if (response.user) this.userService.setCurrentUser(response.user);
+            // Close dialog — signals propagate, no reload needed.
+            this.dialogRef.close();
           }
         },
         error: (error: any) => {
