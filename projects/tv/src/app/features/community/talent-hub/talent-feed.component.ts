@@ -12,6 +12,7 @@ import { AuthStateService } from '../../../core/services/auth-state.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { EnterChallengeDialogComponent } from '../../challenges/enter-dialog.component';
+import { CalledUpWallComponent } from './called-up-wall/called-up-wall.component';
 
 /**
  * Public talent feed - TikTok/Spotify inspired vertical list with play + like/share.
@@ -20,7 +21,7 @@ import { EnterChallengeDialogComponent } from '../../challenges/enter-dialog.com
 @Component({
   selector: 'async-talent-feed',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, MatDialogModule, MatSnackBarModule, SkeletonLoaderComponent, ShortNumberPipe, IntersectionDirective],
+  imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, MatDialogModule, MatSnackBarModule, SkeletonLoaderComponent, ShortNumberPipe, IntersectionDirective, CalledUpWallComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="feed obsidian-bg">
@@ -34,6 +35,7 @@ import { EnterChallengeDialogComponent } from '../../challenges/enter-dialog.com
 
       @if (loading() && items().length===0) { <async-skeleton-loader [count]="6"/> }
       @else {
+        <async-called-up-wall />
         <div class="grid">
           @for (t of items(); track t._id) {
             <div class="card glass-surface">
