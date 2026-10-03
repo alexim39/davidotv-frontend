@@ -16,6 +16,8 @@ export const routes: Routes = [
   { path: 'membership', loadChildren: () => import('./features/membership/membership.routes').then(r => r.MembershipRoutes) },
   // Notification preferences (NOT-01)
   { path: 'notifications', loadChildren: () => import('./features/notifications/notifications.routes').then(r => r.NotificationRoutes) },
+  // Admin console seed (membership overview + paywall toggle)
+  { path: 'admin', loadChildren: () => import('./features/admin/admin.routes').then(r => r.AdminRoutes) },
   // Back-compat aliases
   { path: 'upload', redirectTo: 'talent/upload', pathMatch: 'full' },
   { path: 'curated', redirectTo: 'talent/curated', pathMatch: 'full' },
