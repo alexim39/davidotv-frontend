@@ -9,7 +9,7 @@ import { Observable, throwError, retry, catchError, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 /**
- * Centralized HTTP wrapper for DavidO TV.
+ * Centralized HTTP wrapper for DavidoTV.
  *
  * Architecture choice: singleton in `core` so interceptors/guards can depend on it
  * without circular imports. All feature services MUST inject this instead of HttpClient

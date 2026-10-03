@@ -14,7 +14,7 @@ import { AuthStateService } from '../../../core/services/auth-state.service';
   template: `
     <div class="auth-wrap obsidian-bg">
       <div class="glass-card auth-card">
-        <h1 class="title">Join DavidO TV</h1>
+        <h1 class="title">Join DavidoTV</h1>
         <p class="subtitle">Upload, vibe, get discovered by Davido.</p>
         <form [formGroup]="form" (ngSubmit)="submit()" class="form">
           <div class="grid2">

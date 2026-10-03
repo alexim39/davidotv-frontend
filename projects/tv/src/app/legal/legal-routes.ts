@@ -12,7 +12,7 @@ export const legalRoutes: Routes = [
         children: [
             { path: '', 
                 component: LegalComponent, 
-                title: "Diamond Project Legal - Terms and conditions of website use",
+                title: "DavidoTV Legal - Terms and conditions of website use",
                 //redirectTo: 'terms',
                 //pathMatch: 'prefix',
                 children: [

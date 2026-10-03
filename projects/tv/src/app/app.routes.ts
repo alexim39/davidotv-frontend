@@ -19,7 +19,7 @@ export const routes: Routes = [
   // Media - cached YouTube pipeline
   { path: 'media', loadChildren: () => import('./features/media/media.routes').then(r => r.MediaRoutes) },
   // User profile (isolated domain)
-  { path: 'profile', loadComponent: () => import('./features/user-profile/profile.component').then(m => m.ProfileComponent), canActivate: [authGuard], title: 'Profile — DavidO TV' },
+  { path: 'profile', loadComponent: () => import('./features/user-profile/profile.component').then(m => m.ProfileComponent), canActivate: [authGuard], title: 'Profile — DavidoTV' },
   // Membership billing (pay-as-you-go)
   { path: 'membership', loadChildren: () => import('./features/membership/membership.routes').then(r => r.MembershipRoutes) },
   // Notification preferences (NOT-01)
@@ -31,7 +31,7 @@ export const routes: Routes = [
   // Back-compat aliases
   { path: 'upload', redirectTo: 'talent/upload', pathMatch: 'full' },
   { path: 'curated', redirectTo: 'talent/curated', pathMatch: 'full' },
-  { path: 'forbidden', loadComponent: () => import('./shared/components/forbidden/forbidden.component').then(m => m.ForbiddenComponent), title: 'Not allowed — DavidO TV' },
+  { path: 'forbidden', loadComponent: () => import('./shared/components/forbidden/forbidden.component').then(m => m.ForbiddenComponent), title: 'Not allowed — DavidoTV' },
   // FE-01: catch-all must stay last
-  { path: '**', loadComponent: () => import('./shared/components/not-found/not-found.component').then(m => m.NotFoundComponent), title: 'Not found — DavidO TV' },
+  { path: '**', loadComponent: () => import('./shared/components/not-found/not-found.component').then(m => m.NotFoundComponent), title: 'Not found — DavidoTV' },
 ];

@@ -20,6 +20,6 @@ export const EventRoutes: Routes = [
   {
     path: ':id',
     loadComponent: () => import('./event-detail-page.component').then(m => m.EventDetailPageComponent),
-    title: 'Event — DavidO TV'
+    title: 'Event — DavidoTV'
   }
 ];

@@ -13,12 +13,12 @@ export const AuthRoutes: Routes = [
     {
         path: '',
         component: SigninComponent,
-        title: "Sign in - DavidO TV",
+        title: "Sign in - DavidoTV",
     },
     {
         path: 'signup',
         component: SignupComponent,
-        title: "Create account - DavidO TV",
+        title: "Create account - DavidoTV",
     },
     {
         path: 'forgot-password',

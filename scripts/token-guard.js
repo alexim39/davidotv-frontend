@@ -36,6 +36,12 @@ const RULES = [
     rx: /(?:^|[;{\s])((?:background-)?color|fill)\s*:\s*rgba\(\s*0\s*,\s*0\s*,\s*0\b/gi,
     textPropOnly: true,
   },
+  {
+    name: 'brand spelling (DavidoTV, not DavidO TV / Diamond Project)',
+    // The contact email diamondprojectonline.com has no space — never matches.
+    rx: /DavidO TV|Diamond Project/gi,
+    excludeFiles: null,
+  },
 ];
 
 function stripComments(src, ext) {

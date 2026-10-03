@@ -4,11 +4,11 @@ export const AuthRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./signin/signin.component').then(m => m.SigninComponent),
-    title: 'Sign in — DavidO TV'
+    title: 'Sign in — DavidoTV'
   },
   {
     path: 'signup',
     loadComponent: () => import('./signup/signup.component').then(m => m.SignupComponent),
-    title: 'Create account — DavidO TV'
+    title: 'Create account — DavidoTV'
   }
 ];

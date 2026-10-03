@@ -20,7 +20,7 @@ import { AuthStateService } from '../../../core/services/auth-state.service';
     <div class="auth-wrap obsidian-bg">
       <div class="glass-card auth-card">
         <h1 class="title">Welcome back</h1>
-        <p class="subtitle">Sign in to DavidO TV — the home of Afrobeat</p>
+        <p class="subtitle">Sign in to DavidoTV — the home of Afrobeat</p>
 
         <form [formGroup]="form" (ngSubmit)="submit()" class="form">
           <mat-form-field appearance="outline" class="full">
