@@ -99,9 +99,9 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
             <!-- Price and Actions -->
             <div class="price-section">
               <div class="price-container">
-                <span class="current-price">N{{formatPrice(product.discountedPrice || product.price)}}</span>
+                <span class="current-price">₦{{formatPrice(product.discountedPrice || product.price)}}</span>
                 @if (product.discountedPrice) {
-                  <span class="original-price">N{{formatPrice(product.price)}}</span>
+                  <span class="original-price">₦{{formatPrice(product.price)}}</span>
                 }
               </div>
               

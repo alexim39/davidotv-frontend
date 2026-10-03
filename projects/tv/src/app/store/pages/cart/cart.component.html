@@ -28,7 +28,7 @@
                     @if (item.product.variants) {
                       <p class="item-variant">Variant: {{item.product.variants}}</p>
                     }
-                    <p class="item-price">N{{item.product.price | number:'1.2-2'}}</p>
+                    <p class="item-price">₦{{item.product.price | number:'1.2-2'}}</p>
                     
                     <div class="item-actions">
                       <div class="quantity-selector">
@@ -48,7 +48,7 @@
                   </div>
 
                   <div class="item-total">
-                    N{{(item.product.price * item.quantity) | number:'1.2-2'}}
+                    ₦{{(item.product.price * item.quantity) | number:'1.2-2'}}
                   </div>
                 </mat-card>
               }
@@ -80,12 +80,12 @@
 
             <div class="summary-row">
               <span>Subtotal ({{getTotalItems()}} items)</span>
-              <span>N{{getSubtotal() | number:'1.2-2'}}</span>
+              <span>₦{{getSubtotal() | number:'1.2-2'}}</span>
             </div>
 
             <div class="summary-row">
               <span>Shipping</span>
-              <span>{{getShippingCost() === 0 ? 'Free' : 'N' + (getShippingCost() | number:'1.2-2')}}</span>
+              <span>{{getShippingCost() === 0 ? 'Free' : '₦' + (getShippingCost() | number:'1.2-2')}}</span>
             </div>
 
             <div class="summary-row discount-row">
@@ -95,7 +95,7 @@
                 <button matSuffix mat-button (click)="applyDiscount()">APPLY</button>
               </mat-form-field>
               @if (discountApplied) {
-                <span class="discount-amount">-N{{discountAmount | number:'1.2-2'}}</span>
+                <span class="discount-amount">-₦{{discountAmount | number:'1.2-2'}}</span>
               }
             </div>
 
@@ -103,7 +103,7 @@
 
             <div class="summary-row total-row">
               <span>Total</span>
-              <span class="total-amount">N{{getTotal() | number:'1.2-2'}}</span>
+              <span class="total-amount">₦{{getTotal() | number:'1.2-2'}}</span>
             </div>
 
             <button mat-raised-button color="primary" class="checkout-btn" routerLink="/store/checkout">

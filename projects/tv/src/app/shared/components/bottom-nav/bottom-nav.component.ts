@@ -21,21 +21,21 @@ const IMMERSIVE_PREFIXES = ['/media/watch', '/store/checkout'];
   template: `
     <nav *ngIf="visible" class="bottom-nav" aria-label="Primary">
       <a class="tab" routerLink="/" [routerLinkActiveOptions]="{ exact: true }"
-         routerLinkActive="active" aria-label="Home">
+         routerLinkActive="active" ariaCurrentWhenActive="page" aria-label="Home">
         <mat-icon aria-hidden="true">home</mat-icon><span>Home</span>
       </a>
-      <a class="tab" routerLink="/media/trending" routerLinkActive="active" aria-label="Watch">
+      <a class="tab" routerLink="/media/trending" routerLinkActive="active" ariaCurrentWhenActive="page" aria-label="Watch">
         <mat-icon aria-hidden="true">play_circle</mat-icon><span>Watch</span>
       </a>
-      <a class="fab" routerLink="/talent" routerLinkActive="active"
+      <a class="fab" routerLink="/talent" routerLinkActive="active" ariaCurrentWhenActive="page"
          aria-label="Talent Hub — get discovered">
         <span class="fab-btn" aria-hidden="true"><mat-icon>auto_awesome</mat-icon></span>
         <span class="fab-label">Talent</span>
       </a>
-      <a class="tab" routerLink="/forum" routerLinkActive="active" aria-label="Community">
+      <a class="tab" routerLink="/forum" routerLinkActive="active" ariaCurrentWhenActive="page" aria-label="Community">
         <mat-icon aria-hidden="true">forum</mat-icon><span>Community</span>
       </a>
-      <a class="tab" routerLink="/store" routerLinkActive="active" aria-label="Store">
+      <a class="tab" routerLink="/store" routerLinkActive="active" ariaCurrentWhenActive="page" aria-label="Store">
         <mat-icon aria-hidden="true">shopping_bag</mat-icon><span>Store</span>
       </a>
     </nav>

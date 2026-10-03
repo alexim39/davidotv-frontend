@@ -301,7 +301,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
                     <p class="item-name">{{item.name}}</p>
                     <p *ngIf="item.variant" class="item-variant">{{item.variant}}</p>
                   </div>
-                  <div class="item-price">N{{item.price * item.quantity | number:'1.2-2'}}</div>
+                  <div class="item-price">₦{{item.price * item.quantity | number:'1.2-2'}}</div>
                 </div>
               </div>
             </div>
@@ -311,15 +311,15 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
             <div class="price-summary">
               <div class="price-row">
                 <span>Subtotal</span>
-                <span>N{{subtotal | number:'1.2-2'}}</span>
+                <span>₦{{subtotal | number:'1.2-2'}}</span>
               </div>
               <div class="price-row">
                 <span>Shipping</span>
-                <span>{{shippingCost === 0 ? 'Free' : 'N' + (shippingCost | number:'1.2-2')}}</span>
+                <span>{{shippingCost === 0 ? 'Free' : '₦' + (shippingCost | number:'1.2-2')}}</span>
               </div>
               <div *ngIf="discountAmount > 0" class="price-row discount">
                 <span>Member discount ({{memberTier}}, {{discountPct}}%)</span>
-                <span>-N{{discountAmount | number:'1.2-2'}}</span>
+                <span>-₦{{discountAmount | number:'1.2-2'}}</span>
               </div>
               <div *ngIf="quoteLoading" class="price-row">
                 <span>Refreshing prices…</span>
@@ -329,7 +329,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
               </div>
               <div class="price-row total">
                 <span>Total</span>
-                <span>N{{total | number:'1.2-2'}}</span>
+                <span>₦{{total | number:'1.2-2'}}</span>
               </div>
             </div>
           </div>

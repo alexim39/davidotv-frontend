@@ -78,7 +78,7 @@ export interface OrderView {
           </div>
           <div class="order-foot">
             <span class="items">{{ o.itemCount }} item{{ o.itemCount === 1 ? '' : 's' }}</span>
-            <span class="total">N{{ o.total | number:'1.2-2' }}</span>
+            <span class="total">₦{{ o.total | number:'1.2-2' }}</span>
           </div>
         </article>
       </div>
