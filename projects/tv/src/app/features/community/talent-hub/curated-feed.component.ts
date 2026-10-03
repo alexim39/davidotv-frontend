@@ -3,9 +3,12 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { TalentService, TalentUpload } from './talent.service';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader.component';
 import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
+import { CallUpTakeoverComponent } from '../../../shared/components/call-up-takeover/call-up-takeover.component';
 
 /**
  * Davido's Curated Feed - admin-only dashboard.
@@ -15,7 +18,7 @@ import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
 @Component({
   selector: 'async-curated-feed',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatChipsModule, SkeletonLoaderComponent, ShortNumberPipe],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatChipsModule, MatDialogModule, MatSnackBarModule, SkeletonLoaderComponent, ShortNumberPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="curated obsidian-bg">
@@ -86,6 +89,8 @@ import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
 })
 export class CuratedFeedComponent implements OnInit {
   private readonly talent = inject(TalentService);
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
   items = signal<TalentUpload[]>([]);
   loading = signal(true);
   filter = signal<'all' | 'pending' | 'called_up'>('all');
@@ -103,14 +108,43 @@ export class CuratedFeedComponent implements OnInit {
   }
 
   setFilter(f: 'all' | 'pending' | 'called_up'): void { this.filter.set(f); }
-  play(t: TalentUpload): void { this.talent.play(t._id).subscribe(()=> t.plays++); }
-  callUp(t: TalentUpload): void {
-    this.talent.callUp(t._id).subscribe({
-      next: () => { t.callUpStatus = 'called_up'; },
+  play(t: TalentUpload): void {
+    this.talent.play(t._id).subscribe({
+      next: () => this.patchItem(t._id, { plays: (t.plays || 0) + 1 }),
       error: () => {}
     });
   }
+  callUp(t: TalentUpload): void {
+    this.talent.callUp(t._id).subscribe({
+      next: () => {
+        this.patchItem(t._id, { callUpStatus: 'called_up' });
+        this.dialog.open(CallUpTakeoverComponent, {
+          data: {
+            artistName: t.artistName,
+            title: t.title,
+            genre: t.genre,
+            plays: t.plays || 0,
+            likeCount: t.likeCount || 0,
+          },
+          maxWidth: '480px',
+          width: 'calc(100vw - 32px)',
+        });
+      },
+      error: (err) => {
+        const msg = err?.error?.message || err?.message || 'Call-Up failed. Please try again.';
+        this.snackBar.open(msg, 'Close', { duration: 3000 });
+      }
+    });
+  }
   flag(t: TalentUpload): void {
-    this.talent.flag(t._id, 'admin flagged').subscribe(()=> t.callUpStatus='flagged');
+    this.talent.flag(t._id, 'admin flagged').subscribe({
+      next: () => this.patchItem(t._id, { callUpStatus: 'flagged' }),
+      error: () => {}
+    });
+  }
+
+  /** Immutable patch so OnPush re-renders (plain mutation never surfaces). */
+  private patchItem(id: string, patch: Partial<TalentUpload>): void {
+    this.items.update((list) => list.map((i) => (i._id === id ? { ...i, ...patch } : i)));
   }
 }
