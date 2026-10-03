@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader.component';
+import { VideoCommentsComponent } from './comments/video-comments.component';
 import { Subscription } from 'rxjs';
 
 /**
@@ -18,14 +19,15 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'async-video-player',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, MatSnackBarModule, ShortNumberPipe, SkeletonLoaderComponent],
+  imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, MatSnackBarModule, ShortNumberPipe, SkeletonLoaderComponent, VideoCommentsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (video(); as v) {
       <div class="player-wrap obsidian-bg">
         <div class="stage">
           <iframe
-            [src]="embedUrl(v.youtubeVideoId)"
+            *ngIf="embedSrc()"
+            [src]="embedSrc()"
             title="{{v.title}}"
             allow="autoplay; encrypted-media"
             allowfullscreen
@@ -46,6 +48,8 @@ import { Subscription } from 'rxjs';
             <button mat-flat-button class="rose-btn" (click)="share(v)"><mat-icon>share</mat-icon> Share</button>
           </div>
         </div>
+
+        <async-video-comments [videoId]="v.youtubeVideoId" [initial]="v.comments ?? []" />
 
         <div class="upnext">
           <div class="upnext-head">
@@ -117,6 +121,10 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   likes = signal(0);
   upNext = signal<YoutubeVideo[]>([]);
   upNextLoading = signal(true);
+  // Stable trusted URL: embedUrl() mints a NEW SafeResourceUrl object per
+  // call, and rebinding [src] reloads the iframe — so compute once per video.
+  // (This was the "player restarts on like" bug.)
+  embedSrc = signal<SafeResourceUrl | null>(null);
   private readonly currentId = signal('');
 
   @Input() videoId?: string;
@@ -149,6 +157,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
 
   private loadVideo(id: string): void {
     this.video.set(null);
+    this.embedSrc.set(this.trustedEmbed(id));
     this.currentId.set(id);
     // WEF-01: consumption signal (anon-safe: service skips when signed out).
     this.analytics.track('video_watch', id);
@@ -172,6 +181,10 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   }
 
   embedUrl(id: string): SafeResourceUrl {
+    return this.trustedEmbed(id);
+  }
+
+  private trustedEmbed(id: string): SafeResourceUrl {
     // Bypass is safe: id is validated to video-id characters only, and the
     // host + path are fixed (plain-string binding blanks the iframe).
     const clean = /^[\w-]{6,}$/.test(id || '') ? id : '';

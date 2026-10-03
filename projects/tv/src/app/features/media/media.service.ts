@@ -24,6 +24,7 @@ export interface YoutubeVideo {
   likes: number;
   appViews?: number;
   isOfficialContent: boolean;
+  comments?: unknown[];
   url?: string;
   menuTypes: string[];
 }
@@ -104,5 +105,20 @@ export class MediaService {
   }
   dislike(videoId: string, userId: string): Observable<any> {
     return this.api.post(`api/v1/youtube/videos/${videoId}/dislike`, {});
+  }
+
+  // Video comments (contract verified from the legacy engagement service:
+  // same api/v1 family as like/dislike, session user server-side).
+  addVideoComment(videoId: string, text: string): Observable<any> {
+    return this.api.post(`api/v1/youtube/videos/${videoId}/comments`, { text });
+  }
+  replyVideoComment(videoId: string, parentCommentId: string, text: string): Observable<any> {
+    return this.api.post(`api/v1/youtube/videos/${videoId}/comments/${parentCommentId}/replies`, { text });
+  }
+  likeVideoComment(videoId: string, commentId: string): Observable<any> {
+    return this.api.post(`api/v1/youtube/videos/${videoId}/comments/${commentId}/like`, {});
+  }
+  deleteVideoComment(videoId: string, commentId: string): Observable<any> {
+    return this.api.delete(`api/v1/youtube/videos/${videoId}/comments/${commentId}`);
   }
 }
