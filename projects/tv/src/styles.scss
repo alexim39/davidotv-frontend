@@ -133,6 +133,20 @@ body:not(.dark-mode) {
   border-radius: 16px !important;
   box-shadow: 0 12px 40px rgba(0,0,0,0.55);
 }
+// Explicit item colors: never rely on the MDC theme default, which mismatches
+// our obsidian panels and has hidden menu text before (text-1 ~18:1 here).
+.mat-mdc-menu-panel .mat-mdc-menu-item .mdc-list-item__primary-text {
+  color: #F8F7F8 !important;
+}
+.mat-mdc-menu-panel .mat-mdc-menu-item .mat-icon {
+  color: #C9C9D1 !important;
+}
+.mat-mdc-menu-panel .mat-mdc-menu-item:hover {
+  background: rgba(255,255,255,0.06) !important;
+}
+.mat-mdc-menu-panel .mat-mdc-menu-item:hover .mat-icon {
+  color: #FB7185 !important;
+}
 
 // ── Tabs — premium underline ─────────────────────────────────────
 .mat-mdc-tab-group {
