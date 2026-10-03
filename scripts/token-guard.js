@@ -25,8 +25,8 @@ const RULES = [
     excludeFiles: null,
   },
   {
-    name: 'legacy gray literal (#666/#888/#999/#ccc/#333 or bare gray)',
-    rx: new RegExp(`${HEX3('666|888|999|ccc|333').source}|\\bgray\\b`, 'gi'),
+    name: 'legacy gray literal (#666/#888/#999/#ccc/#333/#606060/#555/#444 or bare gray)',
+    rx: new RegExp(`${HEX3('666|888|999|ccc|333|606060|555|555555|444|444444').source}|\\bgray\\b`, 'gi'),
     excludeFiles: null,
   },
   {

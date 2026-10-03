@@ -164,7 +164,7 @@ import { MatIconModule } from '@angular/material/icon';
 
     .section-description {
       font-size: 14px;
-      color: #606060;
+      color: var(--dt-text-2);
       margin: 0 0 24px;
     }
 

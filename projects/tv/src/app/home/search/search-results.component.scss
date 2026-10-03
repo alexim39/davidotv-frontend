@@ -50,8 +50,15 @@
 
     .results-count {
       font-size: 0.875rem;
-      color: #606060;
+      color: var(--dt-text-2);
       text-align: center;
+    }
+
+    .search-tabs {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 12px;
     }
 
     
@@ -232,7 +239,7 @@
 
       .video-description {
         font-size: 0.8125rem;
-        color: #606060;
+        color: var(--dt-text-2);
         margin: 8px 0;
         display: -webkit-box;
         -webkit-line-clamp: 2;

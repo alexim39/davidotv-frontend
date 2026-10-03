@@ -64,7 +64,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
       .section-description {
         font-size: 14px;
-        color: #606060;
+        color: var(--dt-text-2);
         margin: 0 0 24px;
       }
 
@@ -101,7 +101,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
           p {
             margin: 4px 0 0;
             font-size: 14px;
-            color: #606060;
+            color: var(--dt-text-2);
           }
         }
 
@@ -148,7 +148,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
           background-color: #f9f9f9;
 
           mat-icon {
-            color: #606060;
+            color: var(--dt-text-2);
             margin-right: 12px;
             font-size: 20px;
             width: 20px;
@@ -157,7 +157,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
           span {
             font-size: 14px;
-            color: #606060;
+            color: var(--dt-text-2);
           }
         }
       }

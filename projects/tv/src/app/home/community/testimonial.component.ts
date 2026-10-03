@@ -206,7 +206,7 @@ template: `
   display: flex;
   align-items: center;
   font-size: 12px;
-  //color: #606060;
+  //color: var(--dt-text-2);
   margin-top: 2px;
   
   .location-icon {
@@ -242,7 +242,7 @@ template: `
 .engagement-button {
   display: flex;
   align-items: center;
-  //color: #606060;
+  //color: var(--dt-text-2);
   font-size: 13px;
   margin-right: 8px;
   

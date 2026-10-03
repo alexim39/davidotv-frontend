@@ -178,7 +178,7 @@ import { MatDialog } from '@angular/material/dialog';
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        //color: #606060;
+        //color: var(--dt-text-2);
         font-size: 14px;
         margin-top: -10px;
       }

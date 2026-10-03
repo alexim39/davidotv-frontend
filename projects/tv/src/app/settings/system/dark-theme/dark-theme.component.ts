@@ -65,7 +65,7 @@ import { MatIconModule } from '@angular/material/icon';
 
       .section-description {
         font-size: 14px;
-        color: #606060;
+        color: var(--dt-text-2);
         margin: 0 0 24px;
       }
 
@@ -102,7 +102,7 @@ import { MatIconModule } from '@angular/material/icon';
           p {
             margin: 4px 0 0;
             font-size: 14px;
-            color: #606060;
+            color: var(--dt-text-2);
           }
         }
 
@@ -186,7 +186,7 @@ import { MatIconModule } from '@angular/material/icon';
           text-align: center;
           margin: 8px 0 0;
           font-size: 13px;
-          color: #606060;
+          color: var(--dt-text-2);
         }
       }
     }

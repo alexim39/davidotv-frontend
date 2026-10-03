@@ -81,7 +81,7 @@ import { MatCardModule } from '@angular/material/card';
       .mat-tab-label {
         height: 48px;
         font-weight: 500;
-        color: #606060;
+        color: var(--dt-text-2);
         opacity: 1;
 
         &:hover {

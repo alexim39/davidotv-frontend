@@ -288,7 +288,7 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
 
     .event-description {
       margin: 0 0 1.5rem;
-      //color: #555;
+      //color: var(--dt-text-2);
       font-size: 0.95rem;
       line-height: 1.5;
       flex-grow: 1;

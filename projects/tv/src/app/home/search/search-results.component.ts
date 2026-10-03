@@ -15,7 +15,12 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { timeAgo as timeAgoUtil, formatViewCount as viewFormat, formatDuration as videoDuration } from '../../common/utils/time.util';
 import { Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
 import { YoutubeService, YoutubeVideoInterface } from "../../common/services/youtube.service";
+import { StoreService, ProductInterface } from "../../store/services/store.service";
+import { ProductGridComponent } from "../../store/pages/product-grid.component";
 import { TruncatePipe } from "../../common/pipes/truncate.pipe";
+import { SkeletonLoaderComponent } from "../../shared/components/skeleton-loader/skeleton-loader.component";
+import { EmptyStateComponent } from "../../shared/components/empty-state/empty-state.component";
+import { ErrorStateComponent } from "../../shared/components/error-state/error-state.component";
 
 @Component({
   selector: 'async-search-results',
@@ -33,6 +38,10 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
     MatFormFieldModule,
     FormsModule,
     MatPaginatorModule,
+    ProductGridComponent,
+    SkeletonLoaderComponent,
+    EmptyStateComponent,
+    ErrorStateComponent,
     TruncatePipe
   ],
   animations: [
@@ -75,9 +84,16 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
           </mat-form-field>
         </div>
 
-        <div class="results-count" *ngIf="!loading && videos.length > 0">
+        <div class="results-count" *ngIf="!loading && videos.length > 0 && activeTab === 'videos'">
           About {{ totalResults }} results for "{{ currentSearchTerm }}"
         </div>
+
+        @if (currentSearchTerm) {
+          <mat-chip-listbox class="search-tabs" aria-label="Search categories">
+            <mat-chip-option [selected]="activeTab === 'videos'" (click)="setTab('videos')">Videos</mat-chip-option>
+            <mat-chip-option [selected]="activeTab === 'products'" (click)="setTab('products')">Products</mat-chip-option>
+          </mat-chip-listbox>
+        }
       </div>
 
       <!-- Loading State -->
@@ -89,7 +105,7 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
       }
 
       <!-- No Results State -->
-      @if (!loading && videos.length === 0 && currentSearchTerm) {
+      @if (activeTab === 'videos' && !loading && videos.length === 0 && currentSearchTerm) {
         <div class="no-results" [@slideIn]>
           <mat-icon class="no-results-icon" aria-hidden="false" aria-label="No results found">search_off</mat-icon>
           <h3>No results found for "{{ currentSearchTerm }}"</h3>
@@ -116,7 +132,7 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
       }
 
       <!-- Search Results Grid -->
-      @if (!loading && videos.length > 0) {
+      @if (activeTab === 'videos' && !loading && videos.length > 0) {
         <div class="results-grid">
           @for (video of videos; track video.youtubeVideoId) {
             <mat-card 
@@ -187,6 +203,25 @@ import { TruncatePipe } from "../../common/pipes/truncate.pipe";
           class="search-paginator"
         ></mat-paginator>
       }
+
+      <!-- Products Results (store catalog search; talent/thread tabs need backend query support) -->
+      @if (activeTab === 'products' && currentSearchTerm) {
+        @if (productsLoading) {
+          <async-skeleton-loader [count]="4" />
+        } @else if (productsError) {
+          <async-error-state [message]="productsError" (retry)="runProductSearch()" />
+        } @else if (products.length > 0) {
+          <div class="results-count">About {{ products.length }} products for "{{ currentSearchTerm }}"</div>
+          <app-product-grid [products]="products" />
+        } @else if (productsSearched) {
+          <async-empty-state
+            icon="shopping_bag"
+            [title]="'No products found for \u201C' + currentSearchTerm + '\u201D'"
+            message="Try different keywords or browse the full store."
+            actionLabel="Browse store"
+            (actionClicked)="goToStore()" />
+        }
+      }
     </section>
   `,
   styleUrls: ['./search-results.component.scss']
@@ -197,6 +232,12 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   searchQuery = '';
   currentSearchTerm = '';
   totalResults = 0;
+  activeTab: 'videos' | 'products' = 'videos';
+  products: ProductInterface[] = [];
+  productsLoading = false;
+  productsError: string | null = null;
+  productsSearched = false;
+  private productsTerm = '';
   pageSize = 12;
   currentPage = 0;
   private routeSubscription!: Subscription;
@@ -206,7 +247,8 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-    private youtubeService: YoutubeService
+    private youtubeService: YoutubeService,
+    private storeService: StoreService
   ) {}
 
   ngOnInit() {
@@ -257,6 +299,9 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.videos = [];
     this.cdr.detectChanges();
+    // Invalidate cached product results when the term changes.
+    this.productsSearched = false;
+    if (this.activeTab === 'products') this.runProductSearch();
 
     this.youtubeService.searchVideos(this.currentSearchTerm, this.currentPage + 1, this.pageSize)
         .subscribe({
@@ -290,6 +335,42 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
     if (videoId) {
       this.router.navigate(['/media/watch', videoId]);
     }
+  }
+
+  setTab(tab: 'videos' | 'products'): void {
+    this.activeTab = tab;
+    if (tab === 'products' && this.productsTerm !== this.currentSearchTerm) {
+      this.runProductSearch();
+    }
+    this.cdr.detectChanges();
+  }
+
+  runProductSearch(): void {
+    const term = this.currentSearchTerm.trim();
+    if (!term) return;
+    this.productsLoading = true;
+    this.productsError = null;
+    this.productsSearched = false;
+    this.cdr.detectChanges();
+    this.storeService.searchProducts(term).subscribe({
+      next: (products) => {
+        this.products = Array.isArray(products) ? products : [];
+        this.productsTerm = term;
+        this.productsSearched = true;
+        this.productsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error searching products:', error);
+        this.productsError = error?.message || 'Product search failed — check your connection and try again.';
+        this.productsLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  goToStore(): void {
+    this.router.navigate(['/store']);
   }
 
   timeAgo(date: string | Date): string {
