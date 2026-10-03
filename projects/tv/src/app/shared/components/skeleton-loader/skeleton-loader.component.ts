@@ -39,7 +39,7 @@ import { CommonModule } from '@angular/common';
     }
     .thumb { height: 160px; background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 37%, rgba(255,255,255,0.06) 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; }
     .meta { padding: 12px; display: grid; gap: 8px; }
-    .line { height: 12px; background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 37%, rgba(255,255,255,0.06) 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; border-radius: 6px; }
+    .line { height: 12px; background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 37%, rgba(255,255,255,0.06) 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; border-radius: var(--dt-radius-sm); }
     .title { width: 85%; height: 14px; }
     .short { width: 55%; }
     .tinier { width: 35%; height: 10px; opacity: 0.7; }

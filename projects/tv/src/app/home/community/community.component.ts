@@ -93,7 +93,7 @@ import { UpcomingEventComponent } from './upcoming-event.component';
     .post-card { width: 100%; }
     :host ::ng-deep .mat-mdc-tab-group { --mdc-tab-indicator-active-indicator-color: #E11D48; }
     :host ::ng-deep .mat-mdc-tab-labels { gap: 4px; }
-    :host ::ng-deep .mat-mdc-tab { border-radius: 999px; }
+    :host ::ng-deep .mat-mdc-tab { border-radius: var(--dt-radius-pill); }
   `]
 })
 export class CommunityComponent implements OnInit, OnDestroy {

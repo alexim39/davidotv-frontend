@@ -439,7 +439,7 @@ type SimpleAudioPlayer = HTMLAudioElement | null;
     .bar {
       width: 4px;
       background: linear-gradient(to top, #ff4b2b, #ff416c);
-      border-radius: 2px;
+      border-radius: var(--dt-radius-sm);
       transition: height 0.3s ease;
     }
 

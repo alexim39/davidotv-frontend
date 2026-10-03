@@ -119,7 +119,7 @@ import { AuthService } from '../auth.service';
         flex-grow: 1;
         height: 4px;
         background: #e0e0e0;
-        border-radius: 2px;
+        border-radius: var(--dt-radius-sm);
         overflow: hidden;
         .fill {
           height: 100%;

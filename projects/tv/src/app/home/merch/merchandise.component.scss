@@ -50,7 +50,7 @@
 
   .icon-wrapper {
     background: linear-gradient(135deg, #BE123C 0%, #FB7185 100%);
-    width: 56px; height: 56px; border-radius: 14px;
+    width: 56px; height: 56px; border-radius: var(--dt-radius-card);
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 8px 24px rgba(225,29,72,0.30);
   }
@@ -438,7 +438,7 @@
   button {
     width: 10px;
     height: 10px;
-    border-radius: 5px;
+    border-radius: var(--dt-radius-sm);
     background: #DDD;
     border: none;
     cursor: pointer;
@@ -448,7 +448,7 @@
     &.active {
       background: linear-gradient(to right, var(--dt-accent-2), #FF4D4D);
       width: 30px;
-      border-radius: 5px;
+      border-radius: var(--dt-radius-sm);
     }
 
     &:hover:not(.active) {

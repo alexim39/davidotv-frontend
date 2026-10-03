@@ -554,7 +554,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
     height: 48px;
     padding: 0 16px;
     margin: 2px 8px;
-    border-radius: 6px;
+    border-radius: var(--dt-radius-sm);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     
     &:hover {

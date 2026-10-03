@@ -69,7 +69,7 @@ export interface VideoCardData {
     .video-card:hover .thumb { transform: scale(1.04); }
     .duration {
       position: absolute; bottom: 8px; right: 8px;
-      background: rgba(0,0,0,0.75); color: white; font-size: 12px; padding: 2px 6px; border-radius: 6px;
+      background: rgba(0,0,0,0.75); color: white; font-size: 12px; padding: 2px 6px; border-radius: var(--dt-radius-sm);
     }
     .badge {
       position: absolute; top: 8px; left: 8px; font-size: 12px; letter-spacing: 0.08em; font-weight: 700;

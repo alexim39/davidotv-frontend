@@ -105,7 +105,7 @@ import { Router } from '@angular/router';
       background-color: rgba(0, 0, 0, 0.8);
       color: white;
       padding: 2px 4px;
-      border-radius: 2px;
+      border-radius: var(--dt-radius-sm);
       font-size: 12px;
       font-weight: 500;
     }

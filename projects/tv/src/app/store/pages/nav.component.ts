@@ -570,7 +570,7 @@ import { CartInterface, CartService } from './cart/cart.service';
           .shop-btn {
             padding: 8px 24px;
             font-weight: 500;
-            border-radius: 6px;
+            border-radius: var(--dt-radius-sm);
           }
         }
       }
@@ -599,7 +599,7 @@ import { CartInterface, CartService } from './cart/cart.service';
           padding: 12px;
           font-weight: 600;
           font-size: 15px;
-          border-radius: 6px;
+          border-radius: var(--dt-radius-sm);
           margin-bottom: 12px;
           box-shadow: 0 2px 8px rgba(143, 0, 69, 0.1);
         }
@@ -685,7 +685,7 @@ import { CartInterface, CartService } from './cart/cart.service';
             text-align: left;
             background: transparent;
             border: none;
-            border-radius: 6px;
+            border-radius: var(--dt-radius-sm);
             cursor: pointer;
             transition: all 0.2s ease;
 

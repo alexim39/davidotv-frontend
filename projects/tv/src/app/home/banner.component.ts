@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,6 +13,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Router, RouterModule } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthComponent } from '../auth/auth.component';
+import { AuthStateService } from '../core/services/auth-state.service';
 
 @Component({
   selector: 'async-banner',
@@ -40,7 +41,7 @@ import { AuthComponent } from '../auth/auth.component';
   template: `
     <div class="video-section">
       <div class="video-loader-bar"><div class="progress" [style.width.%]="progress"></div></div>
-      <iframe [src]="safeVideoUrl" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <iframe [src]="safeVideoUrl" title="DavidoTV featured video" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       <div class="banner-overlay"></div>
       <div class="banner-content" [@bannerFadeSlide]>
         <span class="eyebrow">AFROBEAT HOME • NEXT GLOBAL STAR</span>
@@ -97,7 +98,7 @@ import { AuthComponent } from '../auth/auth.component';
     }
   `]
 })
-export class BannerComponent {
+export class BannerComponent implements OnInit, OnDestroy {
   messages: string[] = [
     'Join thousands of Davido fans sharing exclusive videos, covers, fan art, and more.',
     'Upload your remix of Davido songs, and fan art to share with the community.',
@@ -119,42 +120,65 @@ export class BannerComponent {
   safeVideoUrl: SafeResourceUrl;
   isLoading = false;
   progress = 0;
-  intervalId: any;
+  private timers: Array<ReturnType<typeof setInterval> | ReturnType<typeof setTimeout>> = [];
+  private readonly onVisibilityChange = () => {
+    if (document.hidden) this.stopTimers();
+    else this.startTimers();
+  };
 
   readonly dialog = inject(MatDialog);
+  readonly auth = inject(AuthStateService);
 
   constructor(private sanitizer: DomSanitizer, private cdr: ChangeDetectorRef, private router: Router) {
     this.safeVideoUrl = this.sanitizeUrl(this.videoUrls[this.currentVideoIndex]);
+  }
 
+  ngOnInit(): void {
+    this.startTimers();
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
+  }
+
+  ngOnDestroy(): void {
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
+    this.stopTimers();
+  }
+
+  private startTimers(): void {
+    this.stopTimers();
     // Rotate messages
-    setInterval(() => {
+    this.timers.push(setInterval(() => {
       this.isLoading = true;
       this.cdr.detectChanges();
 
-      setTimeout(() => {
+      this.timers.push(setTimeout(() => {
         this.currentMessageIndex = (this.currentMessageIndex + 1) % this.messages.length;
         this.isLoading = false;
         this.cdr.detectChanges();
-      }, 800);
-    }, 9000);
+      }, 800));
+    }, 9000));
 
     // Rotate videos every 60 seconds
-    setInterval(() => {
+    this.timers.push(setInterval(() => {
       this.currentVideoIndex = (this.currentVideoIndex + 1) % this.videoUrls.length;
       this.safeVideoUrl = this.sanitizeUrl(this.videoUrls[this.currentVideoIndex]);
       this.progress = 0;
-      this.cdr.detectChanges(); 
-    }, 60000);
+      this.cdr.detectChanges();
+    }, 60000));
 
     // Progress bar update every 1 second
-    this.intervalId = setInterval(() => {
+    this.timers.push(setInterval(() => {
       if (this.progress < 100) {
         this.progress += 100 / 60;
       } else {
         this.progress = 0;
       }
       this.cdr.detectChanges();
-    }, 1000);
+    }, 1000));
+  }
+
+  private stopTimers(): void {
+    this.timers.forEach((t) => { clearInterval(t as number); clearTimeout(t as number); });
+    this.timers = [];
   }
 
   private sanitizeUrl(url: string): SafeResourceUrl {
@@ -162,8 +186,12 @@ export class BannerComponent {
   }
 
   authDialog() {
-     this.dialog.open(AuthComponent);
-   }
+    if (this.auth.user()) {
+      this.router.navigate(['/talent']);
+      return;
+    }
+    this.dialog.open(AuthComponent);
+  }
 
   loadVideos(): void {
     this.router.navigate(['/media/trending']);

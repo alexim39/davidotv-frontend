@@ -7,7 +7,9 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:ci": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox"
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadlessNoSandbox",
+    "lint:tokens": "node scripts/token-guard.js",
+    "typecheck": "tsc --noEmit -p projects/tv/tsconfig.app.json"
   },
   "private": true,
   "dependencies": {

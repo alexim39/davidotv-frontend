@@ -62,7 +62,7 @@ const IMMERSIVE_PREFIXES = ['/media/watch', '/store/checkout'];
     .tab.active { color: var(--dt-accent-3); }
     .tab.active::before {
       content: ''; position: absolute; top: 0; width: 24px; height: 3px;
-      border-radius: 0 0 4px 4px; background: var(--dt-gradient);
+      border-radius: 0 0 var(--dt-radius-sm) var(--dt-radius-sm); background: var(--dt-gradient);
     }
     .fab {
       flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
