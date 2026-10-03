@@ -8,7 +8,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { AuthComponent } from '../../auth/auth.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatDividerModule } from '@angular/material/divider';
@@ -104,7 +103,10 @@ export class NavbarComponent implements OnDestroy, OnInit {
     this.mobileMenuOpen = !this.mobileMenuOpen;
   }
 
-  authDialog() {
+  async authDialog() {
+    // Dynamic import: AuthComponent pulls Firebase + signin/signup dialogs.
+    // Keeping it out of the shell chunk protects the initial bundle.
+    const { AuthComponent } = await import('../../auth/auth.component');
     this.dialog.open(AuthComponent);
   }
 

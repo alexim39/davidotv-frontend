@@ -9,8 +9,8 @@ import { Subscription, filter } from 'rxjs';
  * Home / Watch / Talent-FAB / Community / Store. Talent is a raised center
  * action because discovery is the brand. Hidden on desktop (>=768px, the top
  * navbar owns navigation there) and on immersive routes (player, checkout).
- * Mounted in app.ts so it persists across ALL routes (top navbar only covers
- * the HomeRoutes subtree via home-container).
+ * Mounted in app.ts so it persists across ALL routes (the top navbar +
+ * sidenav live in the app shell for the same reason).
  */
 const IMMERSIVE_PREFIXES = ['/media/watch', '/store/checkout'];
 

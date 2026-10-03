@@ -3,62 +3,69 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
+import { MatDividerModule } from '@angular/material/divider';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
-import { NavbarComponent } from './navbar/navbar.component';
-import { FooterComponent } from './footer/footer.component';
+import { NavbarComponent } from '../home/navbar/navbar.component';
+import { FooterComponent } from '../home/footer/footer.component';
 import { Router, RouterModule } from '@angular/router';
 import { UserInterface, UserService } from '../common/services/user.service';
-import { AuthComponent } from '../auth/auth.component';
 import { MatDialog } from '@angular/material/dialog';
 
 
+/**
+ * Persistent app shell: navbar + sidenav + footer on EVERY route.
+ * Promoted from home-container (which scoped chrome to the HomeRoutes
+ * subtree, leaving talent/media/store/etc. nav-less on desktop).
+ * Sidenav links are the canonical 5 tabs + shelves (no duplicates).
+ */
 @Component({
-  selector: 'async-home-container',
+  selector: 'async-app-shell',
   imports: [
     CommonModule,
     MatIconModule,
     MatSidenavModule,
     MatListModule,
+    MatDividerModule,
     NavbarComponent,
     FooterComponent,
-    RouterModule,    
+    RouterModule,
   ],
   template: `
-    <async-navbar (menuToggle)="toggleSidenav()"/>
+    <async-navbar/>
 
     <div class="page-container">
       <mat-sidenav-container class="sidenav-container">
-        <mat-sidenav #sidenav 
-          [mode]="(isMobile$ | async) ? 'over' : 'side'" 
+        <mat-sidenav #sidenav
+          [mode]="(isMobile$ | async) ? 'over' : 'side'"
           [fixedInViewport]="(isMobile$ | async)"
           [fixedTopGap]="mobileNavbarHeight"
           [(opened)]="sidenavOpen"
           class="app-sidenav"
           (keydown.escape)="sidenavOpen = false">
-          
+
           <mat-nav-list>
             <a mat-list-item routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>home</mat-icon>
               <span>Home</span>
             </a>
-            <a mat-list-item routerLink="/media/trending" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
-              <mat-icon>local_fire_department</mat-icon>
-              <span>Trending</span>
-            </a>
-            <a mat-list-item routerLink="/media/official" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/media/trending" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>play_circle</mat-icon>
-              <span>Official</span>
+              <span>Watch</span>
             </a>
-            <a mat-list-item routerLink="/media/trending" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
-              <mat-icon>music_video</mat-icon>
-              <span>Videos</span>
+            <a mat-list-item routerLink="/talent" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+              <mat-icon>auto_awesome</mat-icon>
+              <span>Talent</span>
             </a>
-           <!--  <a mat-list-item routerLink="/subscriptions" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"(click)="closeSidenavOnMobile()">
-              <mat-icon>subscriptions</mat-icon>
-              <span>Subscriptions</span>
-            </a> -->
+            <a mat-list-item routerLink="/forum" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+              <mat-icon>forum</mat-icon>
+              <span>Community</span>
+            </a>
+            <a mat-list-item routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+              <mat-icon>storefront</mat-icon>
+              <span>Store</span>
+            </a>
 
             <mat-divider></mat-divider>
 
@@ -74,60 +81,34 @@ import { MatDialog } from '@angular/material/dialog';
             <mat-divider></mat-divider>
 
             <h3 matSubheader>FAN COMMUNITY</h3>
-            <!-- <a mat-list-item routerLink="/feed" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
-              <mat-icon>rss_feed</mat-icon>
-              <span>Feeds</span>
-            </a> -->
-            <a mat-list-item routerLink="/forum" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
-              <mat-icon>groups</mat-icon>
-              <span>Forum</span>
-            </a>
             <a mat-list-item routerLink="/events" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>event</mat-icon>
               <span>Events</span>
             </a>
-            <a mat-list-item (click)="uploadContent()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+            <a mat-list-item (click)="uploadContent(); closeSidenavOnMobile()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
               <mat-icon>computer_arrow_up</mat-icon>
               <span>Upload</span>
             </a>
-           <!--  <a mat-list-item (click)="chatRoom()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
-              <mat-icon>chat</mat-icon>
-              <span>chat rooms</span>
-            </a> -->
-            <a mat-list-item routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
-              <mat-icon>storefront</mat-icon>
-              <span>Store</span>
-            </a>
           </mat-nav-list>
         </mat-sidenav>
-        
+
         <mat-sidenav-content class="content">
-          
+
           <router-outlet/>
-          
-          <async-footer/>
+
+          @defer (on viewport) {
+            <async-footer/>
+          } @placeholder {
+            <div class="footer-spacer" aria-hidden="true"></div>
+          }
         </mat-sidenav-content>
       </mat-sidenav-container>
     </div>
   `,
   styles: [`
-    /* Variables */
-    /* :root {
-      --primary: var(--dt-accent-2);
-      --accent: #282828;
-      --background: #f9f9f9;
-      --desktop-sidenav-width: 240px;
-      --mobile-navbar-height: 56px;
-      --desktop-navbar-height: 64px;
-      --mobile-breakpoint: 600px;
-      --tablet-breakpoint: 960px;
-    } */
-
     /* Main layout */
     .page-container {
-      //background-color: var(--background);
       min-height: 100vh;
-      //margin-top: 4em;
     }
 
     /* Sidenav container */
@@ -139,7 +120,7 @@ import { MatDialog } from '@angular/material/dialog';
 
     /* Sidenav styles */
   .app-sidenav {
-  width: var(--desktop-sidenav-width);
+  width: 240px;
   background-color: var(--dt-card, #1A1A1E);
   padding-top: 12px;
   border-right: 1px solid var(--dt-line, rgba(255,255,255,0.08));
@@ -161,7 +142,6 @@ import { MatDialog } from '@angular/material/dialog';
       color: var(--dt-text-2, #C9C9D1);
       border-radius: var(--dt-radius-card, var(--dt-radius-card));
       margin: 2px 8px;
-      //color: var(--dt-accent-2);
       transition: background-color 0.2s;
 
       mat-icon {
@@ -178,13 +158,8 @@ import { MatDialog } from '@angular/material/dialog';
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        //color: var(--dt-text-2);
         font-size: 14px;
         margin-top: -10px;
-      }
-
-      &:hover {
-        //background-color: #f2f2f2;
       }
 
       &.active {
@@ -193,10 +168,6 @@ import { MatDialog } from '@angular/material/dialog';
         color: var(--dt-accent-3, #FB7185);
         mat-icon {
           color: var(--dt-accent-3, #FB7185);
-        }
-
-        span {
-          //color: var(--primary);
         }
       }
     }
@@ -214,39 +185,15 @@ import { MatDialog } from '@angular/material/dialog';
       margin: 8px 0;
     }
   }
-
-  @media (max-width: var(--mobile-breakpoint)) {
-    width: 85%;
-    max-width: 300px;
-  }
 }
 
 
     /* Content area */
     .content {
-      min-height: calc(100vh - var(--desktop-navbar-height));
+      min-height: 100vh;
       margin-top: 4em;
-      @media (max-width: var(--mobile-breakpoint)) {
-        min-height: calc(100vh - var(--mobile-navbar-height));
-      }
     }
-
-    /* Mobile-specific styles */
-    @media (max-width: var(--tablet-breakpoint)) {
-      .sidenav-container {
-        height: auto;
-        min-height: 100vh;
-      }
-
-      .app-sidenav {
-        position: fixed;
-        z-index: 1000;
-      }
-
-      .content {
-        margin-left: 0 !important;
-      }
-    }
+    .footer-spacer { min-height: 120px; }
 
 
     /* Section headers */
@@ -254,39 +201,26 @@ import { MatDialog } from '@angular/material/dialog';
       display: flex;
       align-items: center;
       margin: 24px 16px 16px;
-      
-      .section-icon {
-        margin-right: 8px;
-        //color: var(--primary);
-      }
-      
+
       h2 {
         margin: 0;
         flex: 1;
         font-size: clamp(1rem, 2vw, 1.25rem);
         font-weight: 500;
       }
-      
-      .see-all {
-        //color: var(--primary);
-      }
-
-      @media (max-width: var(--mobile-breakpoint)) {
-        margin: 16px 8px 12px;
-      }
     }
 
 
     /* Accessibility focus styles */
     button:focus-visible, a:focus-visible {
-      outline: 2px solid var(--primary);
+      outline: 2px solid var(--dt-accent-2);
       outline-offset: 2px;
     }
 
 
   `]
 })
-export class HomeContainerComponent implements OnInit, OnDestroy {
+export class AppShellComponent implements OnInit, OnDestroy {
   sidenavOpen = true;
   mobileNavbarHeight = 56;
   private destroy$ = new Subject<void>();
@@ -299,7 +233,7 @@ export class HomeContainerComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   private router = inject(Router);
   readonly dialog = inject(MatDialog);
-  
+
   constructor(private breakpointObserver: BreakpointObserver) {}
 
   ngOnInit() {
@@ -337,10 +271,6 @@ export class HomeContainerComponent implements OnInit, OnDestroy {
     }
   }
 
-  toggleSidenav() {
-    this.sidenavOpen = !this.sidenavOpen;
-  }
-
   closeSidenavOnMobile() {
     this.isMobile$.pipe(takeUntil(this.destroy$)).subscribe(isMobile => {
       if (isMobile) {
@@ -349,13 +279,15 @@ export class HomeContainerComponent implements OnInit, OnDestroy {
     });
   }
 
-   authDialog() {
+   async authDialog() {
+      // Dynamic import: AuthComponent pulls Firebase + signin/signup dialogs.
+      const { AuthComponent } = await import('../auth/auth.component');
       this.dialog.open(AuthComponent);
       // After successful auth, set isAuthenticated to true and load user image
     }
 
 
-  uploadContent(): void {    
+  uploadContent(): void {
     if (this.isAuthenticated) {
       this.router.navigateByUrl('/talent/upload');
     } else {
@@ -363,7 +295,7 @@ export class HomeContainerComponent implements OnInit, OnDestroy {
     }
   }
 
-  chatRoom(): void {    
+  chatRoom(): void {
     if (this.isAuthenticated) {
       this.router.navigateByUrl('chat');
     } else {
