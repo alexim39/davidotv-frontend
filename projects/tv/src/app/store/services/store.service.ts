@@ -52,7 +52,7 @@ export interface ProductInterface {
   discountPercent?: number; // Optional field for discount percentage
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class StoreService {
   private readonly baseEndpoint = 'store'; // API endpoint for products
 
