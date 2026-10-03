@@ -58,7 +58,14 @@ import { Subscription } from 'rxjs';
         <div class="upnext">
           <div class="upnext-head">
             <h2>Up next</h2>
-            <a routerLink="/media/trending">More trending</a>
+            <div class="upnext-tools">
+              <button mat-button class="autoplay-toggle" (click)="toggleAutoplay()"
+                      [attr.aria-pressed]="autoplayNext()" aria-label="Toggle autoplay next video">
+                <mat-icon>{{ autoplayNext() ? 'autorenew' : 'pause_circle' }}</mat-icon>
+                <span>Autoplay {{ autoplayNext() ? 'on' : 'off' }}</span>
+              </button>
+              <a routerLink="/media/trending">More trending</a>
+            </div>
           </div>
           @if (upNextLoading()) { <async-skeleton-loader [count]="4" /> }
           @else if (rail().length > 0) {
@@ -97,8 +104,10 @@ import { Subscription } from 'rxjs';
     .actions{ display:flex; gap:10px; margin-top:16px; }
     .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:var(--dt-radius-pill); }
     .upnext{ max-width:1100px; margin:4px auto 0; padding:0 20px 8px; display:grid; gap:12px; }
-    .upnext-head{ display:flex; justify-content:space-between; align-items:baseline; }
+    .upnext-head{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
     .upnext-head h2{ margin:0; font-size:18px; font-weight:800; color:#F8F7F8; }
+    .upnext-tools{ display:flex; gap:4px; align-items:center; }
+    .autoplay-toggle{ color:var(--dt-text-2); font-size:12px; min-height:var(--dt-target); }
     .upnext-head a{ font-size:12px; color:var(--dt-accent-3); text-decoration:none; min-height:var(--dt-target); display:inline-flex; align-items:center; }
     .upnext-rail{ display:grid; grid-auto-flow:column; grid-auto-columns:minmax(220px,260px); gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:8px; }
     .upnext-card{ text-decoration:none; scroll-snap-align:start; display:grid; gap:8px; }
@@ -128,6 +137,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   saved = signal(false);
   upNext = signal<YoutubeVideo[]>([]);
   upNextLoading = signal(true);
+  autoplayNext = signal(this.readAutoplayPref());
+  private readonly onYTMessage = (e: MessageEvent) => this.handleYTMessage(e);
   // Stable trusted URL: embedUrl() mints a NEW SafeResourceUrl object per
   // call, and rebinding [src] reloads the iframe — so compute once per video.
   // (This was the "player restarts on like" bug.)
@@ -142,6 +153,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       const id = this.videoId ?? params.get('id') ?? '';
       if (id) this.loadVideo(id);
     });
+    window.addEventListener('message', this.onYTMessage);
     this.media.getTrending(12).subscribe({
       next: (res) => {
         const list = res?.data ?? [];
@@ -158,7 +170,43 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     return this.upNext().filter((v) => v.youtubeVideoId !== current).slice(0, 8);
   }
 
+  toggleAutoplay(): void {
+    const next = !this.autoplayNext();
+    this.autoplayNext.set(next);
+    try {
+      localStorage.setItem('dtv-autoplay-next', next ? '1' : '0');
+    } catch {
+      // private mode: preference simply doesn't persist
+    }
+  }
+
+  private readAutoplayPref(): boolean {
+    try {
+      return localStorage.getItem('dtv-autoplay-next') !== '0';
+    } catch {
+      return true;
+    }
+  }
+
+  /** YouTube IFrame API posts {event:'onStateChange', info} — info 0 = ended. */
+  private handleYTMessage(e: MessageEvent): void {
+    if (e.origin !== 'https://www.youtube.com' || !this.autoplayNext()) return;
+    let data: any = e.data;
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch {
+        return;
+      }
+    }
+    if (data?.event === 'onStateChange' && Number(data?.info) === 0) {
+      const next = this.rail()[0];
+      if (next) this.router.navigate(['/media/watch', next.youtubeVideoId]);
+    }
+  }
+
   ngOnDestroy(): void {
+    window.removeEventListener('message', this.onYTMessage);
     this.sub?.unsubscribe();
   }
 
@@ -197,9 +245,11 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   private trustedEmbed(id: string): SafeResourceUrl {
     // Bypass is safe: id is validated to video-id characters only, and the
     // host + path are fixed (plain-string binding blanks the iframe).
+    // enablejsapi exposes ended events so autoplay-next can advance.
     const clean = /^[\w-]{6,}$/.test(id || '') ? id : '';
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
     return this.sanitizer.bypassSecurityTrustResourceUrl(
-      `https://www.youtube.com/embed/${clean}?autoplay=0&rel=0`
+      `https://www.youtube.com/embed/${clean}?autoplay=0&rel=0&enablejsapi=1&origin=${origin}`
     );
   }
 
