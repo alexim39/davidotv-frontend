@@ -1,6 +1,6 @@
-import { Component, Input, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MediaService, YoutubeVideo } from '../media.service';
 import { AuthStateService } from '../../../core/services/auth-state.service';
@@ -9,6 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
+import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader.component';
+import { Subscription } from 'rxjs';
 
 /**
  * Premium watch page - responsive 16:9 + glass meta + engagement bar.
@@ -16,7 +18,7 @@ import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
 @Component({
   selector: 'async-video-player',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatSnackBarModule, ShortNumberPipe],
+  imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, MatSnackBarModule, ShortNumberPipe, SkeletonLoaderComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (video(); as v) {
@@ -44,6 +46,32 @@ import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
             <button mat-flat-button class="rose-btn" (click)="share(v)"><mat-icon>share</mat-icon> Share</button>
           </div>
         </div>
+
+        <div class="upnext">
+          <div class="upnext-head">
+            <h2>Up next</h2>
+            <a routerLink="/media/trending">More trending</a>
+          </div>
+          @if (upNextLoading()) { <async-skeleton-loader [count]="4" /> }
+          @else if (rail().length > 0) {
+            <div class="upnext-rail" role="list">
+              @for (u of rail(); track u.youtubeVideoId) {
+                <a class="upnext-card" role="listitem" [routerLink]="['/media/watch', u.youtubeVideoId]"
+                   [attr.aria-label]="'Watch ' + u.title">
+                  <span class="thumb">
+                    <img [src]="'https://i.ytimg.com/vi/' + u.youtubeVideoId + '/mqdefault.jpg'"
+                         [alt]="u.title" loading="lazy" />
+                    @if (u.isOfficialContent) { <span class="mini-badge">OFFICIAL</span> }
+                  </span>
+                  <span class="umeta">
+                    <span class="utitle">{{ u.title }}</span>
+                    <span class="usub">{{ u.channel }} · {{ (u.views ?? 0) | shortNumber }} views</span>
+                  </span>
+                </a>
+              }
+            </div>
+          }
+        </div>
       </div>
     } @else {
       <div class="loading">Loading video…</div>
@@ -60,10 +88,22 @@ import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
     .desc{ color:#A1A1AA; font-size:13px; white-space:pre-wrap; margin-top:12px; }
     .actions{ display:flex; gap:10px; margin-top:16px; }
     .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:var(--dt-radius-pill); }
+    .upnext{ max-width:1100px; margin:4px auto 0; padding:0 20px 8px; display:grid; gap:12px; }
+    .upnext-head{ display:flex; justify-content:space-between; align-items:baseline; }
+    .upnext-head h2{ margin:0; font-size:18px; font-weight:800; color:#F8F7F8; }
+    .upnext-head a{ font-size:12px; color:var(--dt-accent-3); text-decoration:none; min-height:var(--dt-target); display:inline-flex; align-items:center; }
+    .upnext-rail{ display:grid; grid-auto-flow:column; grid-auto-columns:minmax(220px,260px); gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:8px; }
+    .upnext-card{ text-decoration:none; scroll-snap-align:start; display:grid; gap:8px; }
+    .upnext-card .thumb{ position:relative; aspect-ratio:16/9; border-radius:var(--dt-radius-card); overflow:hidden; background:var(--dt-sunken); border:1px solid var(--dt-line); }
+    .upnext-card img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .mini-badge{ position:absolute; top:6px; left:6px; background:linear-gradient(135deg,#BE123C,#FB7185); color:#fff; font-size:12px; font-weight:700; padding:2px 8px; border-radius:var(--dt-radius-pill); }
+    .umeta{ display:grid; gap:2px; }
+    .utitle{ font-size:13px; font-weight:500; color:#F8F7F8; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .usub{ font-size:12px; color:#A1A1AA; }
     .loading{ padding:40px; text-align:center; color:#A1A1AA; }
   `]
 })
-export class VideoPlayerComponent implements OnInit {
+export class VideoPlayerComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly snack = inject(MatSnackBar);
@@ -71,15 +111,45 @@ export class VideoPlayerComponent implements OnInit {
   private readonly auth = inject(AuthStateService);
   private readonly analytics = inject(AnalyticsService);
   private readonly sanitizer = inject(DomSanitizer);
+  private sub: Subscription | null = null;
 
   video = signal<YoutubeVideo | null>(null);
   likes = signal(0);
+  upNext = signal<YoutubeVideo[]>([]);
+  upNextLoading = signal(true);
+  private readonly currentId = signal('');
 
   @Input() videoId?: string;
 
   ngOnInit(): void {
-    const id = this.videoId ?? this.route.snapshot.paramMap.get('id') ?? '';
-    if (!id) return;
+    // Rail taps reuse this component: reload on param change, not just init.
+    this.sub = this.route.paramMap.subscribe((params) => {
+      const id = this.videoId ?? params.get('id') ?? '';
+      if (id) this.loadVideo(id);
+    });
+    this.media.getTrending(12).subscribe({
+      next: (res) => {
+        const list = res?.data ?? [];
+        this.upNext.set((Array.isArray(list) ? list : []).filter((v) => v?.youtubeVideoId).slice(0, 9));
+        this.upNextLoading.set(false);
+      },
+      error: () => this.upNextLoading.set(false),
+    });
+  }
+
+  /** Rail minus the playing video (stays correct across same-route hops). */
+  rail(): YoutubeVideo[] {
+    const current = this.currentId();
+    return this.upNext().filter((v) => v.youtubeVideoId !== current).slice(0, 8);
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
+  }
+
+  private loadVideo(id: string): void {
+    this.video.set(null);
+    this.currentId.set(id);
     // WEF-01: consumption signal (anon-safe: service skips when signed out).
     this.analytics.track('video_watch', id);
     this.media.getById(id).subscribe({
