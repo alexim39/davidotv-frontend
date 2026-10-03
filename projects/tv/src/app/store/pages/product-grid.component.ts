@@ -119,13 +119,13 @@ import { Subscription } from 'rxjs';
                 
                 <div class="product-price">
                   @if (product.discountedPrice) {
-                    <span class="current-price">{{ product.discountedPrice | currency:'N':'symbol':'1.0-0' }}</span>
-                    <span class="original-price">{{ product.price | currency:'N':'symbol':'1.0-0' }}</span>
+                    <span class="current-price">{{ product.discountedPrice | currency:'NGN':'symbol':'1.0-0' }}</span>
+                    <span class="original-price">{{ product.price | currency:'NGN':'symbol':'1.0-0' }}</span>
                     <span class="discount-percent">
                       {{ calculateDiscountPercent(product.price, product.discountedPrice) }}% off
                     </span>
                   } @else {
-                    <span class="standard-price">{{ product.price | currency:'N':'symbol':'1.0-0' }}</span>
+                    <span class="standard-price">{{ product.price | currency:'NGN':'symbol':'1.0-0' }}</span>
                   }
                 </div>
                 
