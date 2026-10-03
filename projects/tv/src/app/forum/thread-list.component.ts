@@ -33,7 +33,7 @@ import { ApiService } from '../core/services/api.service';
       <div *ngFor="let thread of threads" class="thread-item">
         <mat-card (click)="openThread(thread._id)" class="thread-card">
           <mat-card-header>
-            <img mat-card-avatar [src]="thread.author.avatar || 'assets/default-avatar.png'" [alt]="thread.author.name">
+            <img mat-card-avatar [src]="thread.author.avatar || '/img/avatar.png'" [alt]="thread.author.name">
             <mat-card-title>{{thread.title}}</mat-card-title>
             <mat-card-subtitle>
               <span>{{thread.author.name | titlecase}} - {{thread.author.username}}</span>
@@ -46,18 +46,18 @@ import { ApiService } from '../core/services/api.service';
             <!-- Media Preview -->
             <div *ngIf="thread.media" class="media-preview">
               <img *ngIf="thread.media.type === 'image'" 
-                   [src]="apiService.getBaseUrl() + thread.media.url" 
+                   [src]="mediaUrl(thread.media.url)" 
                    [alt]="thread.media.originalName"
                    class="preview-image">
               <video *ngIf="thread.media.type === 'video'" 
                      controls 
                      class="preview-video">
-                <source [src]="apiService.getBaseUrl() + thread.media.url" [type]="getMediaType(thread.media)">
+                <source [src]="mediaUrl(thread.media.url)" [type]="getMediaType(thread.media)">
               </video>
               <audio *ngIf="thread.media.type === 'audio'" 
                      controls 
                      class="preview-audio">
-                <source [src]="apiService.getBaseUrl() + thread.media.url" [type]="getMediaType(thread.media)">
+                <source [src]="mediaUrl(thread.media.url)" [type]="getMediaType(thread.media)">
               </audio>
             </div>
 
@@ -278,6 +278,13 @@ export class ThreadListComponent implements OnInit {
   isThreadOwner(thread: Thread): boolean {
     if (!this.currentUser?._id) return false;
     return thread.author._id === this.currentUser?._id;
+  }
+
+  /** Slash-safe media URL (base has no trailing slash; stored paths vary). */
+  mediaUrl(path?: string): string {
+    if (!path) return '';
+    if (/^https?:\/\//i.test(path)) return path;
+    return `${this.apiService.getBaseUrl()}/${path.replace(/^\//, '')}`;
   }
 
   getMediaType(media: Thread['media']): string {

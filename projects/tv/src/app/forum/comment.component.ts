@@ -33,7 +33,7 @@ imports: [
 template: `
 <div class="comment">
   <div class="comment-main">
-    <img class="comment-avatar" [src]="comment.author.avatar" [alt]="comment.author.name">
+    <img class="comment-avatar" [src]="comment.author.avatar || '/img/avatar.png'" [alt]="comment.author.name">
     
     <div class="comment-content">
       <div class="comment-header">

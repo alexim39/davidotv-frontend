@@ -18,7 +18,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   template: `
     <div class="reply">
       <div class="reply-main">
-        <img class="reply-avatar" [src]="reply.author.avatar" [alt]="reply.author.name">
+        <img class="reply-avatar" [src]="reply.author.avatar || '/img/avatar.png'" [alt]="reply.author.name">
         
         <div class="reply-content">
           <div class="reply-header">
