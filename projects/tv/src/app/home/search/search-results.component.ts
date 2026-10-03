@@ -150,6 +150,7 @@ import { ErrorStateComponent } from "../../shared/components/error-state/error-s
                   [alt]="video.title + ' thumbnail'" 
                   loading="lazy"
                 >
+                <span class="play-overlay" aria-hidden="true"><span class="play-btn"><mat-icon>play_arrow</mat-icon></span></span>
                 @if (video.duration) {
                   <div class="duration-overlay">
                     {{ formatDuration(video.duration) }}

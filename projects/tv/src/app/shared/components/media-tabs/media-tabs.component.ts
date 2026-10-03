@@ -12,12 +12,12 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule],
   template: `
     <nav class="media-tabs" aria-label="Video catalog">
+      <a routerLink="/media/videos" routerLinkActive="active" ariaCurrentWhenActive="page"
+         [class.active]="active === 'videos'">All Videos</a>
       <a routerLink="/media/trending" routerLinkActive="active" ariaCurrentWhenActive="page"
          [class.active]="active === 'trending'">Trending</a>
       <a routerLink="/media/official" routerLinkActive="active" ariaCurrentWhenActive="page"
          [class.active]="active === 'official'">Official</a>
-      <a routerLink="/media/videos" routerLinkActive="active" ariaCurrentWhenActive="page"
-         [class.active]="active === 'videos'">All Videos</a>
       <a routerLink="/media/shorts" routerLinkActive="active" ariaCurrentWhenActive="page"
          [class.active]="active === 'shorts'">Shorts</a>
     </nav>

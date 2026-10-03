@@ -49,6 +49,9 @@ import { Subscription } from 'rxjs';
               <mat-icon>{{ saved() ? 'bookmark' : 'bookmark_border' }}</mat-icon>
               <span>{{ saved() ? 'Saved' : 'Save' }}</span>
             </button>
+            <button mat-stroked-button (click)="playNext()" [disabled]="rail().length === 0" aria-label="Play next video">
+              <mat-icon>skip_next</mat-icon><span>Next</span>
+            </button>
             <button mat-flat-button class="rose-btn" (click)="share(v)"><mat-icon>share</mat-icon> Share</button>
           </div>
         </div>
@@ -77,6 +80,7 @@ import { Subscription } from 'rxjs';
                     <img [src]="'https://i.ytimg.com/vi/' + u.youtubeVideoId + '/mqdefault.jpg'"
                          [alt]="u.title" loading="lazy" />
                     @if (u.isOfficialContent) { <span class="mini-badge">OFFICIAL</span> }
+                    <span class="play-overlay" aria-hidden="true"><span class="play-btn"><mat-icon>play_arrow</mat-icon></span></span>
                   </span>
                   <span class="umeta">
                     <span class="utitle">{{ u.title }}</span>
@@ -113,6 +117,11 @@ import { Subscription } from 'rxjs';
     .upnext-card{ text-decoration:none; scroll-snap-align:start; display:grid; gap:8px; }
     .upnext-card .thumb{ position:relative; aspect-ratio:16/9; border-radius:var(--dt-radius-card); overflow:hidden; background:var(--dt-sunken); border:1px solid var(--dt-line); }
     .upnext-card img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .play-overlay{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 180ms; pointer-events:none; background:radial-gradient(ellipse at center, rgba(0,0,0,0.35), transparent 60%); }
+    .upnext-card:hover .play-overlay, .upnext-card:focus-visible .play-overlay{ opacity:1; }
+    .play-btn{ width:52px; height:52px; border-radius:50%; background:rgba(255,255,255,0.94); box-shadow:0 8px 24px rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; }
+    .play-btn mat-icon{ font-size:28px; width:28px; height:28px; line-height:28px; color:#0B0B0C; }
+    @media (hover: none){ .play-overlay{ opacity:1; background:none; } }
     .mini-badge{ position:absolute; top:6px; left:6px; background:linear-gradient(135deg,#BE123C,#FB7185); color:#fff; font-size:12px; font-weight:700; padding:2px 8px; border-radius:var(--dt-radius-pill); }
     .umeta{ display:grid; gap:2px; }
     .utitle{ font-size:13px; font-weight:500; color:#F8F7F8; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
@@ -188,6 +197,12 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Manual next-video advance (same target as autoplay-on-ended). */
+  playNext(): void {
+    const next = this.rail()[0];
+    if (next) this.router.navigate(['/media/watch', next.youtubeVideoId]);
+  }
+
   /** YouTube IFrame API posts {event:'onStateChange', info} — info 0 = ended. */
   private handleYTMessage(e: MessageEvent): void {
     if (e.origin !== 'https://www.youtube.com' || !this.autoplayNext()) return;
@@ -200,8 +215,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       }
     }
     if (data?.event === 'onStateChange' && Number(data?.info) === 0) {
-      const next = this.rail()[0];
-      if (next) this.router.navigate(['/media/watch', next.youtubeVideoId]);
+      this.playNext();
     }
   }
 

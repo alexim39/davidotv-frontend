@@ -39,7 +39,7 @@ export interface VideoCardData {
         @if (data.isOfficialContent) {
           <span class="badge official">OFFICIAL</span>
         }
-        <span class="play-overlay"><mat-icon>play_arrow</mat-icon></span>
+        <span class="play-overlay" aria-hidden="true"><span class="play-btn"><mat-icon>play_arrow</mat-icon></span></span>
       </div>
       <div class="meta">
         <h3 class="title">{{ data.title | truncate:58 }}</h3>
@@ -76,11 +76,23 @@ export interface VideoCardData {
       padding: 4px 8px; border-radius: var(--dt-radius-pill); background: linear-gradient(135deg,#BE123C,#FB7185); color: white;
     }
     .play-overlay {
-      position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transition: opacity 180ms;
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 180ms; pointer-events: none;
       background: radial-gradient(ellipse at center, rgba(0,0,0,0.35), transparent 60%);
     }
-    .video-card:hover .play-overlay { opacity: 1; }
-    .play-overlay mat-icon { background: rgba(255,255,255,0.92); border-radius: 50%; padding: 8px; width: 44px; height: 44px; display: grid; place-items: center; }
+    .video-card:hover .play-overlay, .video-card:focus-visible .play-overlay { opacity: 1; }
+    .play-btn {
+      width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(255,255,255,0.94); box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+      display: flex; align-items: center; justify-content: center;
+      transform: scale(0.9); transition: transform 180ms;
+    }
+    .video-card:hover .play-btn { transform: scale(1); }
+    .play-btn mat-icon { font-size: 30px; width: 30px; height: 30px; line-height: 30px; color: #0B0B0C; }
+    @media (hover: none) {
+      .play-overlay { opacity: 1; background: none; }
+      .play-btn { width: 48px; height: 48px; transform: none; }
+    }
     .meta { padding: 12px; display: grid; gap: 4px; }
     .title { font-size: 14px; font-weight: 600; line-height: 1.35; color: #F8F7F8; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 38px; }
     .channel { font-size: 12px; color: #A1A1AA; margin: 0; }
