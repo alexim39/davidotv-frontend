@@ -7,10 +7,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CartService } from '../cart/cart.service';
 import { UserInterface, UserService } from '../../../common/services/user.service';
-import { Subscription, catchError, map, of } from 'rxjs';
+import { Subscription, catchError, forkJoin, map, of } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -714,6 +714,7 @@ export class WishlistComponent implements OnInit, OnDestroy {
   private storeService = inject(StoreService);
   private cartService = inject(CartService);
   private userService = inject(UserService);
+  private router = inject(Router);
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
   private cdr = inject(ChangeDetectorRef);
@@ -819,17 +820,46 @@ export class WishlistComponent implements OnInit, OnDestroy {
   }
 
   removeFromWishlist(productId: string) {
-    // In a real app, you would call a removeFromWishlist API endpoint
-    this.wishlistItems = this.wishlistItems.filter(item => item._id !== productId);
-    this.snackBar.open('Removed from wishlist', 'Close', { duration: 3000 });
+    const userId = this.user?._id;
+    if (!userId) return;
+    this.subscriptions.push(
+      this.storeService.removeFromWishlist(productId, userId).subscribe({
+        next: () => {
+          this.wishlistItems = this.wishlistItems.filter(item => item._id !== productId);
+          this.snackBar.open('Removed from wishlist', 'Close', { duration: 3000 });
+          this.cdr.markForCheck();
+        },
+        error: (error: any) => {
+          this.snackBar.open(error?.message || 'Could not remove item.', 'Close', { duration: 3000 });
+        }
+      })
+    );
   }
 
   addToCart(productId: string) {
     const userId = this.user?._id;
-    if (!userId) return;
-
-    // In a real app, you would call addToCart API endpoint
-    this.snackBar.open('Added to cart', 'Close', { duration: 3000 });
+    if (!userId) {
+      this.snackBar.open('Please log in to add items to your cart', 'Close', { duration: 3000 });
+      return;
+    }
+    const item = this.wishlistItems.find(i => i._id === productId);
+    if (!item) return;
+    this.subscriptions.push(
+      this.cartService.addToCart({
+        productId,
+        quantity: 1,
+        priceAtAddition: item.discountedPrice || item.price,
+      }).subscribe({
+        next: () => {
+          this.snackBar.open('Added to cart', 'View cart', { duration: 3000 })
+            .onAction().subscribe(() => this.router.navigate(['/store/cart']));
+          this.cdr.markForCheck();
+        },
+        error: (error: any) => {
+          this.snackBar.open(error?.message || 'Could not add to cart.', 'Close', { duration: 3000 });
+        }
+      })
+    );
   }
 
   updateSelection() {
@@ -845,15 +875,36 @@ export class WishlistComponent implements OnInit, OnDestroy {
 
   removeSelectedItems() {
     if (this.selectedItems.length === 0) return;
-
-    // In a real app, you would call a bulk remove API endpoint
-    this.wishlistItems = this.wishlistItems.filter(item => !this.selectedItems.includes(item._id));
-    this.snackBar.open(`Removed ${this.selectedItems.length} items`, 'Close', { duration: 3000 });
-    this.selectedItems = [];
+    const userId = this.user?._id;
+    if (!userId) return;
+    const ids = [...this.selectedItems];
+    this.subscriptions.push(
+      forkJoin(ids.map(id =>
+        this.storeService.removeFromWishlist(id, userId).pipe(
+          map(() => id),
+          catchError(() => of(null))
+        )
+      )).subscribe((results) => {
+        const removed = results.filter((id): id is string => id !== null);
+        this.wishlistItems = this.wishlistItems.filter(item => !removed.includes(item._id));
+        this.selectedItems = [];
+        const failed = ids.length - removed.length;
+        this.snackBar.open(
+          failed > 0 ? `Removed ${removed.length} items (${failed} failed)` : `Removed ${removed.length} items`,
+          'Close', { duration: 3000 }
+        );
+        this.cdr.markForCheck();
+      })
+    );
   }
 
   moveSelectedToCart() {
     if (this.selectedItems.length === 0) return;
+    const userId = this.user?._id;
+    if (!userId) {
+      this.snackBar.open('Please log in to add items to your cart', 'Close', { duration: 3000 });
+      return;
+    }
 
     const dialogRef = this.dialog.open(WishlistMoveToCartDialogComponent, {
       width: '400px',
@@ -861,12 +912,37 @@ export class WishlistComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result === 'move') {
-        // In a real app, you would call a bulk add to cart API endpoint
-        this.snackBar.open(`Added ${this.selectedItems.length} items to cart`, 'Close', { duration: 3000 });
-        this.wishlistItems = this.wishlistItems.filter(item => !this.selectedItems.includes(item._id));
-        this.selectedItems = [];
-      }
+      if (result !== 'move') return;
+      const ids = [...this.selectedItems];
+      const items = ids
+        .map(id => this.wishlistItems.find(i => i._id === id))
+        .filter(i => !!i);
+      this.subscriptions.push(
+        forkJoin(items.map(item =>
+          this.cartService.addToCart({
+            productId: item._id,
+            quantity: 1,
+            priceAtAddition: item.discountedPrice || item.price,
+          }).pipe(
+            map(() => item._id as string),
+            catchError(() => of(null))
+          )
+        )).subscribe((added) => {
+          const moved = added.filter((id): id is string => id !== null);
+          // Moved items leave the wishlist (server-side, best effort).
+          moved.forEach(id => {
+            this.storeService.removeFromWishlist(id, userId).subscribe({ error: () => {} });
+          });
+          this.wishlistItems = this.wishlistItems.filter(item => !moved.includes(item._id));
+          this.selectedItems = [];
+          const failed = ids.length - moved.length;
+          this.snackBar.open(
+            failed > 0 ? `Moved ${moved.length} items to cart (${failed} failed)` : `Moved ${moved.length} items to cart`,
+            'View cart', { duration: 4000 }
+          ).onAction().subscribe(() => this.router.navigate(['/store/cart']));
+          this.cdr.markForCheck();
+        })
+      );
     });
   }
 
