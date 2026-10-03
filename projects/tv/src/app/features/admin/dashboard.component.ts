@@ -21,8 +21,21 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
     <section class="admin obsidian-bg">
       <div class="head glass-surface">
         <h2 class="title">Admin console</h2>
-        <p class="sub">Membership health + members-only video flags.</p>
+        <p class="sub">North star, membership health + members-only video flags.</p>
       </div>
+
+      @if (wefLoading() && !wef()) { <async-skeleton-loader [count]="1"/> }
+      @else {
+        @if (wef(); as w) {
+          <div class="stats">
+            <div class="stat glass-surface wide">
+              <mat-icon>group</mat-icon>
+              <span class="num">{{w.wef}}</span>
+              <span class="lbl">Weekly Engaged Fans ({{w.windowDays}}d window)</span>
+            </div>
+          </div>
+        }
+      }
 
       @if (loading() && !overview()) { <async-skeleton-loader [count]="2"/> }
       @else {
@@ -66,6 +79,7 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
     .title{ margin:0; color:#F8F7F8; font-size:20px; font-weight:800; }
     .sub{ margin:6px 0 0; color:#A1A1AA; font-size:12px; }
     .stats{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; }
+    .stat.wide{ border-color:rgba(251,113,133,0.28); }
     .stat{ padding:18px; border-radius:20px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); display:grid; gap:4px; color:#F8F7F8; }
     .stat mat-icon{ color:#FB7185; }
     .num{ font-size:28px; font-weight:800; }
@@ -85,6 +99,8 @@ export class AdminDashboardComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   overview = this.admin.overview;
   loading = this.admin.loading;
+  wef = this.admin.wef;
+  wefLoading = this.admin.wefLoading;
   saving = signal(false);
   message = signal<string | null>(null);
   error = signal<string | null>(null);
@@ -96,6 +112,7 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.admin.fetchOverview().subscribe();
+    this.admin.fetchWef().subscribe();
   }
 
   apply(): void {
