@@ -18,6 +18,8 @@ export const routes: Routes = [
   { path: 'notifications', loadChildren: () => import('./features/notifications/notifications.routes').then(r => r.NotificationRoutes) },
   // Admin console seed (membership overview + paywall toggle)
   { path: 'admin', loadChildren: () => import('./features/admin/admin.routes').then(r => r.AdminRoutes) },
+  // Fan challenges (board public, entry from own talent uploads)
+  { path: 'challenges', loadChildren: () => import('./features/challenges/challenges.routes').then(r => r.ChallengeRoutes) },
   // Back-compat aliases
   { path: 'upload', redirectTo: 'talent/upload', pathMatch: 'full' },
   { path: 'curated', redirectTo: 'talent/curated', pathMatch: 'full' },

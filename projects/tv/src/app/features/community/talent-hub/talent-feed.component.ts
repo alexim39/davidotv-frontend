@@ -8,6 +8,10 @@ import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loa
 import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
 import { IntersectionDirective } from '../../../shared/directives/intersection.directive';
 import { AnalyticsService } from '../../../core/services/analytics.service';
+import { AuthStateService } from '../../../core/services/auth-state.service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { EnterChallengeDialogComponent } from '../../challenges/enter-dialog.component';
 
 /**
  * Public talent feed - TikTok/Spotify inspired vertical list with play + like/share.
@@ -16,7 +20,7 @@ import { AnalyticsService } from '../../../core/services/analytics.service';
 @Component({
   selector: 'async-talent-feed',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, SkeletonLoaderComponent, ShortNumberPipe, IntersectionDirective],
+  imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, MatDialogModule, MatSnackBarModule, SkeletonLoaderComponent, ShortNumberPipe, IntersectionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="feed obsidian-bg">
@@ -24,6 +28,7 @@ import { AnalyticsService } from '../../../core/services/analytics.service';
         <h2 class="hero-title">Next Global Star</h2>
         <p class="hero-sub">Discover underground Afrobeat. Your likes & shares push talent to Davido's curated queue.</p>
         <a mat-flat-button class="rose-btn" routerLink="upload"><mat-icon>upload</mat-icon> Upload your track</a>
+        <a mat-stroked-button routerLink="/challenges" class="ghost"><mat-icon>emoji_events</mat-icon> Challenges</a>
         <a mat-stroked-button routerLink="curated" class="ghost">Curated (Admin)</a>
       </div>
 
@@ -42,6 +47,9 @@ import { AnalyticsService } from '../../../core/services/analytics.service';
                 <div class="eng">
                   <button mat-stroked-button (click)="like(t)"><mat-icon [style.color]="likedSet.has(t._id) ? '#FB7185':''">favorite</mat-icon> {{t.likeCount | shortNumber}}</button>
                   <button mat-stroked-button (click)="share(t)"><mat-icon>share</mat-icon> {{t.shareCount | shortNumber}}</button>
+                  @if (isMine(t)) {
+                    <button mat-stroked-button (click)="enterChallenge(t)"><mat-icon>emoji_events</mat-icon> Enter</button>
+                  }
                   <span class="plays"><mat-icon>headphones</mat-icon> {{t.plays | shortNumber}} plays</span>
                 </div>
               </div>
@@ -76,6 +84,9 @@ import { AnalyticsService } from '../../../core/services/analytics.service';
 export class TalentFeedComponent implements OnInit {
   private readonly talent = inject(TalentService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly auth = inject(AuthStateService);
+  private readonly dialog = inject(MatDialog);
+  private readonly snack = inject(MatSnackBar);
   items = signal<TalentUpload[]>([]);
   loading = signal(true);
   loadingMore = signal(false);
@@ -112,5 +123,21 @@ export class TalentFeedComponent implements OnInit {
   play(t: TalentUpload): void {
     this.analytics.track('talent_view', t._id);
     this.talent.play(t._id).subscribe(()=> t.plays++);
+  }
+  /** Own uploads only — the backend enforces ownership too. */
+  isMine(t: TalentUpload): boolean {
+    const me = this.auth.user();
+    return !!me && t.uploader?.username === me.username;
+  }
+  enterChallenge(t: TalentUpload): void {
+    const me = this.auth.user();
+    if (!me) {
+      this.snack.open('Sign in to enter challenges.', 'Dismiss', { duration: 3000 });
+      return;
+    }
+    this.dialog.open(EnterChallengeDialogComponent, {
+      width: '420px',
+      data: { uploadId: t._id, uploadTitle: t.title },
+    });
   }
 }
