@@ -13,7 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { timeAgo as timeAgoUtil, formatViewCount as viewFormat, formatDuration as videoDuration } from '../../common/utils/time.util';
-import { Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { YoutubeService, YoutubeVideoInterface } from "../../common/services/youtube.service";
 import { StoreService, ProductInterface } from "../../store/services/store.service";
 import { ProductGridComponent } from "../../store/pages/product-grid.component";
@@ -104,8 +104,13 @@ import { ErrorStateComponent } from "../../shared/components/error-state/error-s
         </div>
       }
 
+      <!-- Search Error State -->
+      @if (activeTab === 'videos' && !loading && videosError) {
+        <async-error-state [message]="videosError" (retry)="searchVideos()" />
+      }
+
       <!-- No Results State -->
-      @if (activeTab === 'videos' && !loading && videos.length === 0 && currentSearchTerm) {
+      @if (activeTab === 'videos' && !loading && !videosError && videos.length === 0 && currentSearchTerm) {
         <div class="no-results" [@slideIn]>
           <mat-icon class="no-results-icon" aria-hidden="false" aria-label="No results found">search_off</mat-icon>
           <h3>No results found for "{{ currentSearchTerm }}"</h3>
@@ -234,6 +239,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   currentSearchTerm = '';
   totalResults = 0;
   activeTab: 'videos' | 'products' = 'videos';
+  videosError: string | null = null;
   products: ProductInterface[] = [];
   productsLoading = false;
   productsError: string | null = null;
@@ -242,7 +248,6 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   pageSize = 12;
   currentPage = 0;
   private routeSubscription!: Subscription;
-  private searchSubscription!: Subscription;
 
   constructor(
     private router: Router,
@@ -253,7 +258,9 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // Get search query from URL
+    // Single param stream: the previous debounced duplicate fired a second
+    // request per keystroke and responses could land out of order (stale
+    // results overwriting fresh ones).
     this.routeSubscription = this.route.queryParams.subscribe(params => {
       if (params['q']) {
         this.searchQuery = params['q'];
@@ -261,27 +268,10 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
         this.searchVideos();
       }
     });
-
-    // Debounce search input for better UX
-    this.searchSubscription = this.route.queryParams
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged()
-      )
-      .subscribe(params => {
-        if (params['q']) {
-          this.searchQuery = params['q'];
-          this.currentSearchTerm = params['q'];
-          if (this.currentSearchTerm) {
-            this.searchVideos();
-          }
-        }
-      });
   }
 
   ngOnDestroy() {
     this.routeSubscription.unsubscribe();
-    this.searchSubscription.unsubscribe();
   }
 
   onSearch() {
@@ -299,6 +289,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
 
     this.loading = true;
     this.videos = [];
+    this.videosError = null;
     this.cdr.detectChanges();
     // Invalidate cached product results when the term changes.
     this.productsSearched = false;
@@ -318,6 +309,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
             console.error('Error searching videos:', error);
+            this.videosError = error?.message || 'Video search failed — check your connection and try again.';
             this.loading = false;
             this.cdr.detectChanges();
         }
