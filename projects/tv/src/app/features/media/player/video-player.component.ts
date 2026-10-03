@@ -42,12 +42,24 @@ import { Subscription } from 'rxjs';
             @if(v.isOfficialContent){<span class="badge">OFFICIAL</span>}
             <span class="views">{{ (v.views ?? 0) | shortNumber }} views</span>
           </div>
-          <p class="desc">{{v.description}}</p>
+          <p class="desc" [class.clamped]="!descExpanded()">{{v.description}}</p>
+          @if (v.description.length > 200) {
+            <button mat-button class="more-btn" (click)="descExpanded.set(!descExpanded())"
+                    [attr.aria-expanded]="descExpanded()">
+              {{ descExpanded() ? 'Show less' : 'Show more' }}
+            </button>
+          }
           <div class="actions">
             <button mat-stroked-button (click)="like(v)" [attr.aria-pressed]="liked()"><mat-icon>favorite</mat-icon> {{ likes() }}</button>
             <button mat-stroked-button (click)="toggleSave(v)" [attr.aria-pressed]="saved()">
               <mat-icon>{{ saved() ? 'bookmark' : 'bookmark_border' }}</mat-icon>
               <span>{{ saved() ? 'Saved' : 'Save' }}</span>
+            </button>
+            <button mat-stroked-button (click)="playPrevious()" [disabled]="!hasPrevious()" aria-label="Play previous video">
+              <mat-icon>skip_previous</mat-icon>
+            </button>
+            <button mat-stroked-button (click)="toggleRepeat()" [attr.aria-pressed]="repeatOne()" aria-label="Repeat current video">
+              <mat-icon>repeat_one</mat-icon>
             </button>
             <button mat-stroked-button (click)="playNext()" [disabled]="rail().length === 0" aria-label="Play next video">
               <mat-icon>skip_next</mat-icon><span>Next</span>
@@ -105,7 +117,10 @@ import { Subscription } from 'rxjs';
     .chan-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; color:#A1A1AA; font-size:13px; }
     .badge{ background:linear-gradient(135deg,#BE123C,#FB7185); color:white; padding:2px 8px; border-radius:var(--dt-radius-pill); font-size:12px; font-weight:700; }
     .desc{ color:#A1A1AA; font-size:13px; white-space:pre-wrap; margin-top:12px; }
-    .actions{ display:flex; gap:10px; margin-top:16px; }
+    .desc.clamped{ display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+    .more-btn{ color:var(--dt-accent-3); font-size:13px; font-weight:600; padding:0; min-height:var(--dt-target); }
+    .actions{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+    .actions button[aria-pressed="true"] mat-icon{ color:var(--dt-accent-3); }
     .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:var(--dt-radius-pill); }
     .upnext{ max-width:1100px; margin:4px auto 0; padding:0 20px 8px; display:grid; gap:12px; }
     .upnext-head{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
@@ -147,6 +162,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   upNext = signal<YoutubeVideo[]>([]);
   upNextLoading = signal(true);
   autoplayNext = signal(this.readAutoplayPref());
+  repeatOne = signal(this.readRepeatPref());
+  descExpanded = signal(false);
   private readonly onYTMessage = (e: MessageEvent) => this.handleYTMessage(e);
   // Stable trusted URL: embedUrl() mints a NEW SafeResourceUrl object per
   // call, and rebinding [src] reloads the iframe — so compute once per video.
@@ -203,9 +220,46 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     if (next) this.router.navigate(['/media/watch', next.youtubeVideoId]);
   }
 
+  /** Previous video in rail order; none before the first. */
+  playPrevious(): void {
+    const rail = this.rail();
+    const idx = rail.findIndex((v) => v.youtubeVideoId === this.currentId());
+    if (idx > 0) this.router.navigate(['/media/watch', rail[idx - 1].youtubeVideoId]);
+  }
+
+  hasPrevious(): boolean {
+    return this.rail().findIndex((v) => v.youtubeVideoId === this.currentId()) > 0;
+  }
+
+  toggleRepeat(): void {
+    const next = !this.repeatOne();
+    this.repeatOne.set(next);
+    try {
+      localStorage.setItem('dtv-repeat-one', next ? '1' : '0');
+    } catch {
+      // private mode: preference simply doesn't persist
+    }
+  }
+
+  private readRepeatPref(): boolean {
+    try {
+      return localStorage.getItem('dtv-repeat-one') === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  /** Replay the current video (repeat takes precedence over autoplay-next). */
+  private replayCurrent(id: string): void {
+    this.embedSrc.set(null);
+    setTimeout(() => {
+      if (this.currentId() === id) this.embedSrc.set(this.trustedEmbed(id, true));
+    }, 60);
+  }
+
   /** YouTube IFrame API posts {event:'onStateChange', info} — info 0 = ended. */
   private handleYTMessage(e: MessageEvent): void {
-    if (e.origin !== 'https://www.youtube.com' || !this.autoplayNext()) return;
+    if (e.origin !== 'https://www.youtube.com') return;
     let data: any = e.data;
     if (typeof data === 'string') {
       try {
@@ -215,7 +269,9 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       }
     }
     if (data?.event === 'onStateChange' && Number(data?.info) === 0) {
-      this.playNext();
+      // Repeat wins over autoplay-next; both off means sit on the end screen.
+      if (this.repeatOne()) this.replayCurrent(this.currentId());
+      else if (this.autoplayNext()) this.playNext();
     }
   }
 
@@ -228,6 +284,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     this.video.set(null);
     this.embedSrc.set(this.trustedEmbed(id));
     this.currentId.set(id);
+    this.descExpanded.set(false);
     this.liked.set(false);
     this.saved.set(false);
     // WEF-01: consumption signal (anon-safe: service skips when signed out).
@@ -256,14 +313,14 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     return this.trustedEmbed(id);
   }
 
-  private trustedEmbed(id: string): SafeResourceUrl {
+  private trustedEmbed(id: string, autoplay = false): SafeResourceUrl {
     // Bypass is safe: id is validated to video-id characters only, and the
     // host + path are fixed (plain-string binding blanks the iframe).
     // enablejsapi exposes ended events so autoplay-next can advance.
     const clean = /^[\w-]{6,}$/.test(id || '') ? id : '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     return this.sanitizer.bypassSecurityTrustResourceUrl(
-      `https://www.youtube.com/embed/${clean}?autoplay=0&rel=0&enablejsapi=1&origin=${origin}`
+      `https://www.youtube.com/embed/${clean}?autoplay=${autoplay ? 1 : 0}&rel=0&enablejsapi=1&origin=${origin}`
     );
   }
 
