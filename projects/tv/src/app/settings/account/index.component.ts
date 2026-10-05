@@ -28,7 +28,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
       <!-- Header Section -->
       <header class="settings-header">
         <nav class="breadcrumb">
-          <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="scrollToTop()">
+          <a routerLink="/dashboard" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="scrollToTop()">
             <mat-icon>home</mat-icon> Dashboard
           </a>
           <mat-icon>chevron_right</mat-icon>
@@ -91,7 +91,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
             <mat-nav-list>
               <div class="nav-section">
                 <div class="nav-section-label">ACCOUNT</div>
-                <a mat-list-item routerLink="./account" routerLinkActive="active" (click)="closeMobileMenu()">
+                <a mat-list-item routerLink="./account" ariaCurrentWhenActive="page" routerLinkActive="active" (click)="closeMobileMenu()">
                   <div class="nav-item-content">
                     <div class="nav-icon-container">
                       <mat-icon class="nav-icon">manage_accounts</mat-icon>
@@ -100,7 +100,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
                   </div>
                   <mat-icon class="nav-chevron">chevron_right</mat-icon>
                 </a>
-               <!--  <a mat-list-item routerLink="./security" routerLinkActive="active" (click)="closeMobileMenu()">
+               <!--  <a mat-list-item routerLink="./security" ariaCurrentWhenActive="page" routerLinkActive="active" (click)="closeMobileMenu()">
                   <div class="nav-item-content">
                     <div class="nav-icon-container">
                       <mat-icon class="nav-icon">lock</mat-icon>
@@ -113,7 +113,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
               <div class="nav-section">
                 <div class="nav-section-label">SYSTEM</div>
-                <a mat-list-item routerLink="./system" routerLinkActive="active" (click)="closeMobileMenu()">
+                <a mat-list-item routerLink="./system" ariaCurrentWhenActive="page" routerLinkActive="active" (click)="closeMobileMenu()">
                   <div class="nav-item-content">
                     <div class="nav-icon-container">
                       <mat-icon class="nav-icon">tune</mat-icon>
@@ -122,7 +122,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
                   </div>
                   <mat-icon class="nav-chevron">chevron_right</mat-icon>
                 </a>
-                <!-- <a mat-list-item routerLink="./notifications" routerLinkActive="active" (click)="closeMobileMenu()">
+                <!-- <a mat-list-item routerLink="./notifications" ariaCurrentWhenActive="page" routerLinkActive="active" (click)="closeMobileMenu()">
                   <div class="nav-item-content">
                     <div class="nav-icon-container">
                       <mat-icon class="nav-icon">notifications</mat-icon>
@@ -135,7 +135,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
               <div class="nav-section">
                 <div class="nav-section-label">SUPPORT</div>
-                <a mat-list-item routerLink="./share-reviews" routerLinkActive="active" (click)="closeMobileMenu()">
+                <a mat-list-item routerLink="./share-reviews" ariaCurrentWhenActive="page" routerLinkActive="active" (click)="closeMobileMenu()">
                   <div class="nav-item-content">
                     <div class="nav-icon-container">
                       <mat-icon class="nav-icon">reviews</mat-icon>
@@ -144,7 +144,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
                   </div>
                   <mat-icon class="nav-chevron">chevron_right</mat-icon>
                 </a>
-                <!-- <a mat-list-item routerLink="/privacy" routerLinkActive="active" (click)="closeMobileMenu()">
+                <!-- <a mat-list-item routerLink="/privacy" ariaCurrentWhenActive="page" routerLinkActive="active" (click)="closeMobileMenu()">
                   <div class="nav-item-content">
                     <div class="nav-icon-container">
                       <mat-icon class="nav-icon">privacy_tip</mat-icon>
@@ -153,7 +153,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
                   </div>
                   <mat-icon class="nav-chevron">chevron_right</mat-icon>
                 </a> -->
-                <!-- <a mat-list-item routerLink="/support" routerLinkActive="active" (click)="closeMobileMenu()">
+                <!-- <a mat-list-item routerLink="/support" ariaCurrentWhenActive="page" routerLinkActive="active" (click)="closeMobileMenu()">
                   <div class="nav-item-content">
                     <div class="nav-icon-container">
                       <mat-icon class="nav-icon">support_agent</mat-icon>

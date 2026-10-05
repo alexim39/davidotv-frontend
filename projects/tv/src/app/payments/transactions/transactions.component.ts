@@ -86,11 +86,11 @@ interface ApiTransactionData {
     <div class="transactions-container">
       <header class="transactions-header">
       <nav class="breadcrumb">
-        <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="scrollToTop()">
+        <a routerLink="/dashboard" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="scrollToTop()">
           <mat-icon>home</mat-icon> Dashboard
         </a>
         <mat-icon>chevron_right</mat-icon>
-        <a routerLink="/dashboard/payment/withdrawal" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="scrollToTop()">Payment</a>
+        <a routerLink="/dashboard/payment/withdrawal" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="scrollToTop()">Payment</a>
         <mat-icon>chevron_right</mat-icon>
         <span class="current">Transaction History</span>
       </nav>

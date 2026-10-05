@@ -148,8 +148,8 @@ template: `
   
   <section class="breadcrumb-wrapper">
     <div class="breadcrumb">
-        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="scrollToTop()">Home</a> &gt;
-        <a routerLink="/faq" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="scrollToTop()">Support</a> &gt;
+        <a routerLink="/" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="scrollToTop()">Home</a> &gt;
+        <a routerLink="/faq" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="scrollToTop()">Support</a> &gt;
         <span>faq</span>
     </div>
   </section>

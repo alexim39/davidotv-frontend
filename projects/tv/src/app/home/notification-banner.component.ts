@@ -23,13 +23,13 @@ import { MatButtonModule } from '@angular/material/button';
             This platform is <strong>currently not officially endorsed</strong> by Davido or his representatives. 
             Created by fans for the fan community, this is presently a <strong>non-commercial project</strong> that operates independently. 
             All trademarks, names, and intellectual property remain the property of their respective owners. 
-           <!--  <a mat-button routerLink="plans" routerLinkActive="active" 
+           <!--  <a mat-button routerLink="plans" ariaCurrentWhenActive="page" routerLinkActive="active" 
                [routerLinkActiveOptions]="{ exact: true }" 
                (click)="scrollToTop()" class="cta-link">
               EliteSpace (₦50,000)
             </a>  -->
             
-            <a mat-button routerLink="about" routerLinkActive="active" 
+            <a mat-button routerLink="about" ariaCurrentWhenActive="page" routerLinkActive="active" 
                [routerLinkActiveOptions]="{ exact: true }" 
                (click)="scrollToTop()" class="cta-link">
               Click here for more information

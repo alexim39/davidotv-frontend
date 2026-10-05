@@ -48,34 +48,34 @@ import { MatDialog } from '@angular/material/dialog';
           (keydown.escape)="sidenavOpen = false">
 
           <mat-nav-list>
-            <a mat-list-item routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>home</mat-icon>
               <span>Home</span>
             </a>
-            <a mat-list-item routerLink="/media/trending" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/media/trending" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>play_circle</mat-icon>
               <span>Watch</span>
             </a>
-            <a mat-list-item routerLink="/talent" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/talent" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>auto_awesome</mat-icon>
               <span>Talent</span>
             </a>
-            <a mat-list-item routerLink="/forum" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/forum" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>forum</mat-icon>
               <span>Community</span>
             </a>
-            <a mat-list-item routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/store" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>storefront</mat-icon>
               <span>Store</span>
             </a>
 
             <mat-divider></mat-divider>
 
-            <a mat-list-item routerLink="/library" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/library" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>video_library</mat-icon>
               <span>Library</span>
             </a>
-            <a mat-list-item routerLink="/history" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/history" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>history</mat-icon>
               <span>History</span>
             </a>
@@ -83,11 +83,11 @@ import { MatDialog } from '@angular/material/dialog';
             <mat-divider></mat-divider>
 
             <h3 matSubheader>FAN COMMUNITY</h3>
-            <a mat-list-item routerLink="/events" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
+            <a mat-list-item routerLink="/events" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeSidenavOnMobile()">
               <mat-icon>event</mat-icon>
               <span>Events</span>
             </a>
-            <a mat-list-item (click)="uploadContent(); closeSidenavOnMobile()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+            <a mat-list-item (click)="uploadContent(); closeSidenavOnMobile()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
               <mat-icon>computer_arrow_up</mat-icon>
               <span>Upload</span>
             </a>

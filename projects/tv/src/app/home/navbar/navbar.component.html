@@ -27,23 +27,23 @@
 
       <!-- Desktop Navigation -->
       <div class="nav-links">
-        <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <a mat-button routerLink="/" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
           <mat-icon>home</mat-icon>
           <span>Home</span>
         </a>
-        <a mat-button routerLink="/media/trending" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <a mat-button routerLink="/media/trending" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
           <mat-icon>play_circle</mat-icon>
           <span>Watch</span>
         </a>
-        <a mat-button routerLink="/talent" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <a mat-button routerLink="/talent" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
           <mat-icon>auto_awesome</mat-icon>
           <span>Talent</span>
         </a>
-        <a mat-button routerLink="/forum" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <a mat-button routerLink="/forum" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
           <mat-icon>forum</mat-icon>
           <span>Community</span>
         </a>
-        <a mat-button routerLink="/store" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <a mat-button routerLink="/store" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
           <mat-icon>shopping_bag</mat-icon>
           <span>Store</span>
         </a>
@@ -133,27 +133,27 @@
     <!-- Mobile Navigation -->
     <div class="mobile-nav-section">
       <h3 class="mobile-section-title">Menu</h3>
-      <a mat-button routerLink="/" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a mat-button routerLink="/" (click)="toggleMobileMenu()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon class="icon-container">home</mat-icon>
         <span>Home</span>
       </a>
-      <a mat-button routerLink="/media/trending" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a mat-button routerLink="/media/trending" (click)="toggleMobileMenu()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon class="icon-container">play_circle</mat-icon>
         <span>Watch</span>
       </a>
-       <a mat-button routerLink="/talent" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+       <a mat-button routerLink="/talent" (click)="toggleMobileMenu()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon class="icon-container">auto_awesome</mat-icon>
         <span>Talent</span>
       </a>
-      <a mat-button routerLink="/forum" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a mat-button routerLink="/forum" (click)="toggleMobileMenu()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon class="icon-container">forum</mat-icon>
         <span>Community</span>
       </a>
-      <a mat-button routerLink="/events" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a mat-button routerLink="/events" (click)="toggleMobileMenu()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon class="icon-container">event</mat-icon>
         <span>Events</span>
       </a>
-      <a mat-button routerLink="/store" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a mat-button routerLink="/store" (click)="toggleMobileMenu()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon class="icon-container">shopping_bag</mat-icon>
         <span>Store</span>
       </a>
@@ -162,15 +162,15 @@
     <!-- Account Section -->
     <div *ngIf="isAuthenticated" class="mobile-nav-section">
       <h3 class="mobile-section-title">Account</h3>
-      <a mat-button routerLink="/profile" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a mat-button routerLink="/profile" (click)="toggleMobileMenu()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon>account_circle</mat-icon>
         <span>Your Channel</span>
       </a>
-      <a mat-button routerLink="/library" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a mat-button routerLink="/library" (click)="toggleMobileMenu()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon>video_library</mat-icon>
         <span>Library</span>
       </a>
-      <a mat-button routerLink="/history" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a mat-button routerLink="/history" (click)="toggleMobileMenu()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon>history</mat-icon>
         <span>History</span>
       </a>
@@ -178,19 +178,19 @@
         <mat-icon>computer_arrow_up</mat-icon>
         <span>Upload</span>
       </button>
-     <!--  <a mat-button routerLink="/history" (click)="toggleMobileMenu(); uploadContent()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+     <!--  <a mat-button routerLink="/history" (click)="toggleMobileMenu(); uploadContent()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon>chat</mat-icon>
         <span>Chat rooms</span>
       </a> -->
-      <a mat-button routerLink="/settings" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a mat-button routerLink="/settings" (click)="toggleMobileMenu()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon>settings</mat-icon>
         <span>Settings</span>
       </a>
-      <a mat-button routerLink="/payment" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a mat-button routerLink="/payment" (click)="toggleMobileMenu()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon>payments</mat-icon>
         <span>Payment</span>
       </a>
-      <a mat-button routerLink="/store/orders" (click)="toggleMobileMenu()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <a mat-button routerLink="/store/orders" (click)="toggleMobileMenu()" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <mat-icon>receipt_long</mat-icon>
         <span>My Orders</span>
       </a>

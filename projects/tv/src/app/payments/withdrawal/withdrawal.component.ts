@@ -98,7 +98,7 @@ interface AccountResolutionResponse {
   <div class="withdrawal-container">
     <div class="withdrawal-header">
       <div class="breadcrumb">
-        <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="scrollToTop()">
+        <a routerLink="/dashboard" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="scrollToTop()">
           <mat-icon>home</mat-icon> Dashboard
         </a>
         <mat-icon>chevron_right</mat-icon>
@@ -315,7 +315,7 @@ interface AccountResolutionResponse {
     <button mat-menu-item (click)="openSavedAccount()">
       <mat-icon>list_alt</mat-icon> View Saved Accounts
     </button>
-    <a mat-menu-item routerLink="../transactions" routerLinkActive="active" (click)="scrollToTop()">
+    <a mat-menu-item routerLink="../transactions" ariaCurrentWhenActive="page" routerLinkActive="active" (click)="scrollToTop()">
       <mat-icon>receipt_long</mat-icon> Transaction History
     </a> 
   </mat-menu>

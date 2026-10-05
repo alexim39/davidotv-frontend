@@ -13,8 +13,8 @@
   
 <section class="breadcrumb-wrapper">
   <div class="breadcrumb">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="scrollToTop()">Home</a> &gt;
-      <a routerLink="/contacts" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="scrollToTop()">Support</a> &gt;
+      <a routerLink="/" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="scrollToTop()">Home</a> &gt;
+      <a routerLink="/contacts" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="scrollToTop()">Support</a> &gt;
       <span>contacts</span>
   </div>
 </section>
@@ -166,5 +166,5 @@
 
 <!-- <div class="cta-btn">
   <h3>Wish to speak to somone?</h3>
-  <a mat-flat-button routerLink="/booking" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="scrollToTop()">Book One-On-One Session</a>
+  <a mat-flat-button routerLink="/booking" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="scrollToTop()">Book One-On-One Session</a>
 </div> -->

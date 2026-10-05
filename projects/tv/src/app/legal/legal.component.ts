@@ -14,19 +14,19 @@ import { RouterModule } from '@angular/router';
       <div class="legal-menu">
         <mat-list>
             <mat-list-item> 
-                <a [routerLink]="['/']" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Back to Web App</a>
+                <a [routerLink]="['/']" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Back to Web App</a>
             </mat-list-item>
             <mat-divider></mat-divider>
             <mat-list-item> 
-                <a [routerLink]="['terms']" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Terms of Service</a>
+                <a [routerLink]="['terms']" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Terms of Service</a>
             </mat-list-item>
             <mat-divider></mat-divider>
             <mat-list-item> 
-                <a [routerLink]="['privacy']" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Privacy Policy</a>
+                <a [routerLink]="['privacy']" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Privacy Policy</a>
             </mat-list-item>
             <mat-divider></mat-divider>
             <mat-list-item>
-                <a [routerLink]="['cookies']" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Cookies Policy</a>
+                <a [routerLink]="['cookies']" ariaCurrentWhenActive="page" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Cookies Policy</a>
             </mat-list-item>
             <mat-divider></mat-divider>
         </mat-list>
