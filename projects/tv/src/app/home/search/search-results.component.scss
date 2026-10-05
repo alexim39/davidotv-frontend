@@ -110,6 +110,22 @@
       max-width: 400px;
     }
 
+    .recent {
+      display: grid;
+      gap: 8px;
+      max-width: 560px;
+    }
+
+    .recent-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--dt-text-3);
+    }
+
     button {
       margin-top: 8px;
       display: flex;

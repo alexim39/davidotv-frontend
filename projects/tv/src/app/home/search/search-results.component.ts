@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, HostListener, OnDestroy, OnInit, ChangeDetectorRef } from "@angular/core";
+import { Component, HostListener, OnDestroy, OnInit, ChangeDetectorRef, signal } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
@@ -133,6 +133,22 @@ import { ErrorStateComponent } from "../../shared/components/error-state/error-s
           <mat-icon class="search-icon" aria-hidden="false" aria-label="Search DavidoTV">search</mat-icon>
           <h3>Search DavidoTV Videos</h3>
           <p>Find official music videos, fan content, interviews and more</p>
+          @if (recentSearches().length > 0) {
+            <div class="recent">
+              <div class="recent-head">
+                <span>Recent searches</span>
+                <button mat-button (click)="clearRecents()">Clear</button>
+              </div>
+              <mat-chip-listbox aria-label="Recent searches">
+                @for (term of recentSearches(); track term) {
+                  <mat-chip-option (click)="searchRecent(term)">
+                    <mat-icon matChipAvatar>history</mat-icon>
+                    {{ term }}
+                  </mat-chip-option>
+                }
+              </mat-chip-listbox>
+            </div>
+          }
         </div>
       }
 
@@ -240,6 +256,9 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   totalResults = 0;
   activeTab: 'videos' | 'products' = 'videos';
   videosError: string | null = null;
+  recentSearches = signal<string[]>([]);
+  private static readonly RECENT_KEY = 'dtv-recent-searches';
+  private static readonly RECENT_MAX = 6;
   products: ProductInterface[] = [];
   productsLoading = false;
   productsError: string | null = null;
@@ -258,6 +277,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.recentSearches.set(this.readRecents());
     // Single param stream: the previous debounced duplicate fired a second
     // request per keystroke and responses could land out of order (stale
     // results overwriting fresh ones).
@@ -265,9 +285,47 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
       if (params['q']) {
         this.searchQuery = params['q'];
         this.currentSearchTerm = params['q'];
+        this.recordRecent(params['q']);
         this.searchVideos();
       }
     });
+  }
+
+  searchRecent(term: string): void {
+    this.searchQuery = term;
+    this.onSearch();
+  }
+
+  clearRecents(): void {
+    try {
+      localStorage.removeItem(SearchResultsComponent.RECENT_KEY);
+    } catch {
+      // private mode: nothing persisted anyway
+    }
+    this.recentSearches.set([]);
+  }
+
+  private recordRecent(term: string): void {
+    const q = (term || '').trim();
+    if (!q) return;
+    const next = [q, ...this.recentSearches().filter((t) => t.toLowerCase() !== q.toLowerCase())]
+      .slice(0, SearchResultsComponent.RECENT_MAX);
+    this.recentSearches.set(next);
+    try {
+      localStorage.setItem(SearchResultsComponent.RECENT_KEY, JSON.stringify(next));
+    } catch {
+      // private mode: keep in-memory only
+    }
+  }
+
+  private readRecents(): string[] {
+    try {
+      const raw = localStorage.getItem(SearchResultsComponent.RECENT_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter((t) => typeof t === 'string').slice(0, SearchResultsComponent.RECENT_MAX) : [];
+    } catch {
+      return [];
+    }
   }
 
   ngOnDestroy() {
