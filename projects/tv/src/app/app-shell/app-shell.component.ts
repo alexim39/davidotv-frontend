@@ -9,7 +9,8 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { NavbarComponent } from '../home/navbar/navbar.component';
 import { FooterComponent } from '../home/footer/footer.component';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { UserInterface, UserService } from '../common/services/user.service';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -246,6 +247,19 @@ export class AppShellComponent implements OnInit, OnDestroy {
   constructor(private breakpointObserver: BreakpointObserver) {}
 
   ngOnInit() {
+    // Route-change focus (pairs with the skip link): keyboard + screen-reader
+    // users land on content, not the top chrome. Query-only changes (search
+    // typing, pagination) keep focus where it is.
+    let lastPath = '';
+    this.subscriptions.push(
+      this.router.events.pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd)).subscribe((e) => {
+        const path = e.urlAfterRedirects.split(/[?#]/)[0];
+        if (path !== lastPath) {
+          lastPath = path;
+          document.getElementById('main-content')?.focus({ preventScroll: false });
+        }
+      })
+    );
     this.isMobile$ = this.breakpointObserver.observe([
       Breakpoints.Handset,
       Breakpoints.TabletPortrait,

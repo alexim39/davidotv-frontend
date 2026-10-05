@@ -189,7 +189,8 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   // (This was the "player restarts on like" bug.)
   embedSrc = signal<SafeResourceUrl | null>(null);
   private readonly currentId = signal('');
-  private ytPlayer: { destroy?: () => void } | null = null;
+  private ytPlayer: { destroy?: () => void; playVideo?: () => void; pauseVideo?: () => void; getPlayerState?: () => number; mute?: () => void; unMute?: () => void; isMuted?: () => boolean } | null = null;
+  private readonly onKeyDown = (e: KeyboardEvent) => this.handleKey(e);
 
   @Input() videoId?: string;
   @ViewChild('ytFrame') private frame?: ElementRef<HTMLIFrameElement>;
@@ -210,6 +211,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
       const id = this.videoId ?? params.get('id') ?? '';
       if (id) this.loadVideo(id);
     });
+    window.addEventListener('keydown', this.onKeyDown);
     // Rail pages are 1-based (page 0 returns empty and starves prev/next).
     this.media.getTrending(12, 1).subscribe({
       next: (res) => {
@@ -314,6 +316,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    window.removeEventListener('keydown', this.onKeyDown);
     try {
       this.ytPlayer?.destroy?.();
     } catch {
@@ -321,6 +324,58 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     }
     this.ytPlayer = null;
     this.sub?.unsubscribe();
+  }
+
+  /**
+   * Keyboard shortcuts (desktop power users). Never hijack typing or native
+   * control activation: inputs and buttons/links keep their default keys.
+   * Cross-origin iframe focus swallows keys natively — accepted limitation.
+   */
+  private handleKey(e: KeyboardEvent): void {
+    const t = e.target as HTMLElement | null;
+    if (!t || t.closest('input, textarea, select, [contenteditable="true"], button, a')) return;
+    const k = e.key.toLowerCase();
+    if (k === 'k' || k === ' ') {
+      e.preventDefault();
+      this.togglePlay();
+    } else if (k === 'm') {
+      this.toggleMute();
+    } else if (k === 'f') {
+      this.goFullscreen();
+    }
+  }
+
+  private togglePlay(): void {
+    try {
+      if (this.ytPlayer?.getPlayerState?.() === 1) this.ytPlayer?.pauseVideo?.();
+      else this.ytPlayer?.playVideo?.();
+    } catch {
+      // player not ready yet
+    }
+  }
+
+  private toggleMute(): void {
+    try {
+      if (this.ytPlayer?.isMuted?.()) this.ytPlayer?.unMute?.();
+      else this.ytPlayer?.mute?.();
+    } catch {
+      // player not ready yet
+    }
+  }
+
+  private goFullscreen(): void {
+    const stage = this.frame?.nativeElement?.closest('.stage') as HTMLElement | null;
+    const el = (stage ?? this.frame?.nativeElement) as (HTMLElement & { webkitRequestFullscreen?: () => void }) | undefined;
+    try {
+      if (document.fullscreenElement) {
+        void document.exitFullscreen();
+      } else if (el) {
+        if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        else void el.requestFullscreen();
+      }
+    } catch {
+      // fullscreen unavailable
+    }
   }
 
   private loadVideo(id: string): void {
