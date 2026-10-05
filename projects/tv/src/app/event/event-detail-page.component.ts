@@ -105,6 +105,9 @@ import { ErrorStateComponent } from '../shared/components/error-state/error-stat
             <button mat-stroked-button class="share-cta" (click)="shareEvent()" aria-label="Share event">
               <mat-icon>share</mat-icon><span>Share</span>
             </button>
+            <button mat-stroked-button class="share-cta" (click)="addToCalendar()" aria-label="Add event to calendar">
+              <mat-icon>event</mat-icon><span>Calendar</span>
+            </button>
           </div>
         </div>
       </article>
@@ -238,6 +241,38 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
       navigator.clipboard.writeText(url);
       this.snackBar.open('Event link copied to clipboard.', 'Close', { duration: 2000 });
     }
+  }
+
+  /** Client-side .ics download (no backend): opens the native calendar import. */
+  addToCalendar(): void {
+    if (!this.event) return;
+    const start = new Date(this.event.date);
+    if (isNaN(start.getTime())) {
+      this.snackBar.open('Event date is not set yet.', 'Close', { duration: 2000 });
+      return;
+    }
+    const end = new Date(start.getTime() + 3 * 3600000);
+    const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+    const ics = [
+      'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//DavidoTV//Events//EN', 'BEGIN:VEVENT',
+      `UID:${this.event._id}@davidotv`, `DTSTART:${fmt(start)}`, `DTEND:${fmt(end)}`,
+      `SUMMARY:${esc(this.event.title)}`,
+      `LOCATION:${esc(this.event.location || '')}`,
+      `DESCRIPTION:${esc(this.event.description || '')}`,
+      `URL:${window.location.href}`,
+      'END:VEVENT', 'END:VCALENDAR',
+    ].join('\r\n');
+    const blob = new Blob([ics], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${this.event.title.replace(/[^\w\- ]+/g, '').trim() || 'davidotv-event'}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    this.snackBar.open('Calendar file downloaded.', 'Close', { duration: 2000 });
   }
 
   getDateString(date: Date): string {
