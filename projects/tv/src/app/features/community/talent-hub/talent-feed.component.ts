@@ -11,6 +11,7 @@ import { AnalyticsService } from '../../../core/services/analytics.service';
 import { AuthStateService } from '../../../core/services/auth-state.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatChipsModule } from '@angular/material/chips';
 import { EnterChallengeDialogComponent } from '../../challenges/enter-dialog.component';
 import { CalledUpWallComponent } from './called-up-wall/called-up-wall.component';
 
@@ -21,7 +22,7 @@ import { CalledUpWallComponent } from './called-up-wall/called-up-wall.component
 @Component({
   selector: 'async-talent-feed',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, MatDialogModule, MatSnackBarModule, SkeletonLoaderComponent, ShortNumberPipe, IntersectionDirective, CalledUpWallComponent],
+  imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, MatDialogModule, MatSnackBarModule, MatChipsModule, SkeletonLoaderComponent, ShortNumberPipe, IntersectionDirective, CalledUpWallComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="feed obsidian-bg">
@@ -32,6 +33,12 @@ import { CalledUpWallComponent } from './called-up-wall/called-up-wall.component
         <a mat-stroked-button routerLink="/challenges" class="ghost"><mat-icon>emoji_events</mat-icon> Challenges</a>
         <a mat-stroked-button routerLink="curated" class="ghost">Curated (Admin)</a>
       </div>
+
+      <mat-chip-listbox class="genres" aria-label="Filter by genre">
+        @for (g of genres; track g) {
+          <mat-chip-option [selected]="genre() === g" (click)="setGenre(g)">{{ g }}</mat-chip-option>
+        }
+      </mat-chip-listbox>
 
       @if (loading() && items().length===0) { <async-skeleton-loader [count]="6"/> }
       @else {
@@ -71,6 +78,7 @@ import { CalledUpWallComponent } from './called-up-wall/called-up-wall.component
     .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:var(--dt-radius-pill); }
     .ghost{ border-color:rgba(255,255,255,0.18); color:#F8F7F8; border-radius:var(--dt-radius-pill); }
     .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+    .genres{ display:flex; gap:8px; overflow-x:auto; padding:2px 2px 4px; margin-bottom:16px; }
     .card{ overflow:hidden; border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(14px); }
     .cover{ height:160px; display:grid; place-items:center; position:relative; }
     .play-fab{ width:56px; height:56px; border-radius:50%; border:0; background:rgba(255,255,255,0.92); display:grid; place-items:center; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
@@ -93,17 +101,28 @@ export class TalentFeedComponent implements OnInit {
   loading = signal(true);
   loadingMore = signal(false);
   page = signal(1);
+  readonly genres = ['All', 'Afrobeats', 'Amapiano', 'Hip-Hop', 'R&B', 'Gospel', 'Highlife', 'Fuji'];
+  genre = signal('All');
   /** Signal so OnPush re-renders the heart state (a plain Set never surfaces). */
   likedSet = signal<Set<string>>(new Set());
 
   ngOnInit(): void { this.loadMore(); }
+
+  setGenre(g: string): void {
+    if (this.genre() === g) return;
+    this.genre.set(g);
+    this.items.set([]);
+    this.page.set(1);
+    this.loadMore();
+  }
 
   loadMore(): void {
     if (this.loadingMore()) return;
     const p = this.page();
     const isFirst = p === 1;
     if (isFirst) this.loading.set(true); else this.loadingMore.set(true);
-    this.talent.list({ page: p, limit: 9, sort: '-likeCount,-plays' }).subscribe({
+    const g = this.genre();
+    this.talent.list({ page: p, limit: 9, sort: '-likeCount,-plays', genre: g === 'All' ? undefined : g }).subscribe({
       next: (res:any)=> {
         const data: TalentUpload[] = res?.data ?? res ?? [];
         this.items.update(v=> [...v, ...data]);
