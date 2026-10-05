@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild, effect, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, Title } from '@angular/platform-browser';
 import { MediaService, YoutubeVideo } from '../media.service';
 import { AuthStateService } from '../../../core/services/auth-state.service';
 import { AnalyticsService } from '../../../core/services/analytics.service';
@@ -171,6 +171,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
   private readonly auth = inject(AuthStateService);
   private readonly analytics = inject(AnalyticsService);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly documentTitle = inject(Title);
   private readonly library = inject(VideoService);
   private sub: Subscription | null = null;
 
@@ -336,6 +337,7 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         const v = res?.data ?? res;
         this.video.set(v);
         this.likes.set(v?.appLikes ?? v?.likes ?? 0);
+        if (v?.title) this.documentTitle.setTitle(`${v.title} — DavidoTV`);
         this.refreshSavedState(v?.youtubeVideoId);
       },
       // Paywall: exclusive videos 403 with upgradeRequired for non-members.

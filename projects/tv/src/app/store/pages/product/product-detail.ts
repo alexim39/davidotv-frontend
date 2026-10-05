@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -721,6 +722,7 @@ export class ProductDetailComponent implements OnInit {
 
   subscriptions: Subscription[] = [];
   private userService = inject(UserService);
+  private documentTitle = inject(Title);
   user: UserInterface | null = null;
   isSubmitting = false;
 
@@ -765,6 +767,7 @@ export class ProductDetailComponent implements OnInit {
     ).subscribe(product => {
       this.product = product;
       if (product) {
+        if (product.name) this.documentTitle.setTitle(`${product.name} — DavidoTV`);
         if (product.variants && product.variants.length > 0) {
           this.selectedVariant = product.variants[0];
         }

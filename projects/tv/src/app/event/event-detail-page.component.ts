@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -154,6 +155,7 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly eventService = inject(EventService);
+  private readonly documentTitle = inject(Title);
   private readonly userService = inject(UserService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly subs: Subscription[] = [];
@@ -179,6 +181,7 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
         next: (response) => {
           const list: Event[] = response?.data || response || [];
           this.event = list.find((e) => e?._id === id || (e as unknown as { id: string })?.id === id) || null;
+          if (this.event?.title) this.documentTitle.setTitle(`${this.event.title} — DavidoTV`);
           this.loading = false;
         },
         error: (err) => {

@@ -33,6 +33,7 @@ import { MatDialog } from '@angular/material/dialog';
     RouterModule,
   ],
   template: `
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <async-navbar/>
 
     <div class="page-container">
@@ -92,7 +93,7 @@ import { MatDialog } from '@angular/material/dialog';
           </mat-nav-list>
         </mat-sidenav>
 
-        <mat-sidenav-content class="content">
+        <mat-sidenav-content class="content" id="main-content" tabindex="-1">
 
           <router-outlet/>
 
@@ -106,6 +107,14 @@ import { MatDialog } from '@angular/material/dialog';
     </div>
   `,
   styles: [`
+    /* Skip link: first tab stop, visible on focus (WCAG 2.4.1). */
+    .skip-link {
+      position: fixed; top: -48px; left: 12px; z-index: 200;
+      background: var(--dt-gradient); color: #fff; font-weight: 700; font-size: 13px;
+      padding: 10px 16px; border-radius: var(--dt-radius-pill); text-decoration: none;
+      transition: top 180ms;
+    }
+    .skip-link:focus-visible { top: 8px; }
     /* Main layout */
     .page-container {
       min-height: 100vh;
