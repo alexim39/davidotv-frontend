@@ -1,13 +1,21 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { Subscription } from 'rxjs';
+import { Subscription, catchError, forkJoin, map, of } from 'rxjs';
 import { OrdersService } from '../../services/orders.service';
+import { CartService } from '../cart/cart.service';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../../shared/components/error-state/error-state.component';
+
+export interface OrderLine {
+  productId: string | null;
+  quantity: number;
+  price: number;
+}
 
 export interface OrderView {
   id: string;
@@ -17,6 +25,7 @@ export interface OrderView {
   total: number;
   itemCount: number;
   itemNames: string[];
+  lines: OrderLine[];
 }
 
 /**
@@ -32,6 +41,7 @@ export interface OrderView {
     RouterModule,
     MatButtonModule,
     MatIconModule,
+    MatSnackBarModule,
     SkeletonLoaderComponent,
     EmptyStateComponent,
     ErrorStateComponent,
@@ -80,6 +90,11 @@ export interface OrderView {
             <span class="items">{{ o.itemCount }} item{{ o.itemCount === 1 ? '' : 's' }}</span>
             <span class="total">₦{{ o.total | number:'1.2-2' }}</span>
           </div>
+          @if (reorderable(o)) {
+            <button mat-stroked-button class="reorder-btn" (click)="buyAgain(o)" [disabled]="reordering()">
+              <mat-icon>replay</mat-icon><span>{{ reordering() ? 'Adding…' : 'Buy again' }}</span>
+            </button>
+          }
         </article>
       </div>
     </div>
@@ -119,6 +134,7 @@ export interface OrderView {
     .order-foot { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--dt-line); padding-top: var(--dt-space-3); }
     .items { font: var(--dt-caption); letter-spacing: var(--dt-letter-caption); color: var(--dt-text-3); }
     .total { font: var(--dt-title-sm); color: var(--dt-accent-3); }
+    .reorder-btn { justify-self: start; min-height: var(--dt-target); border-radius: var(--dt-radius-pill); color: var(--dt-text-1); border-color: var(--dt-line-strong); }
   `]
 })
 export class OrdersHistoryComponent implements OnInit, OnDestroy {
@@ -128,9 +144,12 @@ export class OrdersHistoryComponent implements OnInit, OnDestroy {
   freshOrder: string | null = null;
 
   private readonly ordersService = inject(OrdersService);
+  private readonly cartService = inject(CartService);
+  private readonly snackBar = inject(MatSnackBar);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly subs: Subscription[] = [];
+  reordering = signal(false);
 
   ngOnInit(): void {
     this.freshOrder = this.route.snapshot.queryParamMap.get('fresh');
@@ -196,6 +215,42 @@ export class OrdersHistoryComponent implements OnInit, OnDestroy {
       total,
       itemCount: count,
       itemNames: names,
+      lines: items.map((i: any) => ({
+        productId: i?.product?._id ?? i?.product?.id ?? i?.productId ?? i?.id ?? null,
+        quantity: Number(i?.quantity) || 1,
+        price: Number(i?.priceAtAddition ?? i?.price ?? 0) || 0,
+      })),
     };
+  }
+
+  /** Only orders whose lines still reference products can be reordered. */
+  reorderable(o: OrderView): boolean {
+    return o.lines.some((l) => !!l.productId);
+  }
+
+  buyAgain(o: OrderView): void {
+    const lines = o.lines.filter((l) => !!l.productId);
+    if (lines.length === 0 || this.reordering()) return;
+    this.reordering.set(true);
+    this.subs.push(
+      forkJoin(lines.map((l) =>
+        this.cartService.addToCart({
+          productId: l.productId as string,
+          quantity: l.quantity,
+          priceAtAddition: l.price,
+        }).pipe(
+          map(() => true),
+          catchError(() => of(false))
+        )
+      )).subscribe((results) => {
+        this.reordering.set(false);
+        const ok = results.filter(Boolean).length;
+        const failed = results.length - ok;
+        this.snackBar.open(
+          failed > 0 ? `Re-added ${ok} items (${failed} unavailable)` : `Re-added ${ok} item${ok === 1 ? '' : 's'} to cart`,
+          'View cart', { duration: 4000 }
+        ).onAction().subscribe(() => this.router.navigate(['/store/cart']));
+      })
+    );
   }
 }
