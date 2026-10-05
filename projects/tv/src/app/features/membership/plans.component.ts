@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MembershipService, MembershipPlan } from './membership.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../common/component/confirmationDialog.component';
 import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader/skeleton-loader.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../shared/components/error-state/error-state.component';
@@ -36,6 +38,21 @@ import { ErrorStateComponent } from '../../shared/components/error-state/error-s
           (actionClicked)="goHome()" />
       }
       @else {
+        @if (activeTier(); as t) {
+          <div class="current-plan" role="status">
+            <mat-icon>verified</mat-icon>
+            <div>
+              <strong>You're on {{ t }}</strong>
+              @if (periodEnd(); as end) {
+                <span> — benefits run to {{ end | date:'mediumDate' }}</span>
+              }
+            </div>
+            <button mat-stroked-button class="cancel-btn" (click)="cancel()"
+                    [disabled]="cancelling()">
+              {{ cancelling() ? 'Cancelling…' : 'Cancel plan' }}
+            </button>
+          </div>
+        }
         <div class="grid">
           @for (p of plans(); track p.id) {
             <div class="plan-card glass-surface" [class.free]="p.id==='free'">
@@ -76,15 +93,26 @@ import { ErrorStateComponent } from '../../shared/components/error-state/error-s
     .benefits li{ display:flex; gap:8px; align-items:flex-start; color:#F8F7F8; font-size:13px; }
     .benefits mat-icon{ font-size:16px; width:16px; height:16px; color:#4ADE80; flex-shrink:0; margin-top:1px; }
     .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:var(--dt-radius-pill); }
+    .current-plan{
+      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+      padding:16px 18px; margin-bottom:16px;
+      border-radius:var(--dt-radius-card); background:rgba(74,222,128,0.08);
+      border:1px solid rgba(74,222,128,0.28); color:var(--dt-text-1); font-size:14px;
+    }
+    .current-plan > mat-icon{ color:var(--dt-success); }
+    .current-plan span{ color:var(--dt-text-2); }
+    .cancel-btn{ margin-left:auto; min-height:var(--dt-target); border-radius:var(--dt-radius-pill); color:var(--dt-danger); border-color:rgba(248,113,113,0.4); }
     .err{ color:#FB7185; font-size:12px; margin:0; }
   `]
 })
 export class MembershipPlansComponent implements OnInit {
   private readonly membership = inject(MembershipService);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
   plans = this.membership.plans;
   loading = this.membership.loading;
   busy = signal(false);
+  cancelling = signal(false);
   error = signal<string | null>(null);
   loadError = signal<string | null>(null);
 
@@ -99,6 +127,43 @@ export class MembershipPlansComponent implements OnInit {
         this.loading.set(false);
         this.loadError.set(e?.message ?? 'We could not load plans. Check your connection and try again.');
       }
+    });
+    this.membership.fetchStatus().subscribe({ error: () => {} });
+  }
+
+  /** Paid tier name, or null for free/unknown (no cancel offered then). */
+  activeTier(): string | null {
+    const s = this.membership.status();
+    return s && s.tier && s.tier !== 'free' && s.status === 'active' ? s.tier : null;
+  }
+
+  periodEnd(): string | undefined {
+    return this.membership.status()?.currentPeriodEnd;
+  }
+
+  cancel(): void {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Cancel plan',
+        message: 'Benefits run to the end of your period. You can rejoin anytime.',
+        confirmText: 'Cancel plan',
+        cancelText: 'Keep benefits'
+      }
+    });
+    ref.afterClosed().subscribe((ok) => {
+      if (!ok) return;
+      this.cancelling.set(true);
+      this.error.set(null);
+      this.membership.cancel().subscribe({
+        next: () => {
+          this.cancelling.set(false);
+          this.reload();
+        },
+        error: (e) => {
+          this.cancelling.set(false);
+          this.error.set(e?.message ?? 'Could not cancel. Please try again.');
+        }
+      });
     });
   }
 
