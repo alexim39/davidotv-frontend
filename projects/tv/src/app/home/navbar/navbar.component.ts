@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -39,6 +39,9 @@ import { AuthStateService } from '../../core/services/auth-state.service';
   styleUrls: ['./navbar.desktop.component.scss', './navbar.mobile.component.scss']
 })
 export class NavbarComponent implements OnDestroy, OnInit {
+  @ViewChild('desktopSearch') private desktopSearch?: ElementRef<HTMLInputElement>;
+  @ViewChild('mobileSearch') private mobileSearch?: ElementRef<HTMLInputElement>;
+  private readonly onGlobalKey = (e: KeyboardEvent) => this.handleGlobalKey(e);
   mobileMenuOpen = false;
   searchQuery = '';
   isAuthenticated = false;
@@ -86,6 +89,7 @@ export class NavbarComponent implements OnDestroy, OnInit {
       this.isDarkTheme = true;
       document.body.classList.add('dark-theme');
     }
+    window.addEventListener('keydown', this.onGlobalKey);
   }
 
   toggleTheme() {
@@ -148,7 +152,31 @@ export class NavbarComponent implements OnDestroy, OnInit {
   }
 
   ngOnDestroy(): void {
+    window.removeEventListener('keydown', this.onGlobalKey);
     this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  /**
+   * Global `/` focuses search (power users), Escape releases it.
+   * Never hijacks typing, native control keys, or open dialogs/menus.
+   */
+  private handleGlobalKey(e: KeyboardEvent): void {
+    const t = e.target as HTMLElement | null;
+    const typing = !!t?.closest('input, textarea, select, [contenteditable="true"]');
+    if (e.key === 'Escape' && typing && t?.closest('.search-bar')) {
+      (t as HTMLInputElement).blur();
+      return;
+    }
+    if (e.key !== '/' || typing || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (document.querySelector('.cdk-overlay-pane')) return;
+    e.preventDefault();
+    const desktop = this.desktopSearch?.nativeElement;
+    if (desktop && desktop.offsetParent !== null) {
+      desktop.focus();
+      return;
+    }
+    if (!this.mobileMenuOpen) this.toggleMobileMenu();
+    setTimeout(() => this.mobileSearch?.nativeElement?.focus(), 50);
   }
 
   uploadContent(): void {
