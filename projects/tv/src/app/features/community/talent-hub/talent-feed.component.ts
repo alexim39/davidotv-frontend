@@ -43,6 +43,12 @@ import { CalledUpWallComponent } from './called-up-wall/called-up-wall.component
         }
       </mat-chip-listbox>
 
+      <mat-chip-listbox class="sorts" aria-label="Sort uploads">
+        @for (s of sorts; track s.value) {
+          <mat-chip-option [selected]="sort() === s.value" (click)="setSort(s.value)">{{ s.label }}</mat-chip-option>
+        }
+      </mat-chip-listbox>
+
       @if (loading() && items().length===0) { <async-skeleton-loader [count]="6"/> }
       @else {
         <async-called-up-wall />
@@ -107,7 +113,8 @@ import { CalledUpWallComponent } from './called-up-wall/called-up-wall.component
     .rose-btn{ background:linear-gradient(135deg,#BE123C,#E11D48 50%,#FB7185); color:white; border-radius:var(--dt-radius-pill); }
     .ghost{ border-color:rgba(255,255,255,0.18); color:#F8F7F8; border-radius:var(--dt-radius-pill); }
     .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
-    .genres{ display:flex; gap:8px; overflow-x:auto; padding:2px 2px 4px; margin-bottom:16px; }
+    .genres{ display:flex; gap:8px; overflow-x:auto; padding:2px 2px 4px; margin-bottom:8px; }
+    .sorts{ display:flex; gap:8px; overflow-x:auto; padding:2px 2px 4px; margin-bottom:16px; }
     .card{ overflow:hidden; border-radius:var(--dt-radius-sheet); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(14px); }
     .cover{ height:160px; display:grid; place-items:center; position:relative; }
     .play-fab{ width:56px; height:56px; border-radius:50%; border:0; background:rgba(255,255,255,0.92); display:grid; place-items:center; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
@@ -139,6 +146,19 @@ export class TalentFeedComponent implements OnInit {
   page = signal(1);
   readonly genres = ['All', 'Afrobeats', 'Amapiano', 'Hip-Hop', 'R&B', 'Gospel', 'Highlife', 'Fuji'];
   genre = signal('All');
+  readonly sorts = [
+    { label: 'Top', value: '-likeCount,-plays' },
+    { label: 'Newest', value: '-createdAt' },
+  ];
+  sort = signal('-likeCount,-plays');
+
+  setSort(v: string): void {
+    if (this.sort() === v) return;
+    this.sort.set(v);
+    this.items.set([]);
+    this.page.set(1);
+    this.loadMore();
+  }
   commentsOpen = signal<string | null>(null);
   commentDraft = '';
   postingComment = signal(false);
@@ -161,7 +181,7 @@ export class TalentFeedComponent implements OnInit {
     const isFirst = p === 1;
     if (isFirst) this.loading.set(true); else this.loadingMore.set(true);
     const g = this.genre();
-    this.talent.list({ page: p, limit: 9, sort: '-likeCount,-plays', genre: g === 'All' ? undefined : g }).subscribe({
+    this.talent.list({ page: p, limit: 9, sort: this.sort(), genre: g === 'All' ? undefined : g }).subscribe({
       next: (res:any)=> {
         const data: TalentUpload[] = res?.data ?? res ?? [];
         this.items.update(v=> [...v, ...data]);
