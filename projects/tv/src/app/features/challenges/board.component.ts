@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -44,6 +44,11 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
               <p class="dates">
                 <mat-icon>event</mat-icon> {{c.startsAt | date:'mediumDate'}} → {{c.endsAt | date:'mediumDate'}}
               </p>
+              @if (urgency(c); as u) {
+                <p class="urgency" [class.hot]="u.hot">
+                  <mat-icon>timer</mat-icon> {{ u.label }}
+                </p>
+              }
               <div class="foot">
                 <span class="entries"><mat-icon>people</mat-icon> {{c.entries.length}} entries</span>
                 @if (c.winnerUpload) {
@@ -76,6 +81,9 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
     .desc{ margin:0; color:#A1A1AA; font-size:13px; }
     .dates{ margin:0; color:#71717A; font-size:12px; display:flex; gap:6px; align-items:center; }
     .dates mat-icon{ font-size:16px; width:16px; height:16px; }
+    .urgency{ margin:0; color:var(--dt-text-2); font-size:12px; font-weight:600; display:flex; gap:6px; align-items:center; }
+    .urgency mat-icon{ font-size:16px; width:16px; height:16px; }
+    .urgency.hot{ color:var(--dt-warn); }
     .foot{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
     .entries{ color:#A1A1AA; font-size:12px; display:flex; gap:6px; align-items:center; }
     .entries mat-icon{ font-size:16px; width:16px; height:16px; }
@@ -85,15 +93,34 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
     .empty{ color:#71717A; text-align:center; padding:24px; }
   `]
 })
-export class ChallengeBoardComponent implements OnInit {
+export class ChallengeBoardComponent implements OnInit, OnDestroy {
   private readonly challenges = inject(ChallengeService);
   items = this.challenges.challenges;
   loading = this.challenges.loading;
   filter = signal<string>('active');
   readonly filters = ['active', 'judging', 'closed'];
+  /** Minute tick so countdown labels stay fresh (single timer, cleaned up). */
+  private readonly now = signal(Date.now());
+  private timer: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit(): void {
     this.challenges.list(this.filter()).subscribe();
+    this.timer = setInterval(() => this.now.set(Date.now()), 60000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.timer) clearInterval(this.timer);
+  }
+
+  /** Urgency label for active challenges; null otherwise. */
+  urgency(c: { status: string; endsAt: string }): { label: string; hot: boolean } | null {
+    if (c.status !== 'active' || !c.endsAt) return null;
+    const ms = new Date(c.endsAt).getTime() - this.now();
+    if (!isFinite(ms) || ms <= 0) return { label: 'Ending soon', hot: true };
+    const h = Math.floor(ms / 3600000);
+    if (h < 1) return { label: `Ends in ${Math.max(1, Math.floor(ms / 60000))}m`, hot: true };
+    if (h < 24) return { label: `Ends in ${h}h`, hot: true };
+    return { label: `Ends in ${Math.floor(h / 24)}d ${h % 24}h`, hot: false };
   }
 
   setFilter(s: string): void {
