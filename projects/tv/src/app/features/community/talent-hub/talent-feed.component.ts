@@ -1,8 +1,11 @@
 import { Component, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { TalentService, TalentUpload } from './talent.service';
 import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loader/skeleton-loader.component';
 import { ShortNumberPipe } from '../../../shared/pipes/short-number.pipe';
@@ -22,7 +25,7 @@ import { CalledUpWallComponent } from './called-up-wall/called-up-wall.component
 @Component({
   selector: 'async-talent-feed',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, MatDialogModule, MatSnackBarModule, MatChipsModule, SkeletonLoaderComponent, ShortNumberPipe, IntersectionDirective, CalledUpWallComponent],
+  imports: [CommonModule, RouterModule, FormsModule, MatButtonModule, MatIconModule, MatInputModule, MatFormFieldModule, MatDialogModule, MatSnackBarModule, MatChipsModule, SkeletonLoaderComponent, ShortNumberPipe, IntersectionDirective, CalledUpWallComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="feed obsidian-bg">
@@ -55,12 +58,38 @@ import { CalledUpWallComponent } from './called-up-wall/called-up-wall.component
                 <audio controls [src]="t.fileUrl" preload="metadata" (play)="play(t)"></audio>
                 <div class="eng">
                   <button mat-stroked-button (click)="like(t)"><mat-icon [style.color]="likedSet().has(t._id) ? '#FB7185':''">favorite</mat-icon> {{t.likeCount | shortNumber}}</button>
+                  <button mat-stroked-button (click)="toggleComments(t._id)" [attr.aria-expanded="commentsOpen() === t._id">
+                    <mat-icon>comment</mat-icon> {{ commentCount(t) | shortNumber }}
+                  </button>
                   <button mat-stroked-button (click)="share(t)"><mat-icon>share</mat-icon> {{t.shareCount | shortNumber}}</button>
                   @if (isMine(t)) {
                     <button mat-stroked-button (click)="enterChallenge(t)"><mat-icon>emoji_events</mat-icon> Enter</button>
                   }
                   <span class="plays"><mat-icon>headphones</mat-icon> {{t.plays | shortNumber}} plays</span>
                 </div>
+                @if (commentsOpen() === t._id) {
+                  <div class="thread">
+                    @for (c of commentsOf(t); track $index) {
+                      <div class="tcomment">
+                        <span class="cauthor">{{ c.author }}</span>
+                        <span class="ctext">{{ c.text }}</span>
+                      </div>
+                    } @empty {
+                      <p class="tempty">No comments yet — say what this sound does to you.</p>
+                    }
+                    <div class="composer">
+                      <mat-form-field appearance="outline" class="composer-field">
+                        <mat-label>{{ authed() ? 'Support with words' : 'Sign in to comment' }}</mat-label>
+                        <input matInput [(ngModel)]="commentDraft" maxlength="500"
+                               [disabled]="!authed()" (keyup.enter)="sendComment(t)" aria-label="Comment text" />
+                      </mat-form-field>
+                      <button mat-flat-button class="rose-btn" (click)="sendComment(t)"
+                              [disabled]="!authed() || !commentDraft.trim() || postingComment()">
+                        {{ postingComment() ? 'Posting…' : 'Post' }}
+                      </button>
+                    </div>
+                  </div>
+                }
               </div>
             </div>
           }
@@ -88,6 +117,13 @@ import { CalledUpWallComponent } from './called-up-wall/called-up-wall.component
     audio{ width:100%; }
     .eng{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
     .plays{ margin-left:auto; color:#71717A; font-size:12px; display:flex; gap:6px; align-items:center; }
+    .thread{ display:grid; gap:8px; padding:12px 14px 14px; border-top:1px solid var(--dt-line); }
+    .tcomment{ display:flex; gap:8px; align-items:baseline; font-size:13px; }
+    .cauthor{ color:var(--dt-accent-3); font-weight:700; flex-shrink:0; }
+    .ctext{ color:var(--dt-text-2); margin:0; }
+    .tempty{ margin:0; font-size:12px; color:var(--dt-text-3); }
+    .composer{ display:flex; gap:8px; align-items:flex-start; }
+    .composer-field{ flex:1; }
     .sentinel{ height:1px; }
   `]
 })
@@ -103,6 +139,9 @@ export class TalentFeedComponent implements OnInit {
   page = signal(1);
   readonly genres = ['All', 'Afrobeats', 'Amapiano', 'Hip-Hop', 'R&B', 'Gospel', 'Highlife', 'Fuji'];
   genre = signal('All');
+  commentsOpen = signal<string | null>(null);
+  commentDraft = '';
+  postingComment = signal(false);
   /** Signal so OnPush re-renders the heart state (a plain Set never surfaces). */
   likedSet = signal<Set<string>>(new Set());
 
@@ -166,6 +205,53 @@ export class TalentFeedComponent implements OnInit {
   /** Immutable patch so OnPush re-renders counts (plain mutation never surfaces). */
   private patchItem(id: string, patch: Partial<TalentUpload>): void {
     this.items.update((list) => list.map((i) => (i._id === id ? { ...i, ...patch } : i)));
+  }
+  authed(): boolean {
+    return !!this.auth.user();
+  }
+  /** Embedded comments if the backend includes them, else session-posted ones. */
+  commentsOf(t: TalentUpload): { author: string; text: string }[] {
+    const embedded = (t as unknown as { comments?: unknown }).comments;
+    const base = Array.isArray(embedded) ? embedded : [];
+    return base.map((c: any) => ({
+      author: String(c?.author?.username ?? c?.author?.name ?? c?.author ?? 'Fan'),
+      text: String(c?.text ?? c?.content ?? c?.body ?? ''),
+    })).filter((c) => c.text);
+  }
+  commentCount(t: TalentUpload): number {
+    return this.commentsOf(t).length;
+  }
+  toggleComments(id: string): void {
+    this.commentDraft = '';
+    this.commentsOpen.update((open) => (open === id ? null : id));
+  }
+  sendComment(t: TalentUpload): void {
+    const text = this.commentDraft.trim();
+    if (!this.authed()) {
+      this.snack.open('Sign in to comment.', 'Dismiss', { duration: 3000 });
+      return;
+    }
+    if (!text || this.postingComment()) return;
+    this.postingComment.set(true);
+    this.talent.comment(t._id, text).subscribe({
+      next: (res: any) => {
+        const saved = res?.data ?? res;
+        const me = this.auth.user();
+        const author = (me as unknown as { username?: string } | null)?.username ?? 'You';
+        const echoed = {
+          author: String(saved?.author?.username ?? saved?.author ?? author),
+          text: String(saved?.text ?? saved?.content ?? text),
+        };
+        const current = (t as unknown as { comments?: unknown[] }).comments;
+        this.patchItem(t._id, { comments: [...(Array.isArray(current) ? current : []), echoed] } as Partial<TalentUpload>);
+        this.commentDraft = '';
+        this.postingComment.set(false);
+      },
+      error: (err) => {
+        this.postingComment.set(false);
+        this.snack.open(err?.message ?? 'Could not post comment.', 'Dismiss', { duration: 3000 });
+      },
+    });
   }
   /** Own uploads only — the backend enforces ownership too. */
   isMine(t: TalentUpload): boolean {
