@@ -1,4 +1,7 @@
 // chat.service.ts
+// MOCK TRANSPORT: in-memory rooms + generated messages, no socket or
+// persistence. Do not route new traffic here; finish transport or remove
+// (community strategy 01/08).
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { ChatRoom, Message, User } from './chat.model';

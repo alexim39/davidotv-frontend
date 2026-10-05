@@ -1,4 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild, HostListener } from '@angular/core';
+// MOCK DATA: demo track stats + comments, no backend. Do not route new
+// traffic here; wire transports first (community strategy 01/08).
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
@@ -1091,6 +1093,8 @@ export class AudioPlayerComponent implements OnInit {
   liked = false;
 
   // Comments
+  // MOCK DATA: hardcoded list, likes unshift locally. Wire to a real
+  // comments endpoint before routing new traffic here.
   comments = [
     { 
       user: 'SuperFan', 

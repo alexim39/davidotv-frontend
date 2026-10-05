@@ -1,4 +1,6 @@
 // social-feed.service.ts
+// MOCK TRANSPORT: hardcoded posts + delay, no backend. Do not route new
+// traffic here; rebuild on a real post API first (community strategy 01/08).
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
