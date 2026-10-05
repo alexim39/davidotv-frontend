@@ -16,6 +16,13 @@ import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../shared/components/error-state/error-state.component';
 
+export interface RecentProduct {
+  id: string;
+  name: string;
+  image: string;
+  price: number;
+}
+
 @Component({
   selector: 'app-shop-home',
   standalone: true,
@@ -143,12 +150,77 @@ import { ErrorStateComponent } from '../../shared/components/error-state/error-s
           (actionClicked)="retry()" />
         }
       </section>
+
+      <!-- Recently Viewed -->
+      @if (!isLoading && recentlyViewed.length > 0) {
+        <section class="section-container">
+          <mat-toolbar class="section-header">
+            <h2>Recently Viewed</h2>
+            <span class="spacer"></span>
+          </mat-toolbar>
+          <mat-divider></mat-divider>
+          <div class="recent-rail" role="list">
+            @for (p of recentlyViewed; track p.id) {
+              <a class="recent-card" role="listitem" [routerLink]="['/store/product', p.id]"
+                 [attr.aria-label]="'View ' + p.name">
+                <img [src]="p.image" [alt]="p.name" loading="lazy" />
+                <span class="recent-name">{{ p.name }}</span>
+                <span class="recent-price">₦{{ p.price | number:'1.2-2' }}</span>
+              </a>
+            }
+          </div>
+        </section>
+      }
     </div>
   `,
   styles: [`
     /* Your existing styles remain unchanged */
     .section-container {
       margin-bottom: 40px;
+    }
+
+    .recent-rail {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(140px, 170px);
+      gap: 12px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 16px 2px 8px;
+    }
+
+    .recent-card {
+      text-decoration: none;
+      scroll-snap-align: start;
+      display: grid;
+      gap: 6px;
+      background: var(--dt-card);
+      border: 1px solid var(--dt-line);
+      border-radius: var(--dt-radius-card);
+      padding: 10px;
+    }
+
+    .recent-card img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: var(--dt-radius-sm);
+      display: block;
+    }
+
+    .recent-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--dt-text-1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .recent-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--dt-accent-3);
     }
 
     .section-header {
@@ -341,6 +413,7 @@ export class ShopHomeComponent implements OnInit {
   featuredProducts: ProductInterface[] = [];
   newArrivals: ProductInterface[] = [];
   limitedEdition: ProductInterface[] = [];
+  recentlyViewed: RecentProduct[] = [];
   isLoading = true;
   loadError: string | null = null;
 
@@ -353,7 +426,18 @@ export class ShopHomeComponent implements OnInit {
 
   ngOnInit() {
     this.loadProducts();
+    this.loadRecents();
     this.getCurrentUser()
+  }
+
+  private loadRecents(): void {
+    try {
+      const raw = localStorage.getItem('dtv-recent-products');
+      const list = raw ? JSON.parse(raw) : [];
+      this.recentlyViewed = (Array.isArray(list) ? list : []).filter((i) => i?.id && i?.name);
+    } catch {
+      this.recentlyViewed = [];
+    }
   }
 
   private getCurrentUser() {

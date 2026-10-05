@@ -767,6 +767,7 @@ export class ProductDetailComponent implements OnInit {
     ).subscribe(product => {
       this.product = product;
       if (product) {
+        this.recordRecentView(product);
         if (product.name) this.documentTitle.setTitle(`${product.name} — DavidoTV`);
         if (product.variants && product.variants.length > 0) {
           this.selectedVariant = product.variants[0];
@@ -775,6 +776,25 @@ export class ProductDetailComponent implements OnInit {
         this.checkWishlistStatus(productId);
       }
     });
+  }
+
+  /** Recently-viewed trail for the store home rail (local only, cap 8). */
+  private recordRecentView(product: ProductInterface): void {
+    try {
+      const key = 'dtv-recent-products';
+      const raw = localStorage.getItem(key);
+      const list = raw ? JSON.parse(raw) : [];
+      const entry = {
+        id: product._id,
+        name: product.name,
+        image: product.images?.[0]?.url ?? '/img/store/shopping.png',
+        price: product.discountedPrice || product.price,
+      };
+      const next = [entry, ...(Array.isArray(list) ? list : []).filter((i: any) => i?.id !== entry.id)].slice(0, 8);
+      localStorage.setItem(key, JSON.stringify(next));
+    } catch {
+      // private mode: no trail persisted
+    }
   }
 
   loadRelatedProducts(productId: string) {
