@@ -57,6 +57,7 @@ import { ErrorStateComponent } from '../shared/components/error-state/error-stat
           <div class="event-badge" *ngIf="event.badge">
             <span [class]="'badge-' + event.badge.type">{{event.badge.text}}</span>
           </div>
+          <span *ngIf="daysUntil(event) as d" class="countdown" [class.hot]="d <= 7">{{ dayLabel(d) }}</span>
           @if (!isPastEvent(event)) {
             <div class="event-actions">
              <!--  <button mat-icon-button 
@@ -166,6 +167,19 @@ import { ErrorStateComponent } from '../shared/components/error-state/error-stat
       font-weight: 500;
       color: white;
     }
+    .countdown {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      padding: 0.25rem 0.625rem;
+      border-radius: var(--dt-radius-pill);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: white;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+    }
+    .countdown.hot { background: linear-gradient(135deg, #BE123C, #FB7185); }
     .event-badge .badge-primary { background-color: var(--dt-accent-2); }
     .event-badge .badge-accent { background-color: #ff4081; }
     .event-badge .badge-warn { background-color: #f44336; }
@@ -508,6 +522,19 @@ export class EventsListComponent implements OnInit, OnDestroy, OnChanges {
 
   isPastEvent(event: Event): boolean {
     return new Date(event.date) < new Date();
+  }
+
+  /** Whole days until the event (null when past); drives the countdown badge. */
+  daysUntil(event: Event): number | null {
+    const ms = new Date(event.date).getTime() - Date.now();
+    if (!isFinite(ms) || ms < 0) return null;
+    return Math.ceil(ms / 86400000);
+  }
+
+  dayLabel(d: number): string {
+    if (d <= 0) return 'Today';
+    if (d === 1) return 'Tomorrow';
+    return `in ${d}d`;
   }
 
    retry(): void {
